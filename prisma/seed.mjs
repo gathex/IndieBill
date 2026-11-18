@@ -33,6 +33,10 @@ async function main() {
       country: "US",
       language: "en",
       logoDataUrl: null,
+      qrName: "Northstar Studio",
+      qrVpa: "northstar@bank",
+      qrUpiId: "northstar@upi",
+      qrAccountNumber: "000123456789",
       passwordHash,
     },
     create: {
@@ -44,6 +48,10 @@ async function main() {
       country: "US",
       language: "en",
       logoDataUrl: null,
+      qrName: "Northstar Studio",
+      qrVpa: "northstar@bank",
+      qrUpiId: "northstar@upi",
+      qrAccountNumber: "000123456789",
       passwordHash,
     },
   });

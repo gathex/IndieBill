@@ -12,6 +12,10 @@ export async function getUserSettings(userId: string) {
       country: true,
       language: true,
       logoDataUrl: true,
+      qrName: true,
+      qrVpa: true,
+      qrUpiId: true,
+      qrAccountNumber: true,
     },
   });
 
@@ -28,6 +32,10 @@ export async function getUserSettings(userId: string) {
     country,
     language,
     logoDataUrl: user?.logoDataUrl ?? null,
+    qrName: user?.qrName ?? null,
+    qrVpa: user?.qrVpa ?? null,
+    qrUpiId: user?.qrUpiId ?? null,
+    qrAccountNumber: user?.qrAccountNumber ?? null,
     locale: `${language}-${country}`,
   };
 }

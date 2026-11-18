@@ -20,6 +20,10 @@ model User {
   country        String   @default("US")
   language       String   @default("en")
   logoDataUrl    String?
+  qrName          String?
+  qrVpa           String?
+  qrUpiId         String?
+  qrAccountNumber String?
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
 

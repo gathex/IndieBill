@@ -267,6 +267,10 @@ export async function sendInvoiceEmailAction(formData: FormData) {
     businessName: settings.businessName,
     dueDate: invoice.dueDate,
     paymentLink: invoice.paymentLink,
+    qrName: settings.qrName,
+    qrVpa: settings.qrVpa,
+    qrUpiId: settings.qrUpiId,
+    qrAccountNumber: settings.qrAccountNumber,
   });
 
   let skipped = false;

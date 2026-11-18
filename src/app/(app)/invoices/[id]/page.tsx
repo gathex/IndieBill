@@ -60,6 +60,10 @@ export default async function InvoiceDetailPage({
       businessName: settings.businessName,
       dueDate: invoice.dueDate,
       paymentLink: invoice.paymentLink,
+      qrName: settings.qrName,
+      qrVpa: settings.qrVpa,
+      qrUpiId: settings.qrUpiId,
+      qrAccountNumber: settings.qrAccountNumber,
     }),
   ]);
   const discount = computeInvoiceTotals({

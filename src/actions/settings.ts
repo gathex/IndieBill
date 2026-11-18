@@ -27,6 +27,10 @@ const settingsSchema = z.object({
   country: z.string().refine(isValidCountryCode, "Unsupported country"),
   language: z.string().refine(isValidLanguageCode, "Unsupported language"),
   logoDataUrl: logoDataUrlSchema.nullable(),
+  qrName: z.string().max(120).optional(),
+  qrVpa: z.string().max(120).optional(),
+  qrUpiId: z.string().max(120).optional(),
+  qrAccountNumber: z.string().max(60).optional(),
 });
 
 export type SettingsInput = z.infer<typeof settingsSchema>;
@@ -47,6 +51,10 @@ export async function updateSettings(input: SettingsInput) {
       country: data.country,
       language: data.language,
       logoDataUrl: data.logoDataUrl,
+      qrName: data.qrName?.trim() || null,
+      qrVpa: data.qrVpa?.trim() || null,
+      qrUpiId: data.qrUpiId?.trim() || null,
+      qrAccountNumber: data.qrAccountNumber?.trim() || null,
     },
   });
 

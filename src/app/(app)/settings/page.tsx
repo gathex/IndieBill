@@ -24,6 +24,10 @@ export default async function SettingsPage() {
       country: true,
       language: true,
       logoDataUrl: true,
+      qrName: true,
+      qrVpa: true,
+      qrUpiId: true,
+      qrAccountNumber: true,
     },
   });
 
@@ -47,6 +51,10 @@ export default async function SettingsPage() {
         country={country}
         language={language}
         logoDataUrl={user?.logoDataUrl ?? null}
+        qrName={user?.qrName ?? ""}
+        qrVpa={user?.qrVpa ?? ""}
+        qrUpiId={user?.qrUpiId ?? ""}
+        qrAccountNumber={user?.qrAccountNumber ?? ""}
         countries={getCountryOptions(locale)}
         currencies={getCurrencyOptions(locale)}
         languages={getLanguageOptions(locale)}

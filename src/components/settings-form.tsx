@@ -19,6 +19,10 @@ interface SettingsFormProps {
   country: string;
   language: string;
   logoDataUrl: string | null;
+  qrName: string;
+  qrVpa: string;
+  qrUpiId: string;
+  qrAccountNumber: string;
   countries: LocaleOption[];
   currencies: LocaleOption[];
   languages: LocaleOption[];
@@ -39,6 +43,10 @@ export function SettingsForm({
   country,
   language,
   logoDataUrl,
+  qrName,
+  qrVpa,
+  qrUpiId,
+  qrAccountNumber,
   countries,
   currencies,
   languages,
@@ -52,6 +60,10 @@ export function SettingsForm({
     country: fallbackCode(country, countries, "US"),
     language: fallbackCode(language, languages, "en"),
     logoDataUrl,
+    qrName,
+    qrVpa,
+    qrUpiId,
+    qrAccountNumber,
   });
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
@@ -205,6 +217,62 @@ export function SettingsForm({
           <p className="text-xs text-zinc-500">
             Language and country control date and number formatting on invoices,
             quotations, payments, and PDFs.
+          </p>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardContent className="space-y-4 pt-6">
+          <div>
+            <h2 className="text-lg font-semibold text-zinc-900">QR payment details</h2>
+            <p className="mt-1 text-sm text-zinc-500">
+              Used in invoice QR codes when there is no Stripe payment link.
+            </p>
+          </div>
+          <div className="grid gap-4 sm:grid-cols-2">
+            <div className="space-y-2">
+              <Label htmlFor="qrName">Name</Label>
+              <Input
+                id="qrName"
+                value={form.qrName}
+                onChange={(e) => update("qrName", e.target.value)}
+                placeholder="Payee name shown in the QR code"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="qrVpa">VPA</Label>
+              <Input
+                id="qrVpa"
+                value={form.qrVpa}
+                onChange={(e) => update("qrVpa", e.target.value)}
+                placeholder="name@bank"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="qrUpiId">UPI ID</Label>
+              <Input
+                id="qrUpiId"
+                value={form.qrUpiId}
+                onChange={(e) => update("qrUpiId", e.target.value)}
+                placeholder="name@upi"
+              />
+              <p className="text-xs text-zinc-500">
+                Used for the UPI payment link; takes priority over VPA.
+              </p>
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="qrAccountNumber">Account number</Label>
+              <Input
+                id="qrAccountNumber"
+                value={form.qrAccountNumber}
+                onChange={(e) => update("qrAccountNumber", e.target.value)}
+                placeholder="Bank account number"
+              />
+            </div>
+          </div>
+          <p className="text-xs text-zinc-500">
+            With a VPA or UPI ID the QR opens a UPI payment app. Otherwise it
+            shows these details as a payment request.
           </p>
         </CardContent>
       </Card>

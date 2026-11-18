@@ -14,7 +14,7 @@ A focused invoice app for freelancers. Each account has one business profile, cl
 - Downloadable PDF invoices and quotations
 - Full A4 HTML previews with print / Save as PDF support
 - Invoice sharing: native share sheet, copy link, email, and WhatsApp shortcuts
-- QR payment code on invoices, A4 previews, and downloaded PDFs
+- QR payment code on invoices, A4 previews, and downloaded PDFs, using Stripe links, UPI IDs/VPA, or editable payment details
 - Payment management: partial payments, methods, references, balances, and delete/recalculate
 - Email invoices and quotations with the PDF attached (via Resend)
 - Stripe payment links and webhook-based payment recording and status updates
@@ -78,6 +78,10 @@ All integrations are optional. The app remains usable without them; email and pa
 ### Share links
 
 `NEXT_PUBLIC_APP_URL` controls the origin used in invoice share links. Leave it as `http://localhost:3000` locally, and set it to your public domain before sharing invoices from a deployed instance. If it is blank, the app uses the incoming request host.
+
+### QR payment details
+
+In **Settings → QR payment details**, you can store a payee name, VPA, UPI ID, and account number. When an invoice has no Stripe payment link, a VPA or UPI ID produces a `upi://pay` QR (UPI ID takes priority); otherwise the QR contains readable payment-request text including the account number.
 
 ### Email delivery
 
