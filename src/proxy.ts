@@ -9,7 +9,7 @@ export const proxy = auth((req) => {
     nextUrl.pathname.startsWith("/login") ||
     nextUrl.pathname.startsWith("/register");
 
-  if ((isAuthPage || isPublicPage) && isLoggedIn) {
+  if (isAuthPage && isLoggedIn) {
     return NextResponse.redirect(new URL("/dashboard", nextUrl));
   }
 

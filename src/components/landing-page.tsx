@@ -293,7 +293,9 @@ function InvoiceMockup() {
   );
 }
 
-export function LandingPage() {
+export function LandingPage({ isLoggedIn = false }: { isLoggedIn?: boolean }) {
+  const appHref = isLoggedIn ? "/dashboard" : "/register";
+
   return (
     <div className="min-h-screen bg-white text-zinc-900">
       <header className="sticky top-0 z-50 border-b border-zinc-200/80 bg-white/85 backdrop-blur">
@@ -309,14 +311,16 @@ export function LandingPage() {
             <Link href="#faq" className="transition hover:text-zinc-900">FAQ</Link>
           </nav>
           <div className="flex items-center gap-2 sm:gap-3">
-            <Link href="/login" className="hidden rounded-md px-3 py-2 text-sm font-medium text-zinc-600 transition hover:text-zinc-900 sm:block">
-              Sign in
-            </Link>
+            {!isLoggedIn && (
+              <Link href="/login" className="hidden rounded-md px-3 py-2 text-sm font-medium text-zinc-600 transition hover:text-zinc-900 sm:block">
+                Sign in
+              </Link>
+            )}
             <Link
-              href="/register"
+              href={appHref}
               className="inline-flex items-center gap-2 rounded-md bg-zinc-900 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-zinc-700"
             >
-              Get started
+              {isLoggedIn ? "Go to dashboard" : "Get started"}
               <ArrowIcon className="h-4 w-4" />
             </Link>
           </div>
@@ -340,10 +344,10 @@ export function LandingPage() {
               </p>
               <div className="mt-8 flex flex-wrap items-center gap-3">
                 <Link
-                  href="/register"
+                  href={appHref}
                   className="inline-flex items-center gap-2 rounded-md bg-zinc-900 px-6 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-zinc-700"
                 >
-                  Start invoicing
+                  {isLoggedIn ? "Open dashboard" : "Start invoicing"}
                   <ArrowIcon />
                 </Link>
                 <Link
@@ -451,10 +455,10 @@ export function LandingPage() {
                 ))}
               </ul>
               <Link
-                href="/register"
+                href={appHref}
                 className="mt-9 inline-flex items-center gap-2 rounded-md bg-white px-5 py-3 text-sm font-semibold text-zinc-900 transition hover:bg-zinc-200"
               >
-                Try it yourself
+                {isLoggedIn ? "Open dashboard" : "Try it yourself"}
                 <ArrowIcon />
               </Link>
             </div>
@@ -509,10 +513,10 @@ export function LandingPage() {
               Set up your business profile, create your first document, and send it with a link, a PDF, or a QR code.
             </p>
             <Link
-              href="/register"
+              href={appHref}
               className="mt-8 inline-flex items-center gap-2 rounded-md bg-white px-6 py-3 text-sm font-semibold text-indigo-700 transition hover:bg-indigo-50"
             >
-              Create your account
+              {isLoggedIn ? "Open dashboard" : "Create your account"}
               <ArrowIcon />
             </Link>
           </div>
@@ -534,8 +538,12 @@ export function LandingPage() {
             <Link href="#features" className="transition hover:text-zinc-900">Features</Link>
             <Link href="#how-it-works" className="transition hover:text-zinc-900">How it works</Link>
             <Link href="#faq" className="transition hover:text-zinc-900">FAQ</Link>
-            <Link href="/login" className="transition hover:text-zinc-900">Sign in</Link>
-            <Link href="/register" className="transition hover:text-zinc-900">Get started</Link>
+            {!isLoggedIn && (
+              <Link href="/login" className="transition hover:text-zinc-900">Sign in</Link>
+            )}
+            <Link href={appHref} className="transition hover:text-zinc-900">
+              {isLoggedIn ? "Dashboard" : "Get started"}
+            </Link>
           </nav>
         </div>
         <div className="border-t border-zinc-100">
