@@ -51,9 +51,12 @@ export function InvoiceFormClient({
   const isEdit = Boolean(invoice);
 
   const [clientId, setClientId] = useState(invoice?.clientId ?? clients[0]?.id ?? "");
-  const [status, setStatus] = useState<InvoiceStatus>(
-    (invoice?.status as InvoiceStatus) ?? "DRAFT",
-  );
+  const [status, setStatus] = useState<InvoiceStatus>(() => {
+    const initial = invoice?.status;
+    return initial === "PARTIAL" || initial === "OVERDUE"
+      ? "SENT"
+      : ((initial as InvoiceStatus) ?? "DRAFT");
+  });
   const [issueDate, setIssueDate] = useState(
     invoice?.issueDate ? invoice.issueDate.slice(0, 10) : new Date().toISOString().slice(0, 10),
   );
@@ -121,7 +124,8 @@ export function InvoiceFormClient({
         items: cleanedItems,
       };
 
-  const statusValue = status === "OVERDUE" ? "SENT" : status;
+  const statusValue =
+    status === "PARTIAL" || status === "OVERDUE" ? "SENT" : status;
 
       const result = invoice
         ? await updateInvoice(invoice.id, {

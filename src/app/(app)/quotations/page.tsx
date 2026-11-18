@@ -159,6 +159,9 @@ export default async function QuotationsPage({
                             <Link href={`/quotations/${quotation.id}`}>
                               <Button variant="ghost" size="sm">View</Button>
                             </Link>
+                            <Link href={`/quotations/${quotation.id}/preview`}>
+                              <Button variant="ghost" size="sm">Preview</Button>
+                            </Link>
                             {quotation.status !== "CONVERTED" ? (
                               <>
                                 <Link href={`/quotations/${quotation.id}/edit`}>

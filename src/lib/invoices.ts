@@ -1,6 +1,12 @@
 import { prisma } from "./db";
 
-export const INVOICE_STATUSES = ["DRAFT", "SENT", "PAID", "OVERDUE"] as const;
+export const INVOICE_STATUSES = [
+  "DRAFT",
+  "SENT",
+  "PARTIAL",
+  "PAID",
+  "OVERDUE",
+] as const;
 export type InvoiceStatus = (typeof INVOICE_STATUSES)[number];
 
 export function round2(n: number): number {
@@ -31,7 +37,11 @@ export function computeInvoiceTotals(input: {
 export async function getUserInvoices(userId: string) {
   return prisma.invoice.findMany({
     where: { userId },
-    include: { client: true, items: true },
+    include: {
+      client: true,
+      items: true,
+      payments: { orderBy: { paymentDate: "desc" } },
+    },
     orderBy: { issueDate: "desc" },
   });
 }
@@ -39,7 +49,11 @@ export async function getUserInvoices(userId: string) {
 export async function getInvoiceById(id: string, userId: string) {
   return prisma.invoice.findFirst({
     where: { id, userId },
-    include: { client: true, items: true },
+    include: {
+      client: true,
+      items: true,
+      payments: { orderBy: { paymentDate: "desc" } },
+    },
   });
 }
 
@@ -60,6 +74,7 @@ export function effectiveStatus(
   dueDate: Date | string | null | undefined,
 ): InvoiceStatus {
   if (status === "PAID") return "PAID";
+  if (status === "PARTIAL") return "PARTIAL";
   if (status === "DRAFT") return "DRAFT";
   const isOverdue =
     dueDate != null && new Date(dueDate).getTime() < Date.now();

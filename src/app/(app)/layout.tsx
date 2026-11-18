@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 const navItems = [
   { href: "/dashboard", label: "Dashboard" },
   { href: "/invoices", label: "Invoices" },
+  { href: "/payments", label: "Payments" },
   { href: "/quotations", label: "Quotations" },
   { href: "/clients", label: "Clients" },
   { href: "/settings", label: "Settings" },
@@ -14,7 +15,7 @@ const navItems = [
 export default function AppLayout({ children }: { children: ReactNode }) {
   return (
     <div className="min-h-screen bg-zinc-50">
-      <header className="border-b border-zinc-200 bg-white">
+      <header className="print:hidden border-b border-zinc-200 bg-white">
         <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-4 px-6 py-4">
           <Link href="/dashboard" className="text-lg font-bold tracking-tight text-zinc-900">
             Invoicely

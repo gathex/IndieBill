@@ -7,6 +7,7 @@ import { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/db";
 import { auth } from "@/auth";
 import { computeInvoiceTotals, createInvoiceNumber, round2 } from "@/lib/invoices";
+import { derivePaymentStatus, getInvoiceBalance } from "@/lib/payments";
 import { sendInvoiceEmail } from "@/lib/email";
 import { createPaymentLink } from "@/lib/stripe";
 import { renderInvoicePdf } from "@/lib/pdf";
@@ -45,6 +46,7 @@ async function requireUserId(): Promise<string> {
 function revalidateInvoices() {
   revalidatePath("/dashboard");
   revalidatePath("/invoices");
+  revalidatePath("/payments");
   revalidatePath("/clients");
 }
 
@@ -148,19 +150,29 @@ export async function updateInvoice(id: string, input: InvoiceInput) {
   const userId = await requireUserId();
   const data = invoiceSchema.parse(input);
 
-  const existing = await prisma.invoice.findFirst({ where: { id, userId } });
+  const existing = await prisma.invoice.findFirst({
+    where: { id, userId },
+    include: { payments: true },
+  });
   if (!existing) throw new Error("Invoice not found.");
 
   const client = await prisma.client.findFirst({ where: { id: data.clientId, userId } });
   if (!client) throw new Error("Client not found.");
 
   const totals = calculateTotals(data);
+  const paymentStatus = derivePaymentStatus(totals.total, existing.payments);
+  const nextStatus =
+    paymentStatus === "PAID"
+      ? "PAID"
+      : paymentStatus === "PARTIAL"
+        ? "PARTIAL"
+        : data.status;
 
   await prisma.invoice.update({
     where: { id },
     data: {
       clientId: client.id,
-      status: data.status,
+      status: nextStatus,
       issueDate: new Date(`${data.issueDate}T00:00:00`),
       dueDate: data.dueDate ? new Date(`${data.dueDate}T00:00:00`) : null,
       subtotal: totals.subtotal,
@@ -192,11 +204,34 @@ export async function setInvoiceStatus(formData: FormData) {
     .enum(["DRAFT", "SENT", "PAID"])
     .parse(String(formData.get("status") ?? "SENT"));
   const userId = await requireUserId();
-  const invoice = await prisma.invoice.findFirst({ where: { id, userId } });
+  const invoice = await prisma.invoice.findFirst({
+    where: { id, userId },
+    include: { payments: true },
+  });
   if (!invoice) throw new Error("Invoice not found.");
 
-  await prisma.invoice.update({ where: { id }, data: { status } });
+  if (status === "PAID") {
+    const balance = getInvoiceBalance(invoice.total, invoice.payments);
+    if (balance > 0) {
+      await prisma.payment.create({
+        data: {
+          userId,
+          invoiceId: id,
+          amount: balance,
+          method: "MANUAL",
+          notes: "Recorded when the invoice was marked as paid.",
+        },
+      });
+    }
+  }
+
+  const derived = derivePaymentStatus(invoice.total, invoice.payments);
+  const nextStatus =
+    status === "PAID" ? "PAID" : derived === "PARTIAL" ? "PARTIAL" : status;
+
+  await prisma.invoice.update({ where: { id }, data: { status: nextStatus } });
   revalidateInvoices();
+  revalidatePath("/payments");
   revalidatePath(`/invoices/${id}`);
 }
 
@@ -260,15 +295,21 @@ export async function sendInvoiceEmailAction(formData: FormData) {
 
 export async function createPaymentLinkForInvoice(invoiceId: string) {
   const userId = await requireUserId();
-  const invoice = await prisma.invoice.findFirst({ where: { id: invoiceId, userId } });
+  const invoice = await prisma.invoice.findFirst({
+    where: { id: invoiceId, userId },
+    include: { payments: true },
+  });
   if (!invoice) throw new Error("Invoice not found.");
   if (invoice.paymentLink) return invoice.paymentLink;
+
+  const balance = getInvoiceBalance(invoice.total, invoice.payments);
+  if (balance <= 0) throw new Error("Invoice is already paid.");
 
   const settings = await getUserSettings(userId);
   const paymentLink = await createPaymentLink({
     invoiceId: invoice.id,
     invoiceNumber: invoice.number,
-    amount: invoice.total,
+    amount: balance,
     currency: settings.currency,
   });
   if (paymentLink) {

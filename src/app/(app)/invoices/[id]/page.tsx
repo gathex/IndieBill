@@ -2,6 +2,12 @@ import { notFound, redirect } from "next/navigation";
 import Link from "next/link";
 import { auth } from "@/auth";
 import { getInvoiceById, effectiveStatus, computeInvoiceTotals } from "@/lib/invoices";
+import {
+  getInvoiceBalance,
+  sumPayments,
+  PAYMENT_METHOD_LABELS,
+  type PaymentMethod,
+} from "@/lib/payments";
 import { formatCurrency, formatDate } from "@/lib/utils";
 import { getUserSettings } from "@/lib/users";
 import { InvoiceStatusBadge } from "@/components/invoice-status-badge";
@@ -17,6 +23,7 @@ import type { InvoicePdfData } from "@/components/invoice-document";
 import { CreatePaymentLinkButton } from "@/components/payment-link-button";
 import { ConfirmSubmitButton } from "@/components/confirm-submit-button";
 import { Notice } from "@/components/notice";
+import { PaymentForm } from "@/components/payment-form";
 
 export default async function InvoiceDetailPage({
   params,
@@ -37,6 +44,8 @@ export default async function InvoiceDetailPage({
   const settings = await getUserSettings(userId);
   const money = (amount: number) => formatCurrency(amount, settings.currency);
   const status = effectiveStatus(invoice.status, invoice.dueDate);
+  const paid = sumPayments(invoice.payments);
+  const balance = getInvoiceBalance(invoice.total, invoice.payments);
   const discount = computeInvoiceTotals({
     subtotal: invoice.subtotal,
     discountPercent: invoice.discountPercent,
@@ -84,6 +93,9 @@ export default async function InvoiceDetailPage({
           </div>
         </div>
         <div className="flex gap-2">
+          <Link href={`/invoices/${invoice.id}/preview`}>
+            <Button variant="outline">Preview A4</Button>
+          </Link>
           <Link href={`/invoices/${invoice.id}/edit`}>
             <Button variant="outline">Edit</Button>
           </Link>
@@ -225,28 +237,95 @@ export default async function InvoiceDetailPage({
           </Card>
 
           <Card>
-            <CardHeader>
-              <CardTitle>Payment</CardTitle>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
+              <CardTitle>Payments</CardTitle>
+              <Link href="/payments">
+                <Button variant="ghost" size="sm">All payments</Button>
+              </Link>
             </CardHeader>
-            <CardContent className="space-y-3">
-              {invoice.paymentLink ? (
+            <CardContent className="space-y-4">
+              <div className="grid grid-cols-3 gap-2 rounded-md bg-zinc-50 p-3">
+                <div>
+                  <div className="text-[10px] font-semibold uppercase tracking-wide text-zinc-500">
+                    Total
+                  </div>
+                  <div className="mt-1 text-sm font-semibold text-zinc-900">{money(invoice.total)}</div>
+                </div>
+                <div>
+                  <div className="text-[10px] font-semibold uppercase tracking-wide text-zinc-500">
+                    Received
+                  </div>
+                  <div className="mt-1 text-sm font-semibold text-emerald-700">{money(paid)}</div>
+                </div>
+                <div>
+                  <div className="text-[10px] font-semibold uppercase tracking-wide text-zinc-500">
+                    Balance
+                  </div>
+                  <div className="mt-1 text-sm font-semibold text-zinc-900">{money(balance)}</div>
+                </div>
+              </div>
+
+              {invoice.payments.length > 0 ? (
                 <div className="space-y-2">
-                  <p className="text-sm text-zinc-600">Share this link with your client:</p>
-                  <a
-                    href={invoice.paymentLink}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="block break-all text-sm text-zinc-900 underline"
-                  >
-                    {invoice.paymentLink}
-                  </a>
+                  <div className="text-xs font-medium uppercase tracking-wide text-zinc-500">
+                    Payment history
+                  </div>
+                  {invoice.payments.map((payment) => (
+                    <div
+                      key={payment.id}
+                      className="flex items-center justify-between gap-3 border-b border-zinc-100 pb-2 text-sm last:border-0 last:pb-0"
+                    >
+                      <div>
+                        <div className="font-medium text-zinc-900">{money(payment.amount)}</div>
+                        <div className="text-xs text-zinc-500">
+                          {formatDate(payment.paymentDate)} ·{" "}
+                          {PAYMENT_METHOD_LABELS[payment.method as PaymentMethod] ?? payment.method}
+                          {payment.reference ? ` · ${payment.reference}` : ""}
+                        </div>
+                      </div>
+                    </div>
+                  ))}
                 </div>
               ) : (
-                <p className="text-sm text-zinc-500">
-                  No payment link yet. Create one to let your client pay online.
+                <p className="text-sm text-zinc-500">No payments recorded yet.</p>
+              )}
+
+              {balance > 0 ? (
+                <div className="border-t border-zinc-200 pt-4">
+                  <PaymentForm
+                    invoiceId={invoice.id}
+                    balance={balance}
+                    currency={settings.currency}
+                  />
+                </div>
+              ) : (
+                <p className="rounded-md bg-emerald-50 px-3 py-2 text-sm text-emerald-800">
+                  Paid in full. Thank you!
                 </p>
               )}
-              <CreatePaymentLinkButton invoiceId={invoice.id} />
+
+              {balance > 0 ? (
+                <div className="space-y-3 border-t border-zinc-200 pt-4">
+                  {invoice.paymentLink ? (
+                    <div className="space-y-2">
+                      <p className="text-sm text-zinc-600">Share this link with your client:</p>
+                      <a
+                        href={invoice.paymentLink}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="block break-all text-sm text-zinc-900 underline"
+                      >
+                        {invoice.paymentLink}
+                      </a>
+                    </div>
+                  ) : (
+                    <p className="text-sm text-zinc-500">
+                      No payment link yet. Create one to let your client pay online.
+                    </p>
+                  )}
+                  <CreatePaymentLinkButton invoiceId={invoice.id} />
+                </div>
+              ) : null}
             </CardContent>
           </Card>
         </div>

@@ -12,8 +12,10 @@ A focused invoice app for freelancers. Each account has one business profile, cl
 - One-click conversion of an accepted quotation into a draft invoice
 - Line items, discounts, tax, automatic totals, due dates, and overdue detection
 - Downloadable PDF invoices and quotations
+- Full A4 HTML previews with print / Save as PDF support
+- Payment management: partial payments, methods, references, balances, and delete/recalculate
 - Email invoices and quotations with the PDF attached (via Resend)
-- Stripe payment links and webhook-based paid status updates
+- Stripe payment links and webhook-based payment recording and status updates
 - Business name, address, and currency settings
 - Dashboard with outstanding, received, overdue, and draft metrics
 
@@ -51,7 +53,7 @@ Email:    test@example.com
 Password: password123
 ```
 
-The seed is idempotent, so you can run it again to restore the sample clients, invoices, and quotations.
+The seed is idempotent, so you can run it again to restore the sample clients, invoices, quotations, and payments.
 
 ## Scripts
 
@@ -81,7 +83,7 @@ Set `STRIPE_SECRET_KEY` and `STRIPE_WEBHOOK_SECRET`. Add a Stripe webhook pointi
 https://your-domain.com/api/stripe/webhook
 ```
 
-Subscribe it to `checkout.session.completed`. When a client pays, the invoice is automatically marked as paid.
+Subscribe it to `checkout.session.completed`. When a client pays, a Stripe payment is recorded and the invoice status is updated to partial or paid based on the outstanding balance.
 
 ### Google sign-in
 

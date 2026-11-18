@@ -89,6 +89,9 @@ export default async function QuotationDetailPage({
           </div>
         </div>
         <div className="flex gap-2">
+          <Link href={`/quotations/${quotation.id}/preview`}>
+            <Button variant="outline">Preview A4</Button>
+          </Link>
           {quotation.status !== "CONVERTED" ? (
             <Link href={`/quotations/${quotation.id}/edit`}>
               <Button variant="outline">Edit</Button>

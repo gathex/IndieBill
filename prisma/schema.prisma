@@ -25,6 +25,7 @@ model User {
   clients    Client[]
   invoices   Invoice[]
   quotations Quotation[]
+  payments   Payment[]
 }
 
 model Account {
@@ -96,6 +97,7 @@ model Invoice {
   client      Client  @relation(fields: [clientId], references: [id], onDelete: Cascade)
   items       InvoiceItem[]
   quotations  Quotation[]
+  payments    Payment[]
 
   @@unique([userId, number])
   @@index([userId, clientId])
@@ -145,4 +147,22 @@ model QuotationItem {
   rate        Float     @default(0)
   amount      Float     @default(0)
   quotation   Quotation @relation(fields: [quotationId], references: [id], onDelete: Cascade)
+}
+
+model Payment {
+  id          String   @id @default(cuid())
+  userId      String
+  invoiceId   String
+  amount      Float
+  paymentDate DateTime @default(now())
+  method      String   @default("MANUAL")
+  reference   String?
+  notes       String?
+  createdAt   DateTime @default(now())
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  invoice     Invoice  @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
+
+  @@unique([invoiceId, reference])
+  @@index([userId, paymentDate])
+  @@index([userId, invoiceId])
 }

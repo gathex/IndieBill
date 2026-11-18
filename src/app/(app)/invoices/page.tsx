@@ -2,6 +2,7 @@ import { redirect } from "next/navigation";
 import Link from "next/link";
 import { auth } from "@/auth";
 import { getUserInvoices, effectiveStatus } from "@/lib/invoices";
+import { getInvoiceBalance } from "@/lib/payments";
 import { formatCurrency, formatDate } from "@/lib/utils";
 import { getUserSettings } from "@/lib/users";
 import { InvoiceStatusBadge } from "@/components/invoice-status-badge";
@@ -21,6 +22,7 @@ const statusFilters = [
   { value: "ALL", label: "All" },
   { value: "DRAFT", label: "Draft" },
   { value: "SENT", label: "Sent" },
+  { value: "PARTIAL", label: "Partial" },
   { value: "PAID", label: "Paid" },
   { value: "OVERDUE", label: "Overdue" },
 ];
@@ -122,6 +124,7 @@ export default async function InvoicesPage({
                 <tbody>
                   {filtered.map((invoice) => {
                     const invoiceStatus = effectiveStatus(invoice.status, invoice.dueDate);
+                    const balance = getInvoiceBalance(invoice.total, invoice.payments);
                     return (
                       <tr key={invoice.id} className="border-b last:border-0">
                         <td className="py-3 pr-4 font-medium text-zinc-900">
@@ -138,6 +141,11 @@ export default async function InvoicesPage({
                         <td className="py-3 pr-4 text-zinc-600">{formatDate(invoice.dueDate)}</td>
                         <td className="py-3 pr-4 text-right font-medium text-zinc-900">
                           {money(invoice.total)}
+                          {balance > 0 && balance < invoice.total ? (
+                            <span className="mt-0.5 block text-xs font-normal text-amber-700">
+                              {money(balance)} due
+                            </span>
+                          ) : null}
                         </td>
                         <td className="py-3 pr-4">
                           <InvoiceStatusBadge status={invoiceStatus} />
@@ -146,6 +154,9 @@ export default async function InvoicesPage({
                           <div className="flex justify-end gap-1">
                             <Link href={`/invoices/${invoice.id}`}>
                               <Button variant="ghost" size="sm">View</Button>
+                            </Link>
+                            <Link href={`/invoices/${invoice.id}/preview`}>
+                              <Button variant="ghost" size="sm">Preview</Button>
                             </Link>
                             <Link href={`/invoices/${invoice.id}/edit`}>
                               <Button variant="ghost" size="sm">Edit</Button>

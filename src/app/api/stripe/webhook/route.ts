@@ -1,7 +1,7 @@
 import { revalidatePath } from "next/cache";
 import { NextResponse } from "next/server";
 import Stripe from "stripe";
-import { prisma } from "@/lib/db";
+import { recordStripePayment } from "@/lib/payments";
 
 export const runtime = "nodejs";
 
@@ -37,16 +37,19 @@ export async function POST(request: Request) {
     const session = event.data.object as Stripe.Checkout.Session;
     const invoiceId = session.metadata?.invoiceId;
     if (invoiceId) {
-      const invoice = await prisma.invoice.findUnique({ where: { id: invoiceId } });
-      if (invoice && invoice.status !== "PAID") {
-        await prisma.invoice.update({
-          where: { id: invoiceId },
-          data: { status: "PAID" },
-        });
-        revalidatePath("/dashboard");
-        revalidatePath("/invoices");
-        revalidatePath(`/invoices/${invoiceId}`);
-      }
+      const amount =
+        typeof session.amount_total === "number" && session.amount_total > 0
+          ? session.amount_total / 100
+          : undefined;
+      await recordStripePayment({
+        invoiceId,
+        amount,
+        reference: session.id,
+      });
+      revalidatePath("/dashboard");
+      revalidatePath("/invoices");
+      revalidatePath("/payments");
+      revalidatePath(`/invoices/${invoiceId}`);
     }
   }
 

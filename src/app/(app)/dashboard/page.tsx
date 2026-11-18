@@ -2,6 +2,7 @@ import { redirect } from "next/navigation";
 import Link from "next/link";
 import { auth } from "@/auth";
 import { getUserInvoices, effectiveStatus } from "@/lib/invoices";
+import { getInvoiceBalance, sumPayments } from "@/lib/payments";
 import { getUserQuotations, effectiveQuotationStatus } from "@/lib/quotations";
 import { formatCurrency, formatDate } from "@/lib/utils";
 import { getUserSettings } from "@/lib/users";
@@ -31,15 +32,17 @@ export default async function DashboardPage() {
 
   for (const invoice of invoices) {
     const status = effectiveStatus(invoice.status, invoice.dueDate);
-    if (status === "PAID") {
-      if (invoice.updatedAt >= monthStart) paidThisMonth += invoice.total;
-    } else if (status !== "DRAFT") {
-      outstanding += invoice.total;
-      outstandingCount += 1;
-      if (status === "OVERDUE") {
-        overdueCount += 1;
-        overdueAmount += invoice.total;
-      }
+    const balance = getInvoiceBalance(invoice.total, invoice.payments);
+    paidThisMonth += sumPayments(
+      invoice.payments.filter((payment) => payment.paymentDate >= monthStart),
+    );
+
+    if (status === "PAID" || status === "DRAFT") continue;
+    outstanding += balance;
+    outstandingCount += 1;
+    if (status === "OVERDUE") {
+      overdueCount += 1;
+      overdueAmount += balance;
     }
   }
 
@@ -59,6 +62,9 @@ export default async function DashboardPage() {
         <div className="flex gap-2">
           <Link href="/invoices/new">
             <Button>New invoice</Button>
+          </Link>
+          <Link href="/payments">
+            <Button variant="outline">Payments</Button>
           </Link>
           <Link href="/quotations/new">
             <Button variant="outline">New quotation</Button>
@@ -85,7 +91,7 @@ export default async function DashboardPage() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-zinc-900">{money(paidThisMonth)}</div>
-            <p className="mt-1 text-xs text-zinc-500">Marked as paid</p>
+            <p className="mt-1 text-xs text-zinc-500">Payments recorded</p>
           </CardContent>
         </Card>
         <Card>

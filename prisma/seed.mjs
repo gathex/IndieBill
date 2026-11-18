@@ -106,7 +106,7 @@ async function main() {
       id: "seed-invoice-0002",
       number: "INV-0002",
       clientKey: "globex",
-      status: "SENT",
+      status: "PARTIAL",
       issueDays: -10,
       dueDays: 20,
       discountPercent: 5,
@@ -163,6 +163,8 @@ async function main() {
     },
   ];
 
+  const invoices = {};
+
   for (const spec of invoiceSpecs) {
     const itemData = spec.items.map((item) => ({
       description: item.description,
@@ -186,7 +188,7 @@ async function main() {
       notes: spec.notes,
     };
 
-    await prisma.invoice.upsert({
+    invoices[spec.number] = await prisma.invoice.upsert({
       where: { id: spec.id },
       update: {
         ...data,
@@ -198,6 +200,51 @@ async function main() {
         ...data,
         items: { create: itemData },
       },
+    });
+  }
+
+  const paymentSpecs = [
+    {
+      id: "seed-payment-0001",
+      invoiceNumber: "INV-0001",
+      ratio: 1,
+      method: "BANK_TRANSFER",
+      reference: "WIRE-1042",
+      notes: "Final payment received in full.",
+      daysAgo: 16,
+    },
+    {
+      id: "seed-payment-0002",
+      invoiceNumber: "INV-0002",
+      ratio: 0.25,
+      method: "BANK_TRANSFER",
+      reference: "DEPOSIT-2002",
+      notes: "Initial deposit received.",
+      daysAgo: 6,
+    },
+  ];
+
+  for (const spec of paymentSpecs) {
+    const invoice = invoices[spec.invoiceNumber];
+    const data = {
+      userId: user.id,
+      invoiceId: invoice.id,
+      amount: round2(invoice.total * spec.ratio),
+      paymentDate: dateFromNow(-spec.daysAgo),
+      method: spec.method,
+      reference: spec.reference,
+      notes: spec.notes,
+    };
+
+    await prisma.payment.upsert({
+      where: {
+        invoiceId_reference: {
+          invoiceId: invoice.id,
+          reference: spec.reference,
+        },
+      },
+      update: data,
+      create: { id: spec.id, ...data },
     });
   }
 
@@ -299,14 +346,15 @@ async function main() {
     });
   }
 
-  const [clientCount, invoiceCount, quotationCount] = await Promise.all([
+  const [clientCount, invoiceCount, quotationCount, paymentCount] = await Promise.all([
     prisma.client.count({ where: { userId: user.id } }),
     prisma.invoice.count({ where: { userId: user.id } }),
     prisma.quotation.count({ where: { userId: user.id } }),
+    prisma.payment.count({ where: { userId: user.id } }),
   ]);
 
   console.log(
-    `Seeded ${clientCount} clients, ${invoiceCount} invoices, and ${quotationCount} quotations for ${user.email}.`,
+    `Seeded ${clientCount} clients, ${invoiceCount} invoices, ${quotationCount} quotations, and ${paymentCount} payments for ${user.email}.`,
   );
 }
 
