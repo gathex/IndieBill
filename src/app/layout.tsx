@@ -17,7 +17,8 @@ export const metadata: Metadata = {
     default: "Invoicely",
     template: "%s · Invoicely",
   },
-  description: "Simple, beautiful invoicing for freelancers.",
+  description:
+    "Create professional invoices and quotations, share them anywhere, accept UPI or Stripe payments, and track every balance in one workspace built for freelancers.",
 };
 
 export default function RootLayout({
