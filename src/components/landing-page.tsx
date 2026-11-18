@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { ThemeToggle } from "@/components/theme-toggle";
+import { LandingDemo } from "@/components/landing-demo";
 
 type IconProps = { className?: string };
 
@@ -308,6 +309,7 @@ export function LandingPage({ isLoggedIn = false }: { isLoggedIn?: boolean }) {
           <nav className="hidden items-center gap-7 text-sm font-medium text-zinc-600 dark:text-zinc-400 md:flex" aria-label="Main navigation">
             <Link href="#features" className="transition hover:text-zinc-900 dark:hover:text-zinc-50">Features</Link>
             <Link href="#how-it-works" className="transition hover:text-zinc-900 dark:hover:text-zinc-50">How it works</Link>
+            <Link href="#demo" className="transition hover:text-zinc-900 dark:hover:text-zinc-50">Demo</Link>
             <Link href="#payments" className="transition hover:text-zinc-900 dark:hover:text-zinc-50">Payments</Link>
             <Link href="#faq" className="transition hover:text-zinc-900 dark:hover:text-zinc-50">FAQ</Link>
           </nav>
@@ -359,6 +361,10 @@ export function LandingPage({ isLoggedIn = false }: { isLoggedIn?: boolean }) {
                   See how it works
                 </Link>
               </div>
+              <Link href="#demo" className="mt-4 inline-flex items-center gap-1.5 text-sm font-medium text-indigo-600 dark:text-indigo-400 transition hover:text-indigo-700 dark:hover:text-indigo-300">
+                Explore the interactive demo
+                <ArrowIcon className="h-3.5 w-3.5" />
+              </Link>
               <div className="mt-7 flex flex-wrap items-center gap-x-6 gap-y-2 text-sm text-zinc-500 dark:text-zinc-400">
                 <span className="flex items-center gap-2"><CheckIcon className="h-4 w-4 text-emerald-500" /> No credit card needed</span>
                 <span className="flex items-center gap-2"><CheckIcon className="h-4 w-4 text-emerald-500" /> Ready in minutes</span>
@@ -428,6 +434,21 @@ export function LandingPage({ isLoggedIn = false }: { isLoggedIn?: boolean }) {
                 </div>
               ))}
             </div>
+          </div>
+        </section>
+
+        <section id="demo" className="scroll-mt-20 border-y border-zinc-100 dark:border-zinc-800 bg-white py-20 sm:py-24 dark:bg-zinc-900">
+          <div className="mx-auto max-w-6xl px-6">
+            <div className="mx-auto max-w-2xl text-center">
+              <p className="text-sm font-semibold uppercase tracking-[0.18em] text-indigo-600 dark:text-indigo-400">Interactive demo</p>
+              <h2 className="mt-3 text-3xl font-semibold tracking-tight text-zinc-900 dark:text-zinc-100 sm:text-4xl">
+                Take Invoicely for a spin.
+              </h2>
+              <p className="mt-4 text-base leading-8 text-zinc-600 dark:text-zinc-400">
+                Switch between an invoice, a quotation, and your payments dashboard to see how the whole flow fits together. No account needed to look around.
+              </p>
+            </div>
+            <LandingDemo appHref={appHref} isLoggedIn={isLoggedIn} />
           </div>
         </section>
 
@@ -539,6 +560,7 @@ export function LandingPage({ isLoggedIn = false }: { isLoggedIn?: boolean }) {
           <nav className="flex flex-wrap gap-x-8 gap-y-3 text-sm text-zinc-600 dark:text-zinc-400" aria-label="Footer navigation">
             <Link href="#features" className="transition hover:text-zinc-900 dark:hover:text-zinc-50">Features</Link>
             <Link href="#how-it-works" className="transition hover:text-zinc-900 dark:hover:text-zinc-50">How it works</Link>
+            <Link href="#demo" className="transition hover:text-zinc-900 dark:hover:text-zinc-50">Demo</Link>
             <Link href="#faq" className="transition hover:text-zinc-900 dark:hover:text-zinc-50">FAQ</Link>
             {!isLoggedIn && (
               <Link href="/login" className="transition hover:text-zinc-900 dark:hover:text-zinc-50">Sign in</Link>
@@ -549,7 +571,7 @@ export function LandingPage({ isLoggedIn = false }: { isLoggedIn?: boolean }) {
           </nav>
         </div>
         <div className="border-t border-zinc-100 dark:border-zinc-800">
-          <div className="mx-auto max-w-6xl px-6 py-5 text-xs text-zinc-400">
+          <div className="mx-auto max-w-6xl px-6 py-5 text-xs text-zinc-400 dark:text-zinc-500">
             © {new Date().getFullYear()} Invoicely. Built for the work you do.
           </div>
         </div>
