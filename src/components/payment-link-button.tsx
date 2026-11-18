@@ -33,20 +33,20 @@ export function CreatePaymentLinkButton({ invoiceId }: { invoiceId: string }) {
         type="button"
         onClick={handleCreate}
         disabled={loading}
-        className="inline-flex h-9 items-center justify-center rounded-md border border-zinc-300 bg-white px-4 py-2 text-sm font-medium shadow-sm transition-colors hover:bg-zinc-50 disabled:pointer-events-none disabled:opacity-50"
+        className="inline-flex h-9 items-center justify-center rounded-md border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-900 px-4 py-2 text-sm font-medium shadow-sm transition-colors hover:bg-zinc-50 dark:hover:bg-zinc-800 disabled:pointer-events-none disabled:opacity-50"
       >
         {loading ? "Creating…" : "Create payment link"}
       </button>
-      {error ? <p className="text-xs text-red-600">{error}</p> : null}
+      {error ? <p className="text-xs text-red-600 dark:text-red-400">{error}</p> : null}
       {link ? (
         <div className="space-y-2">
-          <p className="text-xs text-zinc-600">Payment link created:</p>
+          <p className="text-xs text-zinc-600 dark:text-zinc-400">Payment link created:</p>
           <div className="flex items-start gap-2">
             <a
               href={link}
               target="_blank"
               rel="noopener noreferrer"
-              className="break-all text-sm text-zinc-900 underline"
+              className="break-all text-sm text-zinc-900 dark:text-zinc-100 underline"
             >
               {link}
             </a>
@@ -55,7 +55,7 @@ export function CreatePaymentLinkButton({ invoiceId }: { invoiceId: string }) {
               onClick={() => {
                 void navigator.clipboard.writeText(link).catch(() => undefined);
               }}
-              className="text-xs font-medium text-zinc-600 underline"
+              className="text-xs font-medium text-zinc-600 dark:text-zinc-400 underline"
             >
               Copy
             </button>
@@ -67,7 +67,7 @@ export function CreatePaymentLinkButton({ invoiceId }: { invoiceId: string }) {
         onClick={() => {
           router.refresh();
         }}
-        className="text-xs text-zinc-500 underline"
+        className="text-xs text-zinc-500 dark:text-zinc-400 underline"
       >
         Refresh
       </button>

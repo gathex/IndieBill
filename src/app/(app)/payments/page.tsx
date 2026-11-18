@@ -38,8 +38,8 @@ export default async function PaymentsPage({
       <Notice notice={notice} />
       <div className="flex flex-wrap items-center justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-semibold tracking-tight text-zinc-900">Payments</h1>
-          <p className="mt-1 text-sm text-zinc-500">
+          <h1 className="text-3xl font-semibold tracking-tight text-zinc-900 dark:text-zinc-100">Payments</h1>
+          <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400">
             {payments.length} payment(s) · {money(totalReceived)} received
           </p>
         </div>
@@ -51,14 +51,14 @@ export default async function PaymentsPage({
       <Card>
         <CardContent className="pt-6">
           {payments.length === 0 ? (
-            <div className="py-12 text-center text-sm text-zinc-500">
+            <div className="py-12 text-center text-sm text-zinc-500 dark:text-zinc-400">
               No payments recorded yet. Record one from any invoice.
             </div>
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
                 <thead>
-                  <tr className="border-b text-left text-xs uppercase tracking-wide text-zinc-500">
+                  <tr className="border-b text-left text-xs uppercase tracking-wide text-zinc-500 dark:text-zinc-400">
                     <th className="py-2 pr-4 font-medium">Date</th>
                     <th className="py-2 pr-4 font-medium">Invoice</th>
                     <th className="py-2 pr-4 font-medium">Client</th>
@@ -71,10 +71,10 @@ export default async function PaymentsPage({
                 <tbody>
                   {payments.map((payment) => (
                     <tr key={payment.id} className="border-b last:border-0">
-                      <td className="py-3 pr-4 text-zinc-600">
+                      <td className="py-3 pr-4 text-zinc-600 dark:text-zinc-400">
                         {formatDate(payment.paymentDate, undefined, settings.locale)}
                       </td>
-                      <td className="py-3 pr-4 font-medium text-zinc-900">
+                      <td className="py-3 pr-4 font-medium text-zinc-900 dark:text-zinc-100">
                         <Link
                           href={`/invoices/${payment.invoiceId}`}
                           className="hover:underline"
@@ -82,7 +82,7 @@ export default async function PaymentsPage({
                           {payment.invoice.number}
                         </Link>
                       </td>
-                      <td className="py-3 pr-4 text-zinc-700">
+                      <td className="py-3 pr-4 text-zinc-700 dark:text-zinc-300">
                         {payment.invoice.client.name}
                       </td>
                       <td className="py-3 pr-4">
@@ -91,10 +91,10 @@ export default async function PaymentsPage({
                             payment.method}
                         </Badge>
                       </td>
-                      <td className="py-3 pr-4 text-zinc-500">
+                      <td className="py-3 pr-4 text-zinc-500 dark:text-zinc-400">
                         {payment.reference ?? "—"}
                       </td>
-                      <td className="py-3 pr-4 text-right font-medium text-zinc-900">
+                      <td className="py-3 pr-4 text-right font-medium text-zinc-900 dark:text-zinc-100">
                         {money(payment.amount)}
                       </td>
                       <td className="py-3">

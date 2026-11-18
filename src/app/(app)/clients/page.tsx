@@ -43,7 +43,7 @@ export default async function ClientsPage({
   return (
     <div className="space-y-6">
       <div className="flex flex-wrap items-center justify-between gap-4">
-        <h1 className="text-3xl font-semibold tracking-tight text-zinc-900">Clients</h1>
+        <h1 className="text-3xl font-semibold tracking-tight text-zinc-900 dark:text-zinc-100">Clients</h1>
         <Link href="/clients/new">
           <Button>Add client</Button>
         </Link>
@@ -56,9 +56,9 @@ export default async function ClientsPage({
           </form>
 
           {filtered.length === 0 ? (
-            <div className="py-12 text-center text-sm text-zinc-500">
+            <div className="py-12 text-center text-sm text-zinc-500 dark:text-zinc-400">
               No clients found.{" "}
-              <Link href="/clients/new" className="font-medium text-zinc-900 underline-offset-4 hover:underline">
+              <Link href="/clients/new" className="font-medium text-zinc-900 dark:text-zinc-100 underline-offset-4 hover:underline">
                 Add a client
               </Link>
               .
@@ -67,7 +67,7 @@ export default async function ClientsPage({
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
                 <thead>
-                  <tr className="border-b text-left text-xs uppercase tracking-wide text-zinc-500">
+                  <tr className="border-b text-left text-xs uppercase tracking-wide text-zinc-500 dark:text-zinc-400">
                     <th className="py-2 pr-4 font-medium">Name</th>
                     <th className="py-2 pr-4 font-medium">Email</th>
                     <th className="py-2 pr-4 font-medium">Company</th>
@@ -79,15 +79,15 @@ export default async function ClientsPage({
                 <tbody>
                   {filtered.map((client) => (
                     <tr key={client.id} className="border-b last:border-0">
-                      <td className="py-3 pr-4 font-medium text-zinc-900">
+                      <td className="py-3 pr-4 font-medium text-zinc-900 dark:text-zinc-100">
                         <Link href={`/clients/${client.id}`} className="hover:underline">
                           {client.name}
                         </Link>
                       </td>
-                      <td className="py-3 pr-4 text-zinc-600">{client.email}</td>
-                      <td className="py-3 pr-4 text-zinc-600">{client.company ?? "—"}</td>
-                      <td className="py-3 pr-4 text-zinc-600">{client.invoices.length}</td>
-                      <td className="py-3 pr-4 text-right font-medium text-zinc-900">
+                      <td className="py-3 pr-4 text-zinc-600 dark:text-zinc-400">{client.email}</td>
+                      <td className="py-3 pr-4 text-zinc-600 dark:text-zinc-400">{client.company ?? "—"}</td>
+                      <td className="py-3 pr-4 text-zinc-600 dark:text-zinc-400">{client.invoices.length}</td>
+                      <td className="py-3 pr-4 text-right font-medium text-zinc-900 dark:text-zinc-100">
                         {money(client.invoices.reduce((sum, inv) => sum + inv.total, 0))}
                       </td>
                       <td className="py-3">

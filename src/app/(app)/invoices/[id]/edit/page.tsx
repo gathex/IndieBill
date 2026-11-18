@@ -46,7 +46,7 @@ export default async function InvoiceEditPage({
 
   return (
     <div className="space-y-6">
-      <h1 className="text-3xl font-semibold tracking-tight text-zinc-900">
+      <h1 className="text-3xl font-semibold tracking-tight text-zinc-900 dark:text-zinc-100">
         Edit invoice {invoice.number}
       </h1>
       <InvoiceFormClient

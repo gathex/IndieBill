@@ -134,7 +134,7 @@ export function SettingsForm({
                 onChange={(e) => update("businessName", e.target.value)}
                 placeholder="Freelancer Studio"
               />
-              <p className="text-xs text-zinc-500">Shown on invoices and emails.</p>
+              <p className="text-xs text-zinc-500 dark:text-zinc-400">Shown on invoices and emails.</p>
             </div>
           </div>
           <div className="space-y-2">
@@ -154,19 +154,19 @@ export function SettingsForm({
               type="file"
               accept="image/png,image/jpeg"
               onChange={handleLogoChange}
-              className="block w-full text-sm text-zinc-700 file:mr-3 file:rounded-md file:border file:border-zinc-300 file:bg-white file:px-3 file:py-2 file:text-sm file:font-medium file:text-zinc-900 hover:file:bg-zinc-50"
+              className="block w-full text-sm text-zinc-700 dark:text-zinc-300 file:mr-3 file:rounded-md file:border file:border-zinc-300 file:bg-white file:px-3 file:py-2 file:text-sm file:font-medium file:text-zinc-900 hover:file:bg-zinc-50"
             />
             {form.logoDataUrl ? (
-              <div className="flex items-center gap-4 rounded-md border border-zinc-200 p-3">
+              <div className="flex items-center gap-4 rounded-md border border-zinc-200 dark:border-zinc-800 p-3">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                   src={form.logoDataUrl}
                   alt="Company logo preview"
-                  className="h-14 w-14 shrink-0 rounded border border-zinc-200 object-contain"
+                  className="h-14 w-14 shrink-0 rounded border border-zinc-200 dark:border-zinc-800 object-contain"
                 />
                 <div className="min-w-0 flex-1">
-                  <p className="text-sm font-medium text-zinc-900">Logo ready to save</p>
-                  <p className="text-xs text-zinc-500">
+                  <p className="text-sm font-medium text-zinc-900 dark:text-zinc-100">Logo ready to save</p>
+                  <p className="text-xs text-zinc-500 dark:text-zinc-400">
                     Used in the header and as a faded watermark on documents.
                   </p>
                 </div>
@@ -183,7 +183,7 @@ export function SettingsForm({
                 </Button>
               </div>
             ) : null}
-            <p className="text-xs text-zinc-500">
+            <p className="text-xs text-zinc-500 dark:text-zinc-400">
               PNG or JPG up to 1 MB. Changes apply to new previews and PDFs.
             </p>
           </div>
@@ -214,7 +214,7 @@ export function SettingsForm({
             onChange={(value) => update("language", value)}
             placeholder="Search all languages…"
           />
-          <p className="text-xs text-zinc-500">
+          <p className="text-xs text-zinc-500 dark:text-zinc-400">
             Language and country control date and number formatting on invoices,
             quotations, payments, and PDFs.
           </p>
@@ -224,8 +224,8 @@ export function SettingsForm({
       <Card>
         <CardContent className="space-y-4 pt-6">
           <div>
-            <h2 className="text-lg font-semibold text-zinc-900">QR payment details</h2>
-            <p className="mt-1 text-sm text-zinc-500">
+            <h2 className="text-lg font-semibold text-zinc-900 dark:text-zinc-100">QR payment details</h2>
+            <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400">
               Used in invoice QR codes when there is no Stripe payment link.
             </p>
           </div>
@@ -256,7 +256,7 @@ export function SettingsForm({
                 onChange={(e) => update("qrUpiId", e.target.value)}
                 placeholder="name@upi"
               />
-              <p className="text-xs text-zinc-500">
+              <p className="text-xs text-zinc-500 dark:text-zinc-400">
                 Used for the UPI payment link; takes priority over VPA.
               </p>
             </div>
@@ -270,15 +270,15 @@ export function SettingsForm({
               />
             </div>
           </div>
-          <p className="text-xs text-zinc-500">
+          <p className="text-xs text-zinc-500 dark:text-zinc-400">
             With a VPA or UPI ID the QR opens a UPI payment app. Otherwise it
             shows these details as a payment request.
           </p>
         </CardContent>
       </Card>
 
-      {error ? <p className="text-sm text-red-600">{error}</p> : null}
-      {saved ? <p className="text-sm text-emerald-600">Settings saved.</p> : null}
+      {error ? <p className="text-sm text-red-600 dark:text-red-400">{error}</p> : null}
+      {saved ? <p className="text-sm text-emerald-600 dark:text-emerald-400">Settings saved.</p> : null}
 
       <div className="flex justify-end">
         <Button type="submit" disabled={saving}>

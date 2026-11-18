@@ -60,15 +60,15 @@ export function ShareInvoiceButton({
         >
           {copied ? "Copied" : "Copy link"}
         </Button>
-        <a href={emailHref} className="inline-flex h-9 items-center rounded-md px-3 text-sm font-medium text-zinc-700 underline underline-offset-4 hover:text-zinc-900">
+        <a href={emailHref} className="inline-flex h-9 items-center rounded-md px-3 text-sm font-medium text-zinc-700 dark:text-zinc-300 underline underline-offset-4 hover:text-zinc-900 dark:hover:text-zinc-50">
           Email
         </a>
-        <a href={whatsappHref} target="_blank" rel="noopener noreferrer" className="inline-flex h-9 items-center rounded-md px-3 text-sm font-medium text-zinc-700 underline underline-offset-4 hover:text-zinc-900">
+        <a href={whatsappHref} target="_blank" rel="noopener noreferrer" className="inline-flex h-9 items-center rounded-md px-3 text-sm font-medium text-zinc-700 dark:text-zinc-300 underline underline-offset-4 hover:text-zinc-900 dark:hover:text-zinc-50">
           WhatsApp
         </a>
       </div>
-      {copied ? <p className="text-xs text-emerald-600">Link copied to clipboard.</p> : null}
-      {error ? <p className="text-xs text-red-600">{error}</p> : null}
+      {copied ? <p className="text-xs text-emerald-600 dark:text-emerald-400">Link copied to clipboard.</p> : null}
+      {error ? <p className="text-xs text-red-600 dark:text-red-400">{error}</p> : null}
     </div>
   );
 }

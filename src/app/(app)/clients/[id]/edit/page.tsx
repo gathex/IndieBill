@@ -16,7 +16,7 @@ export default async function EditClientPage({ params }: { params: Promise<{ id:
   }
   return (
     <div className="max-w-2xl space-y-6">
-      <h1 className="text-3xl font-semibold tracking-tight text-zinc-900">Edit client</h1>
+      <h1 className="text-3xl font-semibold tracking-tight text-zinc-900 dark:text-zinc-100">Edit client</h1>
       <ClientFormClient
         client={{
           id: client.id,

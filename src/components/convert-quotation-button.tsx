@@ -48,7 +48,7 @@ export function ConvertQuotationButton({
             ? "View invoice"
             : "Convert to invoice"}
       </Button>
-      {error ? <p className="mt-1 text-xs text-red-600">{error}</p> : null}
+      {error ? <p className="mt-1 text-xs text-red-600 dark:text-red-400">{error}</p> : null}
     </div>
   );
 }

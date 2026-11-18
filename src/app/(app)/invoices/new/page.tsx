@@ -18,8 +18,8 @@ export default async function NewInvoicePage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-3xl font-semibold tracking-tight text-zinc-900">New invoice</h1>
-        <p className="mt-1 text-sm text-zinc-500">
+        <h1 className="text-3xl font-semibold tracking-tight text-zinc-900 dark:text-zinc-100">New invoice</h1>
+        <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400">
           Fill in the details below. Totals are calculated automatically.
         </p>
       </div>

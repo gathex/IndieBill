@@ -38,8 +38,8 @@ export default async function SettingsPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-3xl font-semibold tracking-tight text-zinc-900">Settings</h1>
-        <p className="mt-1 text-sm text-zinc-500">
+        <h1 className="text-3xl font-semibold tracking-tight text-zinc-900 dark:text-zinc-100">Settings</h1>
+        <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400">
           Customize the details that appear on your invoices.
         </p>
       </div>

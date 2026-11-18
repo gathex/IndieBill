@@ -32,7 +32,7 @@ export default function RegisterPage() {
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 px-4">
+    <div className="flex min-h-screen items-center justify-center bg-zinc-50 dark:bg-zinc-950 px-4">
       <Card className="w-full max-w-md">
         <CardHeader>
           <CardTitle className="text-2xl">Create your account</CardTitle>
@@ -60,14 +60,14 @@ export default function RegisterPage() {
                 onChange={(e) => setPassword(e.target.value)}
               />
             </div>
-            {error ? <p className="text-sm text-red-600">{error}</p> : null}
+            {error ? <p className="text-sm text-red-600 dark:text-red-400">{error}</p> : null}
             <Button type="submit" className="w-full" disabled={pending}>
               {pending ? "Creating…" : "Create account"}
             </Button>
           </form>
-          <p className="mt-4 text-center text-sm text-zinc-500">
+          <p className="mt-4 text-center text-sm text-zinc-500 dark:text-zinc-400">
             Already have an account?{" "}
-            <a href="/login" className="font-medium text-zinc-900 underline-offset-4 hover:underline">
+            <a href="/login" className="font-medium text-zinc-900 dark:text-zinc-100 underline-offset-4 hover:underline">
               Sign in
             </a>
           </p>

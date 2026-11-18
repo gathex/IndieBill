@@ -22,8 +22,8 @@ export function PaymentForm({
   return (
     <form action={recordPayment} className="space-y-3">
       <input type="hidden" name="invoiceId" value={invoiceId} />
-      <p className="text-xs text-zinc-500">
-        Remaining balance: <span className="font-medium text-zinc-900">{formatCurrency(balance, currency, locale)}</span>
+      <p className="text-xs text-zinc-500 dark:text-zinc-400">
+        Remaining balance: <span className="font-medium text-zinc-900 dark:text-zinc-100">{formatCurrency(balance, currency, locale)}</span>
       </p>
       <div className="grid gap-3 sm:grid-cols-2">
         <div className="space-y-1">
@@ -56,7 +56,7 @@ export function PaymentForm({
           id="payment-method"
           name="method"
           defaultValue="MANUAL"
-          className="flex h-9 w-full rounded-md border border-zinc-300 bg-white px-3 py-1 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-zinc-400"
+          className="flex h-9 w-full rounded-md border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-900 px-3 py-1 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-zinc-400"
         >
           {PAYMENT_METHODS.map((method) => (
             <option key={method} value={method}>

@@ -99,15 +99,15 @@ export default async function InvoiceDetailPage({
       <Notice notice={notice} />
       <div className="flex items-start justify-between gap-4">
         <div>
-          <Link href="/invoices" className="text-sm text-zinc-500 hover:text-zinc-900">
+          <Link href="/invoices" className="text-sm text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-50">
             ← All invoices
           </Link>
-          <h1 className="mt-2 text-3xl font-semibold tracking-tight text-zinc-900">
+          <h1 className="mt-2 text-3xl font-semibold tracking-tight text-zinc-900 dark:text-zinc-100">
             Invoice {invoice.number}
           </h1>
           <div className="mt-2 flex flex-wrap items-center gap-3">
             <InvoiceStatusBadge status={status} />
-            <span className="text-sm text-zinc-500">
+            <span className="text-sm text-zinc-500 dark:text-zinc-400">
               Issued {formatDate(invoice.issueDate, undefined, settings.locale)} · Due {formatDate(invoice.dueDate, undefined, settings.locale)}
             </span>
           </div>
@@ -143,7 +143,7 @@ export default async function InvoiceDetailPage({
               <div className="overflow-x-auto">
                 <table className="w-full text-sm">
                   <thead>
-                    <tr className="border-b text-left text-xs uppercase tracking-wide text-zinc-500">
+                    <tr className="border-b text-left text-xs uppercase tracking-wide text-zinc-500 dark:text-zinc-400">
                       <th className="py-2 pr-4 font-medium">Description</th>
                       <th className="py-2 pr-4 font-medium text-right">Qty</th>
                       <th className="py-2 pr-4 font-medium text-right">Rate</th>
@@ -153,10 +153,10 @@ export default async function InvoiceDetailPage({
                   <tbody>
                     {invoice.items.map((item) => (
                       <tr key={item.id} className="border-b last:border-0">
-                        <td className="py-3 pr-4 text-zinc-800">{item.description}</td>
-                        <td className="py-3 pr-4 text-right text-zinc-600">{item.quantity}</td>
-                        <td className="py-3 pr-4 text-right text-zinc-600">{money(item.rate)}</td>
-                        <td className="py-3 pr-4 text-right font-medium text-zinc-900">
+                        <td className="py-3 pr-4 text-zinc-800 dark:text-zinc-200">{item.description}</td>
+                        <td className="py-3 pr-4 text-right text-zinc-600 dark:text-zinc-400">{item.quantity}</td>
+                        <td className="py-3 pr-4 text-right text-zinc-600 dark:text-zinc-400">{money(item.rate)}</td>
+                        <td className="py-3 pr-4 text-right font-medium text-zinc-900 dark:text-zinc-100">
                           {money(item.amount)}
                         </td>
                       </tr>
@@ -164,28 +164,28 @@ export default async function InvoiceDetailPage({
                   </tbody>
                   <tfoot className="border-t">
                     <tr>
-                      <td colSpan={3} className="py-2 pr-4 text-right text-sm text-zinc-600">
+                      <td colSpan={3} className="py-2 pr-4 text-right text-sm text-zinc-600 dark:text-zinc-400">
                         Subtotal
                       </td>
-                      <td className="py-2 text-right text-sm text-zinc-800">{money(invoice.subtotal)}</td>
+                      <td className="py-2 text-right text-sm text-zinc-800 dark:text-zinc-200">{money(invoice.subtotal)}</td>
                     </tr>
                     <tr>
-                      <td colSpan={3} className="py-1 pr-4 text-right text-sm text-zinc-600">
+                      <td colSpan={3} className="py-1 pr-4 text-right text-sm text-zinc-600 dark:text-zinc-400">
                         Discount ({invoice.discountPercent}%)
                       </td>
-                      <td className="py-1 text-right text-sm text-zinc-800">-{money(discount)}</td>
+                      <td className="py-1 text-right text-sm text-zinc-800 dark:text-zinc-200">-{money(discount)}</td>
                     </tr>
                     <tr>
-                      <td colSpan={3} className="py-1 pr-4 text-right text-sm text-zinc-600">
+                      <td colSpan={3} className="py-1 pr-4 text-right text-sm text-zinc-600 dark:text-zinc-400">
                         Tax ({invoice.taxRate}%)
                       </td>
-                      <td className="py-1 text-right text-sm text-zinc-800">{money(invoice.tax)}</td>
+                      <td className="py-1 text-right text-sm text-zinc-800 dark:text-zinc-200">{money(invoice.tax)}</td>
                     </tr>
                     <tr>
-                      <td colSpan={3} className="py-3 pr-4 text-right text-sm font-semibold text-zinc-900">
+                      <td colSpan={3} className="py-3 pr-4 text-right text-sm font-semibold text-zinc-900 dark:text-zinc-100">
                         Total
                       </td>
-                      <td className="py-3 text-right text-lg font-bold text-zinc-900">
+                      <td className="py-3 text-right text-lg font-bold text-zinc-900 dark:text-zinc-100">
                         {money(invoice.total)}
                       </td>
                     </tr>
@@ -199,8 +199,8 @@ export default async function InvoiceDetailPage({
             <CardHeader>
               <CardTitle>Billed to</CardTitle>
             </CardHeader>
-            <CardContent className="text-sm text-zinc-700">
-              <Link href={`/clients/${invoice.client.id}`} className="font-medium text-zinc-900 hover:underline">
+            <CardContent className="text-sm text-zinc-700 dark:text-zinc-300">
+              <Link href={`/clients/${invoice.client.id}`} className="font-medium text-zinc-900 dark:text-zinc-100 hover:underline">
                 {invoice.client.name}
               </Link>
               {invoice.client.company ? <p>{invoice.client.company}</p> : null}
@@ -214,7 +214,7 @@ export default async function InvoiceDetailPage({
               <CardHeader>
                 <CardTitle>Notes</CardTitle>
               </CardHeader>
-              <CardContent className="whitespace-pre-wrap text-sm text-zinc-700">
+              <CardContent className="whitespace-pre-wrap text-sm text-zinc-700 dark:text-zinc-300">
                 {invoice.notes}
               </CardContent>
             </Card>
@@ -266,7 +266,7 @@ export default async function InvoiceDetailPage({
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="space-y-2">
-                <p className="text-sm font-medium text-zinc-900">Share invoice</p>
+                <p className="text-sm font-medium text-zinc-900 dark:text-zinc-100">Share invoice</p>
                 <ShareInvoiceButton
                   url={shareUrl}
                   title={`Invoice ${invoice.number}`}
@@ -274,17 +274,17 @@ export default async function InvoiceDetailPage({
                   compact
                 />
               </div>
-              <div className="flex items-start gap-4 border-t border-zinc-200 pt-4">
+              <div className="flex items-start gap-4 border-t border-zinc-200 dark:border-zinc-800 pt-4">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                   src={qr.dataUrl}
                   alt={qr.label}
-                  className="h-24 w-24 shrink-0 rounded-md border border-zinc-200"
+                  className="h-24 w-24 shrink-0 rounded-md border border-zinc-200 dark:border-zinc-800"
                 />
                 <div className="min-w-0">
-                  <p className="text-sm font-medium text-zinc-900">Pay by QR code</p>
-                  <p className="mt-1 text-sm text-zinc-600">{qr.label}</p>
-                  <p className="mt-1 text-xs text-zinc-500">
+                  <p className="text-sm font-medium text-zinc-900 dark:text-zinc-100">Pay by QR code</p>
+                  <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-400">{qr.label}</p>
+                  <p className="mt-1 text-xs text-zinc-500 dark:text-zinc-400">
                     This code is also printed on the A4 invoice and PDF.
                   </p>
                 </div>
@@ -300,40 +300,40 @@ export default async function InvoiceDetailPage({
               </Link>
             </CardHeader>
             <CardContent className="space-y-4">
-              <div className="grid grid-cols-3 gap-2 rounded-md bg-zinc-50 p-3">
+              <div className="grid grid-cols-3 gap-2 rounded-md bg-zinc-50 dark:bg-zinc-950 p-3">
                 <div>
-                  <div className="text-[10px] font-semibold uppercase tracking-wide text-zinc-500">
+                  <div className="text-[10px] font-semibold uppercase tracking-wide text-zinc-500 dark:text-zinc-400">
                     Total
                   </div>
-                  <div className="mt-1 text-sm font-semibold text-zinc-900">{money(invoice.total)}</div>
+                  <div className="mt-1 text-sm font-semibold text-zinc-900 dark:text-zinc-100">{money(invoice.total)}</div>
                 </div>
                 <div>
-                  <div className="text-[10px] font-semibold uppercase tracking-wide text-zinc-500">
+                  <div className="text-[10px] font-semibold uppercase tracking-wide text-zinc-500 dark:text-zinc-400">
                     Received
                   </div>
-                  <div className="mt-1 text-sm font-semibold text-emerald-700">{money(paid)}</div>
+                  <div className="mt-1 text-sm font-semibold text-emerald-700 dark:text-emerald-400">{money(paid)}</div>
                 </div>
                 <div>
-                  <div className="text-[10px] font-semibold uppercase tracking-wide text-zinc-500">
+                  <div className="text-[10px] font-semibold uppercase tracking-wide text-zinc-500 dark:text-zinc-400">
                     Balance
                   </div>
-                  <div className="mt-1 text-sm font-semibold text-zinc-900">{money(balance)}</div>
+                  <div className="mt-1 text-sm font-semibold text-zinc-900 dark:text-zinc-100">{money(balance)}</div>
                 </div>
               </div>
 
               {invoice.payments.length > 0 ? (
                 <div className="space-y-2">
-                  <div className="text-xs font-medium uppercase tracking-wide text-zinc-500">
+                  <div className="text-xs font-medium uppercase tracking-wide text-zinc-500 dark:text-zinc-400">
                     Payment history
                   </div>
                   {invoice.payments.map((payment) => (
                     <div
                       key={payment.id}
-                      className="flex items-center justify-between gap-3 border-b border-zinc-100 pb-2 text-sm last:border-0 last:pb-0"
+                      className="flex items-center justify-between gap-3 border-b border-zinc-100 dark:border-zinc-800 pb-2 text-sm last:border-0 last:pb-0"
                     >
                       <div>
-                        <div className="font-medium text-zinc-900">{money(payment.amount)}</div>
-                        <div className="text-xs text-zinc-500">
+                        <div className="font-medium text-zinc-900 dark:text-zinc-100">{money(payment.amount)}</div>
+                        <div className="text-xs text-zinc-500 dark:text-zinc-400">
                           {formatDate(payment.paymentDate, undefined, settings.locale)} ·{" "}
                           {PAYMENT_METHOD_LABELS[payment.method as PaymentMethod] ?? payment.method}
                           {payment.reference ? ` · ${payment.reference}` : ""}
@@ -343,11 +343,11 @@ export default async function InvoiceDetailPage({
                   ))}
                 </div>
               ) : (
-                <p className="text-sm text-zinc-500">No payments recorded yet.</p>
+                <p className="text-sm text-zinc-500 dark:text-zinc-400">No payments recorded yet.</p>
               )}
 
               {balance > 0 ? (
-                <div className="border-t border-zinc-200 pt-4">
+                <div className="border-t border-zinc-200 dark:border-zinc-800 pt-4">
                   <PaymentForm
                     invoiceId={invoice.id}
                     balance={balance}
@@ -356,27 +356,27 @@ export default async function InvoiceDetailPage({
                   />
                 </div>
               ) : (
-                <p className="rounded-md bg-emerald-50 px-3 py-2 text-sm text-emerald-800">
+                <p className="rounded-md bg-emerald-50 px-3 py-2 text-sm text-emerald-800 dark:bg-emerald-500/15 dark:text-emerald-300">
                   Paid in full. Thank you!
                 </p>
               )}
 
               {balance > 0 ? (
-                <div className="space-y-3 border-t border-zinc-200 pt-4">
+                <div className="space-y-3 border-t border-zinc-200 dark:border-zinc-800 pt-4">
                   {invoice.paymentLink ? (
                     <div className="space-y-2">
-                      <p className="text-sm text-zinc-600">Share this link with your client:</p>
+                      <p className="text-sm text-zinc-600 dark:text-zinc-400">Share this link with your client:</p>
                       <a
                         href={invoice.paymentLink}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="block break-all text-sm text-zinc-900 underline"
+                        className="block break-all text-sm text-zinc-900 dark:text-zinc-100 underline"
                       >
                         {invoice.paymentLink}
                       </a>
                     </div>
                   ) : (
-                    <p className="text-sm text-zinc-500">
+                    <p className="text-sm text-zinc-500 dark:text-zinc-400">
                       No payment link yet. Create one to let your client pay online.
                     </p>
                   )}

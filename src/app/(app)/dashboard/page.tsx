@@ -53,10 +53,10 @@ export default async function DashboardPage() {
     <div className="space-y-8">
       <div className="flex flex-wrap items-center justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-semibold tracking-tight text-zinc-900">
+          <h1 className="text-3xl font-semibold tracking-tight text-zinc-900 dark:text-zinc-100">
             Welcome back, {settings.displayName}
           </h1>
-          <p className="mt-1 text-sm text-zinc-500">
+          <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400">
             Here&apos;s what&apos;s happening with your invoices.
           </p>
         </div>
@@ -79,40 +79,40 @@ export default async function DashboardPage() {
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <Card>
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-zinc-500">Outstanding</CardTitle>
+            <CardTitle className="text-sm font-medium text-zinc-500 dark:text-zinc-400">Outstanding</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-zinc-900">{money(outstanding)}</div>
-            <p className="mt-1 text-xs text-zinc-500">{outstandingCount} open invoice(s)</p>
+            <div className="text-2xl font-bold text-zinc-900 dark:text-zinc-100">{money(outstanding)}</div>
+            <p className="mt-1 text-xs text-zinc-500 dark:text-zinc-400">{outstandingCount} open invoice(s)</p>
           </CardContent>
         </Card>
         <Card>
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-zinc-500">Received this month</CardTitle>
+            <CardTitle className="text-sm font-medium text-zinc-500 dark:text-zinc-400">Received this month</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-zinc-900">{money(paidThisMonth)}</div>
-            <p className="mt-1 text-xs text-zinc-500">Payments recorded</p>
+            <div className="text-2xl font-bold text-zinc-900 dark:text-zinc-100">{money(paidThisMonth)}</div>
+            <p className="mt-1 text-xs text-zinc-500 dark:text-zinc-400">Payments recorded</p>
           </CardContent>
         </Card>
         <Card>
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-zinc-500">Overdue</CardTitle>
+            <CardTitle className="text-sm font-medium text-zinc-500 dark:text-zinc-400">Overdue</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-zinc-900">{money(overdueAmount)}</div>
-            <p className="mt-1 text-xs text-zinc-500">{overdueCount} overdue invoice(s)</p>
+            <div className="text-2xl font-bold text-zinc-900 dark:text-zinc-100">{money(overdueAmount)}</div>
+            <p className="mt-1 text-xs text-zinc-500 dark:text-zinc-400">{overdueCount} overdue invoice(s)</p>
           </CardContent>
         </Card>
         <Card>
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-zinc-500">Drafts</CardTitle>
+            <CardTitle className="text-sm font-medium text-zinc-500 dark:text-zinc-400">Drafts</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-zinc-900">
+            <div className="text-2xl font-bold text-zinc-900 dark:text-zinc-100">
               {invoices.filter((invoice) => invoice.status === "DRAFT").length}
             </div>
-            <p className="mt-1 text-xs text-zinc-500">Awaiting send</p>
+            <p className="mt-1 text-xs text-zinc-500 dark:text-zinc-400">Awaiting send</p>
           </CardContent>
         </Card>
       </div>
@@ -126,9 +126,9 @@ export default async function DashboardPage() {
         </CardHeader>
         <CardContent>
           {recentInvoices.length === 0 ? (
-            <div className="py-8 text-center text-sm text-zinc-500">
+            <div className="py-8 text-center text-sm text-zinc-500 dark:text-zinc-400">
               No invoices yet.{" "}
-              <Link href="/invoices/new" className="font-medium text-zinc-900 underline-offset-4 hover:underline">
+              <Link href="/invoices/new" className="font-medium text-zinc-900 dark:text-zinc-100 underline-offset-4 hover:underline">
                 Create your first invoice
               </Link>
               .
@@ -137,7 +137,7 @@ export default async function DashboardPage() {
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
                 <thead>
-                  <tr className="border-b text-left text-xs uppercase tracking-wide text-zinc-500">
+                  <tr className="border-b text-left text-xs uppercase tracking-wide text-zinc-500 dark:text-zinc-400">
                     <th className="py-2 pr-4 font-medium">Number</th>
                     <th className="py-2 pr-4 font-medium">Client</th>
                     <th className="py-2 pr-4 font-medium">Issued</th>
@@ -149,15 +149,15 @@ export default async function DashboardPage() {
                 <tbody>
                   {recentInvoices.map((invoice) => (
                     <tr key={invoice.id} className="border-b last:border-0">
-                      <td className="py-3 pr-4 font-medium text-zinc-900">
+                      <td className="py-3 pr-4 font-medium text-zinc-900 dark:text-zinc-100">
                         <Link href={`/invoices/${invoice.id}`} className="hover:underline">
                           {invoice.number}
                         </Link>
                       </td>
-                      <td className="py-3 pr-4 text-zinc-700">{invoice.client?.name ?? "—"}</td>
-                      <td className="py-3 pr-4 text-zinc-600">{formatDate(invoice.issueDate, undefined, settings.locale)}</td>
-                      <td className="py-3 pr-4 text-zinc-600">{formatDate(invoice.dueDate, undefined, settings.locale)}</td>
-                      <td className="py-3 pr-4 text-right font-medium text-zinc-900">
+                      <td className="py-3 pr-4 text-zinc-700 dark:text-zinc-300">{invoice.client?.name ?? "—"}</td>
+                      <td className="py-3 pr-4 text-zinc-600 dark:text-zinc-400">{formatDate(invoice.issueDate, undefined, settings.locale)}</td>
+                      <td className="py-3 pr-4 text-zinc-600 dark:text-zinc-400">{formatDate(invoice.dueDate, undefined, settings.locale)}</td>
+                      <td className="py-3 pr-4 text-right font-medium text-zinc-900 dark:text-zinc-100">
                         {money(invoice.total)}
                       </td>
                       <td className="py-3">
@@ -181,9 +181,9 @@ export default async function DashboardPage() {
         </CardHeader>
         <CardContent>
           {quotations.length === 0 ? (
-            <div className="py-8 text-center text-sm text-zinc-500">
+            <div className="py-8 text-center text-sm text-zinc-500 dark:text-zinc-400">
               No quotations yet.{" "}
-              <Link href="/quotations/new" className="font-medium text-zinc-900 underline-offset-4 hover:underline">
+              <Link href="/quotations/new" className="font-medium text-zinc-900 dark:text-zinc-100 underline-offset-4 hover:underline">
                 Create your first quotation
               </Link>
               .
@@ -192,7 +192,7 @@ export default async function DashboardPage() {
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
                 <thead>
-                  <tr className="border-b text-left text-xs uppercase tracking-wide text-zinc-500">
+                  <tr className="border-b text-left text-xs uppercase tracking-wide text-zinc-500 dark:text-zinc-400">
                     <th className="py-2 pr-4 font-medium">Number</th>
                     <th className="py-2 pr-4 font-medium">Client</th>
                     <th className="py-2 pr-4 font-medium">Issued</th>
@@ -204,15 +204,15 @@ export default async function DashboardPage() {
                 <tbody>
                   {quotations.slice(0, 5).map((quotation) => (
                     <tr key={quotation.id} className="border-b last:border-0">
-                      <td className="py-3 pr-4 font-medium text-zinc-900">
+                      <td className="py-3 pr-4 font-medium text-zinc-900 dark:text-zinc-100">
                         <Link href={`/quotations/${quotation.id}`} className="hover:underline">
                           {quotation.number}
                         </Link>
                       </td>
-                      <td className="py-3 pr-4 text-zinc-700">{quotation.client?.name ?? "—"}</td>
-                      <td className="py-3 pr-4 text-zinc-600">{formatDate(quotation.issueDate, undefined, settings.locale)}</td>
-                      <td className="py-3 pr-4 text-zinc-600">{formatDate(quotation.validUntil, undefined, settings.locale)}</td>
-                      <td className="py-3 pr-4 text-right font-medium text-zinc-900">
+                      <td className="py-3 pr-4 text-zinc-700 dark:text-zinc-300">{quotation.client?.name ?? "—"}</td>
+                      <td className="py-3 pr-4 text-zinc-600 dark:text-zinc-400">{formatDate(quotation.issueDate, undefined, settings.locale)}</td>
+                      <td className="py-3 pr-4 text-zinc-600 dark:text-zinc-400">{formatDate(quotation.validUntil, undefined, settings.locale)}</td>
+                      <td className="py-3 pr-4 text-right font-medium text-zinc-900 dark:text-zinc-100">
                         {money(quotation.total)}
                       </td>
                       <td className="py-3">

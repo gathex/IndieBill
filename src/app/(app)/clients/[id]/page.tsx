@@ -42,13 +42,13 @@ export default async function ClientDetailPage({
     <div className="space-y-6">
       <div className="flex items-start justify-between gap-4">
         <div>
-          <Link href="/clients" className="text-sm text-zinc-500 hover:text-zinc-900">
+          <Link href="/clients" className="text-sm text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-50">
             ← All clients
           </Link>
-          <h1 className="mt-2 text-3xl font-semibold tracking-tight text-zinc-900">
+          <h1 className="mt-2 text-3xl font-semibold tracking-tight text-zinc-900 dark:text-zinc-100">
             {client.name}
           </h1>
-          <p className="mt-1 text-sm text-zinc-500">
+          <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400">
             {client.email}
             {client.company ? ` · ${client.company}` : ""}
             {client.phone ? ` · ${client.phone}` : ""}
@@ -62,25 +62,25 @@ export default async function ClientDetailPage({
       <div className="grid gap-4 sm:grid-cols-3">
         <Card>
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-zinc-500">Total billed</CardTitle>
+            <CardTitle className="text-sm font-medium text-zinc-500 dark:text-zinc-400">Total billed</CardTitle>
           </CardHeader>
-          <CardContent className="text-2xl font-bold text-zinc-900">
+          <CardContent className="text-2xl font-bold text-zinc-900 dark:text-zinc-100">
             {money(totalBilled)}
           </CardContent>
         </Card>
         <Card>
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-zinc-500">Outstanding</CardTitle>
+            <CardTitle className="text-sm font-medium text-zinc-500 dark:text-zinc-400">Outstanding</CardTitle>
           </CardHeader>
-          <CardContent className="text-2xl font-bold text-zinc-900">
+          <CardContent className="text-2xl font-bold text-zinc-900 dark:text-zinc-100">
             {money(outstanding)}
           </CardContent>
         </Card>
         <Card>
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-zinc-500">Invoices</CardTitle>
+            <CardTitle className="text-sm font-medium text-zinc-500 dark:text-zinc-400">Invoices</CardTitle>
           </CardHeader>
-          <CardContent className="text-2xl font-bold text-zinc-900">
+          <CardContent className="text-2xl font-bold text-zinc-900 dark:text-zinc-100">
             {client.invoices.length}
           </CardContent>
         </Card>
@@ -91,7 +91,7 @@ export default async function ClientDetailPage({
           <CardHeader>
             <CardTitle>Notes</CardTitle>
           </CardHeader>
-          <CardContent className="whitespace-pre-wrap text-sm text-zinc-700">
+          <CardContent className="whitespace-pre-wrap text-sm text-zinc-700 dark:text-zinc-300">
             {client.notes}
           </CardContent>
         </Card>
@@ -103,14 +103,14 @@ export default async function ClientDetailPage({
         </CardHeader>
         <CardContent>
           {client.invoices.length === 0 ? (
-            <p className="py-6 text-center text-sm text-zinc-500">
+            <p className="py-6 text-center text-sm text-zinc-500 dark:text-zinc-400">
               No invoices for this client yet.
             </p>
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
                 <thead>
-                  <tr className="border-b text-left text-xs uppercase tracking-wide text-zinc-500">
+                  <tr className="border-b text-left text-xs uppercase tracking-wide text-zinc-500 dark:text-zinc-400">
                     <th className="py-2 pr-4 font-medium">Number</th>
                     <th className="py-2 pr-4 font-medium">Issued</th>
                     <th className="py-2 pr-4 font-medium">Due</th>
@@ -121,14 +121,14 @@ export default async function ClientDetailPage({
                 <tbody>
                   {client.invoices.map((invoice) => (
                     <tr key={invoice.id} className="border-b last:border-0">
-                      <td className="py-3 pr-4 font-medium text-zinc-900">
+                      <td className="py-3 pr-4 font-medium text-zinc-900 dark:text-zinc-100">
                         <Link href={`/invoices/${invoice.id}`} className="hover:underline">
                           {invoice.number}
                         </Link>
                       </td>
-                      <td className="py-3 pr-4 text-zinc-600">{formatDate(invoice.issueDate, undefined, settings.locale)}</td>
-                      <td className="py-3 pr-4 text-zinc-600">{formatDate(invoice.dueDate, undefined, settings.locale)}</td>
-                      <td className="py-3 pr-4 text-right font-medium text-zinc-900">
+                      <td className="py-3 pr-4 text-zinc-600 dark:text-zinc-400">{formatDate(invoice.issueDate, undefined, settings.locale)}</td>
+                      <td className="py-3 pr-4 text-zinc-600 dark:text-zinc-400">{formatDate(invoice.dueDate, undefined, settings.locale)}</td>
+                      <td className="py-3 pr-4 text-right font-medium text-zinc-900 dark:text-zinc-100">
                         {money(invoice.total)}
                       </td>
                       <td className="py-3">
@@ -154,14 +154,14 @@ export default async function ClientDetailPage({
         </CardHeader>
         <CardContent>
           {client.quotations.length === 0 ? (
-            <p className="py-6 text-center text-sm text-zinc-500">
+            <p className="py-6 text-center text-sm text-zinc-500 dark:text-zinc-400">
               No quotations for this client yet.
             </p>
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
                 <thead>
-                  <tr className="border-b text-left text-xs uppercase tracking-wide text-zinc-500">
+                  <tr className="border-b text-left text-xs uppercase tracking-wide text-zinc-500 dark:text-zinc-400">
                     <th className="py-2 pr-4 font-medium">Number</th>
                     <th className="py-2 pr-4 font-medium">Issued</th>
                     <th className="py-2 pr-4 font-medium">Valid until</th>
@@ -172,14 +172,14 @@ export default async function ClientDetailPage({
                 <tbody>
                   {client.quotations.map((quotation) => (
                     <tr key={quotation.id} className="border-b last:border-0">
-                      <td className="py-3 pr-4 font-medium text-zinc-900">
+                      <td className="py-3 pr-4 font-medium text-zinc-900 dark:text-zinc-100">
                         <Link href={`/quotations/${quotation.id}`} className="hover:underline">
                           {quotation.number}
                         </Link>
                       </td>
-                      <td className="py-3 pr-4 text-zinc-600">{formatDate(quotation.issueDate, undefined, settings.locale)}</td>
-                      <td className="py-3 pr-4 text-zinc-600">{formatDate(quotation.validUntil, undefined, settings.locale)}</td>
-                      <td className="py-3 pr-4 text-right font-medium text-zinc-900">
+                      <td className="py-3 pr-4 text-zinc-600 dark:text-zinc-400">{formatDate(quotation.issueDate, undefined, settings.locale)}</td>
+                      <td className="py-3 pr-4 text-zinc-600 dark:text-zinc-400">{formatDate(quotation.validUntil, undefined, settings.locale)}</td>
+                      <td className="py-3 pr-4 text-right font-medium text-zinc-900 dark:text-zinc-100">
                         {money(quotation.total)}
                       </td>
                       <td className="py-3">

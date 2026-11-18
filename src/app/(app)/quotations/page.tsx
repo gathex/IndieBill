@@ -71,7 +71,7 @@ export default async function QuotationsPage({
     <div className="space-y-6">
       <Notice notice={notice} />
       <div className="flex flex-wrap items-center justify-between gap-4">
-        <h1 className="text-3xl font-semibold tracking-tight text-zinc-900">Quotations</h1>
+        <h1 className="text-3xl font-semibold tracking-tight text-zinc-900 dark:text-zinc-100">Quotations</h1>
         <Link href="/quotations/new">
           <Button>New quotation</Button>
         </Link>
@@ -105,11 +105,11 @@ export default async function QuotationsPage({
           </div>
 
           {filtered.length === 0 ? (
-            <div className="py-12 text-center text-sm text-zinc-500">
+            <div className="py-12 text-center text-sm text-zinc-500 dark:text-zinc-400">
               No quotations found.{" "}
               <Link
                 href="/quotations/new"
-                className="font-medium text-zinc-900 underline-offset-4 hover:underline"
+                className="font-medium text-zinc-900 dark:text-zinc-100 underline-offset-4 hover:underline"
               >
                 Create a quotation
               </Link>
@@ -119,7 +119,7 @@ export default async function QuotationsPage({
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
                 <thead>
-                  <tr className="border-b text-left text-xs uppercase tracking-wide text-zinc-500">
+                  <tr className="border-b text-left text-xs uppercase tracking-wide text-zinc-500 dark:text-zinc-400">
                     <th className="py-2 pr-4 font-medium">Number</th>
                     <th className="py-2 pr-4 font-medium">Client</th>
                     <th className="py-2 pr-4 font-medium">Issued</th>
@@ -137,19 +137,19 @@ export default async function QuotationsPage({
                     );
                     return (
                       <tr key={quotation.id} className="border-b last:border-0">
-                        <td className="py-3 pr-4 font-medium text-zinc-900">
+                        <td className="py-3 pr-4 font-medium text-zinc-900 dark:text-zinc-100">
                           <Link href={`/quotations/${quotation.id}`} className="hover:underline">
                             {quotation.number}
                           </Link>
                         </td>
-                        <td className="py-3 pr-4 text-zinc-700">
+                        <td className="py-3 pr-4 text-zinc-700 dark:text-zinc-300">
                           <Link href={`/clients/${quotation.client.id}`} className="hover:underline">
                             {quotation.client.name}
                           </Link>
                         </td>
-                        <td className="py-3 pr-4 text-zinc-600">{formatDate(quotation.issueDate, undefined, settings.locale)}</td>
-                        <td className="py-3 pr-4 text-zinc-600">{formatDate(quotation.validUntil, undefined, settings.locale)}</td>
-                        <td className="py-3 pr-4 text-right font-medium text-zinc-900">
+                        <td className="py-3 pr-4 text-zinc-600 dark:text-zinc-400">{formatDate(quotation.issueDate, undefined, settings.locale)}</td>
+                        <td className="py-3 pr-4 text-zinc-600 dark:text-zinc-400">{formatDate(quotation.validUntil, undefined, settings.locale)}</td>
+                        <td className="py-3 pr-4 text-right font-medium text-zinc-900 dark:text-zinc-100">
                           {money(quotation.total)}
                         </td>
                         <td className="py-3 pr-4">

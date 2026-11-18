@@ -21,6 +21,8 @@ export const metadata: Metadata = {
     "Create professional invoices and quotations, share them anywhere, accept UPI or Stripe payments, and track every balance in one workspace built for freelancers.",
 };
 
+const themeScript = `(function(){try{var t=localStorage.getItem("theme");if(t!=="light"&&t!=="dark"){t=window.matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light"}document.documentElement.setAttribute("data-theme",t)}catch(e){}})()`;
+
 export default function RootLayout({
   children,
 }: {
@@ -29,8 +31,13 @@ export default function RootLayout({
   return (
     <html
       lang="en"
+      data-theme="light"
+      suppressHydrationWarning
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: themeScript }} />
+      </head>
       <body className="min-h-full flex flex-col">{children}</body>
     </html>
   );

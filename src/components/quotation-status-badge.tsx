@@ -18,8 +18,8 @@ export function QuotationStatusBadge({ status }: { status: QuotationStatus }) {
       variant={variant}
       className={cn(
         "border-0",
-        status === "SENT" && "bg-blue-100 text-blue-800",
-        status === "CONVERTED" && "bg-indigo-100 text-indigo-800",
+        status === "SENT" && "bg-blue-100 text-blue-800 dark:bg-blue-500/15 dark:text-blue-300",
+        status === "CONVERTED" && "bg-indigo-100 text-indigo-800 dark:bg-indigo-500/15 dark:text-indigo-300",
       )}
     >
       {status}

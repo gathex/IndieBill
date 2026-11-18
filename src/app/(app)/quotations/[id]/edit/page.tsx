@@ -49,7 +49,7 @@ export default async function QuotationEditPage({
 
   return (
     <div className="space-y-6">
-      <h1 className="text-3xl font-semibold tracking-tight text-zinc-900">
+      <h1 className="text-3xl font-semibold tracking-tight text-zinc-900 dark:text-zinc-100">
         Edit quotation {quotation.number}
       </h1>
       <QuotationFormClient

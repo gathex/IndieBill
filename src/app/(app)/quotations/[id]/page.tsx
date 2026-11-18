@@ -75,15 +75,15 @@ export default async function QuotationDetailPage({
       <Notice notice={notice} />
       <div className="flex items-start justify-between gap-4">
         <div>
-          <Link href="/quotations" className="text-sm text-zinc-500 hover:text-zinc-900">
+          <Link href="/quotations" className="text-sm text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-50">
             ← All quotations
           </Link>
-          <h1 className="mt-2 text-3xl font-semibold tracking-tight text-zinc-900">
+          <h1 className="mt-2 text-3xl font-semibold tracking-tight text-zinc-900 dark:text-zinc-100">
             Quotation {quotation.number}
           </h1>
           <div className="mt-2 flex flex-wrap items-center gap-3">
             <QuotationStatusBadge status={status} />
-            <span className="text-sm text-zinc-500">
+            <span className="text-sm text-zinc-500 dark:text-zinc-400">
               Issued {formatDate(quotation.issueDate, undefined, settings.locale)} · Valid until{" "}
               {formatDate(quotation.validUntil, undefined, settings.locale)}
             </span>
@@ -122,7 +122,7 @@ export default async function QuotationDetailPage({
               <div className="overflow-x-auto">
                 <table className="w-full text-sm">
                   <thead>
-                    <tr className="border-b text-left text-xs uppercase tracking-wide text-zinc-500">
+                    <tr className="border-b text-left text-xs uppercase tracking-wide text-zinc-500 dark:text-zinc-400">
                       <th className="py-2 pr-4 font-medium">Description</th>
                       <th className="py-2 pr-4 font-medium text-right">Qty</th>
                       <th className="py-2 pr-4 font-medium text-right">Rate</th>
@@ -132,10 +132,10 @@ export default async function QuotationDetailPage({
                   <tbody>
                     {quotation.items.map((item) => (
                       <tr key={item.id} className="border-b last:border-0">
-                        <td className="py-3 pr-4 text-zinc-800">{item.description}</td>
-                        <td className="py-3 pr-4 text-right text-zinc-600">{item.quantity}</td>
-                        <td className="py-3 pr-4 text-right text-zinc-600">{money(item.rate)}</td>
-                        <td className="py-3 pr-4 text-right font-medium text-zinc-900">
+                        <td className="py-3 pr-4 text-zinc-800 dark:text-zinc-200">{item.description}</td>
+                        <td className="py-3 pr-4 text-right text-zinc-600 dark:text-zinc-400">{item.quantity}</td>
+                        <td className="py-3 pr-4 text-right text-zinc-600 dark:text-zinc-400">{money(item.rate)}</td>
+                        <td className="py-3 pr-4 text-right font-medium text-zinc-900 dark:text-zinc-100">
                           {money(item.amount)}
                         </td>
                       </tr>
@@ -143,28 +143,28 @@ export default async function QuotationDetailPage({
                   </tbody>
                   <tfoot className="border-t">
                     <tr>
-                      <td colSpan={3} className="py-2 pr-4 text-right text-sm text-zinc-600">
+                      <td colSpan={3} className="py-2 pr-4 text-right text-sm text-zinc-600 dark:text-zinc-400">
                         Subtotal
                       </td>
-                      <td className="py-2 text-right text-sm text-zinc-800">{money(quotation.subtotal)}</td>
+                      <td className="py-2 text-right text-sm text-zinc-800 dark:text-zinc-200">{money(quotation.subtotal)}</td>
                     </tr>
                     <tr>
-                      <td colSpan={3} className="py-1 pr-4 text-right text-sm text-zinc-600">
+                      <td colSpan={3} className="py-1 pr-4 text-right text-sm text-zinc-600 dark:text-zinc-400">
                         Discount ({quotation.discountPercent}%)
                       </td>
-                      <td className="py-1 text-right text-sm text-zinc-800">-{money(discount)}</td>
+                      <td className="py-1 text-right text-sm text-zinc-800 dark:text-zinc-200">-{money(discount)}</td>
                     </tr>
                     <tr>
-                      <td colSpan={3} className="py-1 pr-4 text-right text-sm text-zinc-600">
+                      <td colSpan={3} className="py-1 pr-4 text-right text-sm text-zinc-600 dark:text-zinc-400">
                         Tax ({quotation.taxRate}%)
                       </td>
-                      <td className="py-1 text-right text-sm text-zinc-800">{money(quotation.tax)}</td>
+                      <td className="py-1 text-right text-sm text-zinc-800 dark:text-zinc-200">{money(quotation.tax)}</td>
                     </tr>
                     <tr>
-                      <td colSpan={3} className="py-3 pr-4 text-right text-sm font-semibold text-zinc-900">
+                      <td colSpan={3} className="py-3 pr-4 text-right text-sm font-semibold text-zinc-900 dark:text-zinc-100">
                         Total
                       </td>
-                      <td className="py-3 text-right text-lg font-bold text-zinc-900">
+                      <td className="py-3 text-right text-lg font-bold text-zinc-900 dark:text-zinc-100">
                         {money(quotation.total)}
                       </td>
                     </tr>
@@ -178,8 +178,8 @@ export default async function QuotationDetailPage({
             <CardHeader>
               <CardTitle>Prepared for</CardTitle>
             </CardHeader>
-            <CardContent className="text-sm text-zinc-700">
-              <Link href={`/clients/${quotation.client.id}`} className="font-medium text-zinc-900 hover:underline">
+            <CardContent className="text-sm text-zinc-700 dark:text-zinc-300">
+              <Link href={`/clients/${quotation.client.id}`} className="font-medium text-zinc-900 dark:text-zinc-100 hover:underline">
                 {quotation.client.name}
               </Link>
               {quotation.client.company ? <p>{quotation.client.company}</p> : null}
@@ -193,7 +193,7 @@ export default async function QuotationDetailPage({
               <CardHeader>
                 <CardTitle>Notes</CardTitle>
               </CardHeader>
-              <CardContent className="whitespace-pre-wrap text-sm text-zinc-700">
+              <CardContent className="whitespace-pre-wrap text-sm text-zinc-700 dark:text-zinc-300">
                 {quotation.notes}
               </CardContent>
             </Card>
@@ -252,18 +252,18 @@ export default async function QuotationDetailPage({
             </CardHeader>
             <CardContent className="space-y-3">
               {quotation.status === "CONVERTED" && quotation.convertedInvoiceId ? (
-                <p className="text-sm text-zinc-600">
+                <p className="text-sm text-zinc-600 dark:text-zinc-400">
                   Converted to invoice{" "}
                   <Link
                     href={`/invoices/${quotation.convertedInvoiceId}`}
-                    className="font-medium text-zinc-900 underline"
+                    className="font-medium text-zinc-900 dark:text-zinc-100 underline"
                   >
                     View invoice
                   </Link>
                   .
                 </p>
               ) : (
-                <p className="text-sm text-zinc-500">
+                <p className="text-sm text-zinc-500 dark:text-zinc-400">
                   Create a draft invoice from this quotation&apos;s items and totals.
                 </p>
               )}

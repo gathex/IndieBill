@@ -82,14 +82,14 @@ export default async function InvoicePreviewPage({
         <div>
           <Link
             href={`/invoices/${invoice.id}`}
-            className="text-sm text-zinc-500 hover:text-zinc-900"
+            className="text-sm text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-50"
           >
             ← Back to invoice
           </Link>
-          <h1 className="mt-2 text-2xl font-semibold tracking-tight text-zinc-900">
+          <h1 className="mt-2 text-2xl font-semibold tracking-tight text-zinc-900 dark:text-zinc-100">
             Preview · Invoice {invoice.number}
           </h1>
-          <p className="mt-1 text-sm text-zinc-500">
+          <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400">
             Full A4 sheet · use Print / Save as PDF for the best result.
           </p>
         </div>
@@ -117,7 +117,7 @@ export default async function InvoicePreviewPage({
         </div>
       </div>
 
-      <div className="overflow-x-auto bg-zinc-200 p-4 print:bg-white print:p-0">
+      <div className="overflow-x-auto bg-zinc-200 dark:bg-zinc-700 p-4 print:bg-white print:p-0">
         <InvoiceSheet
           invoice={pdfData}
           businessName={settings.businessName}

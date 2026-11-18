@@ -62,7 +62,7 @@ export function QuotationPdfDownload({
       <Button type="button" variant="outline" className="w-full" onClick={handleDownload} disabled={loading}>
         {loading ? "Generating…" : "Download PDF"}
       </Button>
-      {error ? <p className="text-xs text-red-600">{error}</p> : null}
+      {error ? <p className="text-xs text-red-600 dark:text-red-400">{error}</p> : null}
     </div>
   );
 }

@@ -77,7 +77,7 @@ export function ClientFormClient({ client, next }: ClientFormClientProps) {
         <Label htmlFor="notes">Notes</Label>
         <Textarea id="notes" value={notes} onChange={(e) => setNotes(e.target.value)} />
       </div>
-      {error ? <p className="text-sm text-red-600">{error}</p> : null}
+      {error ? <p className="text-sm text-red-600 dark:text-red-400">{error}</p> : null}
       <div className="flex justify-end gap-2">
         <Button type="button" variant="outline" onClick={() => router.back()}>
           Cancel

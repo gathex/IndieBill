@@ -157,7 +157,7 @@ export function InvoiceFormClient({
             id="clientId"
             value={clientId}
             onChange={(e) => setClientId(e.target.value)}
-            className="flex h-9 w-full rounded-md border border-zinc-300 bg-white px-3 py-1 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-zinc-400"
+            className="flex h-9 w-full rounded-md border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-900 px-3 py-1 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-zinc-400"
           >
             {clients.length === 0 ? <option value="">No clients yet</option> : null}
             {clients.map((client) => (
@@ -173,7 +173,7 @@ export function InvoiceFormClient({
             id="status"
             value={status}
             onChange={(e) => setStatus(e.target.value as InvoiceStatus)}
-            className="flex h-9 w-full rounded-md border border-zinc-300 bg-white px-3 py-1 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-zinc-400"
+            className="flex h-9 w-full rounded-md border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-900 px-3 py-1 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-zinc-400"
           >
             <option value="DRAFT">Draft</option>
             <option value="SENT">Sent</option>
@@ -300,7 +300,7 @@ export function InvoiceFormClient({
         </CardContent>
       </Card>
 
-      {error ? <p className="text-sm text-red-600">{error}</p> : null}
+      {error ? <p className="text-sm text-red-600 dark:text-red-400">{error}</p> : null}
 
       <div className="flex justify-end gap-2">
         <Button type="button" variant="outline" onClick={() => router.back()}>

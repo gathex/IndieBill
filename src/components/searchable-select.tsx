@@ -61,7 +61,7 @@ export function SearchableSelect({
           aria-controls={`${id}-options`}
           aria-autocomplete="list"
           autoComplete="off"
-          className="flex h-9 w-full rounded-md border border-zinc-300 bg-white px-3 py-1 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-zinc-400"
+          className="flex h-9 w-full rounded-md border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-900 px-3 py-1 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-zinc-400"
           value={query}
           placeholder={placeholder ?? "Type to search…"}
           onFocus={() => setOpen(true)}
@@ -88,18 +88,18 @@ export function SearchableSelect({
           <ul
             id={`${id}-options`}
             role="listbox"
-            className="absolute z-20 mt-1 max-h-56 w-full overflow-y-auto rounded-md border border-zinc-200 bg-white py-1 shadow-lg"
+            className="absolute z-20 mt-1 max-h-56 w-full overflow-y-auto rounded-md border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 py-1 shadow-lg"
           >
             {filtered.length === 0 ? (
-              <li className="px-3 py-2 text-sm text-zinc-500">No matches</li>
+              <li className="px-3 py-2 text-sm text-zinc-500 dark:text-zinc-400">No matches</li>
             ) : (
               filtered.map((option) => (
                 <li
                   key={option.code}
                   role="option"
                   aria-selected={option.code === value}
-                  className={`cursor-pointer px-3 py-2 text-sm hover:bg-zinc-100 ${
-                    option.code === value ? "bg-zinc-50 font-medium" : ""
+                  className={`cursor-pointer px-3 py-2 text-sm hover:bg-zinc-100 dark:hover:bg-zinc-800 ${
+                    option.code === value ? "bg-zinc-50 dark:bg-zinc-950 font-medium" : ""
                   }`}
                   onMouseDown={(event) => event.preventDefault()}
                   onClick={() => choose(option)}
@@ -111,7 +111,7 @@ export function SearchableSelect({
           </ul>
         ) : null}
       </div>
-      <p className="text-xs text-zinc-500">
+      <p className="text-xs text-zinc-500 dark:text-zinc-400">
         {options.length} options · type to search
       </p>
     </div>

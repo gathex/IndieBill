@@ -71,7 +71,7 @@ export default async function InvoicesPage({
     <div className="space-y-6">
       <Notice notice={notice} />
       <div className="flex flex-wrap items-center justify-between gap-4">
-        <h1 className="text-3xl font-semibold tracking-tight text-zinc-900">Invoices</h1>
+        <h1 className="text-3xl font-semibold tracking-tight text-zinc-900 dark:text-zinc-100">Invoices</h1>
         <Link href="/invoices/new">
           <Button>New invoice</Button>
         </Link>
@@ -101,9 +101,9 @@ export default async function InvoicesPage({
           </div>
 
           {filtered.length === 0 ? (
-            <div className="py-12 text-center text-sm text-zinc-500">
+            <div className="py-12 text-center text-sm text-zinc-500 dark:text-zinc-400">
               No invoices found.{" "}
-              <Link href="/invoices/new" className="font-medium text-zinc-900 underline-offset-4 hover:underline">
+              <Link href="/invoices/new" className="font-medium text-zinc-900 dark:text-zinc-100 underline-offset-4 hover:underline">
                 Create an invoice
               </Link>
               .
@@ -112,7 +112,7 @@ export default async function InvoicesPage({
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
                 <thead>
-                  <tr className="border-b text-left text-xs uppercase tracking-wide text-zinc-500">
+                  <tr className="border-b text-left text-xs uppercase tracking-wide text-zinc-500 dark:text-zinc-400">
                     <th className="py-2 pr-4 font-medium">Number</th>
                     <th className="py-2 pr-4 font-medium">Client</th>
                     <th className="py-2 pr-4 font-medium">Issued</th>
@@ -128,22 +128,22 @@ export default async function InvoicesPage({
                     const balance = getInvoiceBalance(invoice.total, invoice.payments);
                     return (
                       <tr key={invoice.id} className="border-b last:border-0">
-                        <td className="py-3 pr-4 font-medium text-zinc-900">
+                        <td className="py-3 pr-4 font-medium text-zinc-900 dark:text-zinc-100">
                           <Link href={`/invoices/${invoice.id}`} className="hover:underline">
                             {invoice.number}
                           </Link>
                         </td>
-                        <td className="py-3 pr-4 text-zinc-700">
+                        <td className="py-3 pr-4 text-zinc-700 dark:text-zinc-300">
                           <Link href={`/clients/${invoice.client.id}`} className="hover:underline">
                             {invoice.client.name}
                           </Link>
                         </td>
-                        <td className="py-3 pr-4 text-zinc-600">{formatDate(invoice.issueDate, undefined, settings.locale)}</td>
-                        <td className="py-3 pr-4 text-zinc-600">{formatDate(invoice.dueDate, undefined, settings.locale)}</td>
-                        <td className="py-3 pr-4 text-right font-medium text-zinc-900">
+                        <td className="py-3 pr-4 text-zinc-600 dark:text-zinc-400">{formatDate(invoice.issueDate, undefined, settings.locale)}</td>
+                        <td className="py-3 pr-4 text-zinc-600 dark:text-zinc-400">{formatDate(invoice.dueDate, undefined, settings.locale)}</td>
+                        <td className="py-3 pr-4 text-right font-medium text-zinc-900 dark:text-zinc-100">
                           {money(invoice.total)}
                           {balance > 0 && balance < invoice.total ? (
-                            <span className="mt-0.5 block text-xs font-normal text-amber-700">
+                            <span className="mt-0.5 block text-xs font-normal text-amber-700 dark:text-amber-400">
                               {money(balance)} due
                             </span>
                           ) : null}
