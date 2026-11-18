@@ -29,7 +29,8 @@ export default async function PaymentsPage({
     getUserPayments(userId),
     getUserSettings(userId),
   ]);
-  const money = (amount: number) => formatCurrency(amount, settings.currency);
+  const money = (amount: number) =>
+    formatCurrency(amount, settings.currency, settings.locale);
   const totalReceived = payments.reduce((sum, payment) => sum + payment.amount, 0);
 
   return (
@@ -71,7 +72,7 @@ export default async function PaymentsPage({
                   {payments.map((payment) => (
                     <tr key={payment.id} className="border-b last:border-0">
                       <td className="py-3 pr-4 text-zinc-600">
-                        {formatDate(payment.paymentDate)}
+                        {formatDate(payment.paymentDate, undefined, settings.locale)}
                       </td>
                       <td className="py-3 pr-4 font-medium text-zinc-900">
                         <Link

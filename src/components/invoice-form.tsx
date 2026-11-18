@@ -32,6 +32,7 @@ interface InvoiceFormClientProps {
   clients: Array<{ id: string; name: string; email: string; company: string | null }>;
   invoice?: InvoiceFormInvoice | null;
   currency?: string;
+  locale?: string;
 }
 
 interface InvoiceItemRow {
@@ -46,6 +47,7 @@ export function InvoiceFormClient({
   clients,
   invoice,
   currency = "USD",
+  locale,
 }: InvoiceFormClientProps) {
   const router = useRouter();
   const isEdit = Boolean(invoice);
@@ -281,19 +283,19 @@ export function InvoiceFormClient({
         <CardContent className="pt-6 space-y-1">
           <div className="flex justify-between text-sm">
             <span>Subtotal</span>
-            <span>{formatCurrency(totals.subtotal, currency)}</span>
+            <span>{formatCurrency(totals.subtotal, currency, locale)}</span>
           </div>
           <div className="flex justify-between text-sm">
             <span>Discount ({discountPercent || 0}%)</span>
-            <span>-{formatCurrency(totals.discount, currency)}</span>
+            <span>-{formatCurrency(totals.discount, currency, locale)}</span>
           </div>
           <div className="flex justify-between text-sm">
             <span>Tax ({parseFloat(taxRate) || 0}%)</span>
-            <span>{formatCurrency(totals.tax, currency)}</span>
+            <span>{formatCurrency(totals.tax, currency, locale)}</span>
           </div>
           <div className="flex justify-between text-base font-semibold pt-2 border-t">
             <span>Total</span>
-            <span>{formatCurrency(totals.total, currency)}</span>
+            <span>{formatCurrency(totals.total, currency, locale)}</span>
           </div>
         </CardContent>
       </Card>

@@ -233,6 +233,8 @@ export async function sendQuotationEmailAction(formData: FormData) {
       businessName: settings.businessName,
       businessAddress: settings.businessAddress,
       currency: settings.currency,
+      locale: settings.locale,
+      logoDataUrl: settings.logoDataUrl,
     });
     const result = await sendQuotationEmail({
       to: quotation.client.email,
@@ -241,6 +243,7 @@ export async function sendQuotationEmailAction(formData: FormData) {
       clientName: quotation.client.name,
       amount: quotation.total,
       currency: settings.currency,
+      locale: settings.locale,
       validUntil: quotation.validUntil,
       pdf: { filename: `quotation-${quotation.number}.pdf`, content: pdf },
     });

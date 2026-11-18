@@ -13,10 +13,14 @@ A focused invoice app for freelancers. Each account has one business profile, cl
 - Line items, discounts, tax, automatic totals, due dates, and overdue detection
 - Downloadable PDF invoices and quotations
 - Full A4 HTML previews with print / Save as PDF support
+- Invoice sharing: native share sheet, copy link, email, and WhatsApp shortcuts
+- QR payment code on invoices, A4 previews, and downloaded PDFs
 - Payment management: partial payments, methods, references, balances, and delete/recalculate
 - Email invoices and quotations with the PDF attached (via Resend)
 - Stripe payment links and webhook-based payment recording and status updates
-- Business name, address, and currency settings
+- Company logo upload shown in the header and as a faded watermark on invoices and quotations
+- Business name, address, currency, country, and language settings with all ISO options
+- Locale-aware currency and date formatting across invoices, quotations, payments, PDFs, and emails
 - Dashboard with outstanding, received, overdue, and draft metrics
 
 ## Stack
@@ -70,6 +74,10 @@ The seed is idempotent, so you can run it again to restore the sample clients, i
 ## Optional integrations
 
 All integrations are optional. The app remains usable without them; email and payment-link actions show a clear message when they are not configured.
+
+### Share links
+
+`NEXT_PUBLIC_APP_URL` controls the origin used in invoice share links. Leave it as `http://localhost:3000` locally, and set it to your public domain before sharing invoices from a deployed instance. If it is blank, the app uses the incoming request host.
 
 ### Email delivery
 

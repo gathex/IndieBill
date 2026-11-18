@@ -52,7 +52,12 @@ export default async function QuotationEditPage({
       <h1 className="text-3xl font-semibold tracking-tight text-zinc-900">
         Edit quotation {quotation.number}
       </h1>
-      <QuotationFormClient clients={clients} quotation={formQuotation} currency={settings.currency} />
+      <QuotationFormClient
+        clients={clients}
+        quotation={formQuotation}
+        currency={settings.currency}
+        locale={settings.locale}
+      />
     </div>
   );
 }

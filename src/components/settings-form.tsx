@@ -7,29 +7,51 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent } from "@/components/ui/card";
+import { SearchableSelect } from "@/components/searchable-select";
 import { updateSettings } from "@/actions/settings";
+import type { LocaleOption } from "@/lib/locale-data";
 
 interface SettingsFormProps {
   name: string;
   businessName: string;
   businessAddress: string;
   currency: string;
+  country: string;
+  language: string;
+  logoDataUrl: string | null;
+  countries: LocaleOption[];
+  currencies: LocaleOption[];
+  languages: LocaleOption[];
 }
 
-const CURRENCIES = ["USD", "EUR", "GBP", "INR", "CAD", "AUD"];
+function fallbackCode(value: string, options: LocaleOption[], fallback: string) {
+  return options.some((option) => option.code === value) ? value : fallback;
+}
+
+const ALLOWED_LOGO_TYPES = ["image/png", "image/jpeg"];
+const MAX_LOGO_BYTES = 1024 * 1024;
 
 export function SettingsForm({
   name,
   businessName,
   businessAddress,
   currency,
+  country,
+  language,
+  logoDataUrl,
+  countries,
+  currencies,
+  languages,
 }: SettingsFormProps) {
   const router = useRouter();
   const [form, setForm] = useState({
     name,
     businessName,
     businessAddress,
-    currency: CURRENCIES.includes(currency) ? currency : "USD",
+    currency: fallbackCode(currency, currencies, "USD"),
+    country: fallbackCode(country, countries, "US"),
+    language: fallbackCode(language, languages, "en"),
+    logoDataUrl,
   });
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
@@ -38,6 +60,33 @@ export function SettingsForm({
   function update(field: keyof typeof form, value: string) {
     setForm((prev) => ({ ...prev, [field]: value }));
     setSaved(false);
+  }
+
+  function handleLogoChange(event: React.ChangeEvent<HTMLInputElement>) {
+    const file = event.target.files?.[0];
+    setError(null);
+    if (!file) return;
+
+    if (!ALLOWED_LOGO_TYPES.includes(file.type)) {
+      setError("Logo must be a PNG or JPG image.");
+      event.target.value = "";
+      return;
+    }
+    if (file.size > MAX_LOGO_BYTES) {
+      setError("Logo must be 1 MB or smaller.");
+      event.target.value = "";
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = () => {
+      if (typeof reader.result === "string") {
+        setForm((prev) => ({ ...prev, logoDataUrl: reader.result as string }));
+        setSaved(false);
+      }
+    };
+    reader.onerror = () => setError("Unable to read the logo file.");
+    reader.readAsDataURL(file);
   }
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
@@ -85,21 +134,78 @@ export function SettingsForm({
               placeholder="Street, city, country"
             />
           </div>
+
           <div className="space-y-2">
-            <Label htmlFor="currency">Default currency</Label>
-            <select
-              id="currency"
-              value={form.currency}
-              onChange={(e) => update("currency", e.target.value)}
-              className="flex h-9 w-full rounded-md border border-zinc-300 bg-white px-3 py-1 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-zinc-400"
-            >
-              {CURRENCIES.map((code) => (
-                <option key={code} value={code}>
-                  {code}
-                </option>
-              ))}
-            </select>
+            <Label htmlFor="logo">Company logo</Label>
+            <input
+              id="logo"
+              type="file"
+              accept="image/png,image/jpeg"
+              onChange={handleLogoChange}
+              className="block w-full text-sm text-zinc-700 file:mr-3 file:rounded-md file:border file:border-zinc-300 file:bg-white file:px-3 file:py-2 file:text-sm file:font-medium file:text-zinc-900 hover:file:bg-zinc-50"
+            />
+            {form.logoDataUrl ? (
+              <div className="flex items-center gap-4 rounded-md border border-zinc-200 p-3">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={form.logoDataUrl}
+                  alt="Company logo preview"
+                  className="h-14 w-14 shrink-0 rounded border border-zinc-200 object-contain"
+                />
+                <div className="min-w-0 flex-1">
+                  <p className="text-sm font-medium text-zinc-900">Logo ready to save</p>
+                  <p className="text-xs text-zinc-500">
+                    Used in the header and as a faded watermark on documents.
+                  </p>
+                </div>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => {
+                    setForm((prev) => ({ ...prev, logoDataUrl: null }));
+                    setSaved(false);
+                  }}
+                >
+                  Remove
+                </Button>
+              </div>
+            ) : null}
+            <p className="text-xs text-zinc-500">
+              PNG or JPG up to 1 MB. Changes apply to new previews and PDFs.
+            </p>
           </div>
+
+          <div className="grid gap-4 sm:grid-cols-2">
+            <SearchableSelect
+              id="country"
+              label="Country"
+              value={form.country}
+              options={countries}
+              onChange={(value) => update("country", value)}
+              placeholder="Search all countries…"
+            />
+            <SearchableSelect
+              id="currency"
+              label="Default currency"
+              value={form.currency}
+              options={currencies}
+              onChange={(value) => update("currency", value)}
+              placeholder="Search all currencies…"
+            />
+          </div>
+          <SearchableSelect
+            id="language"
+            label="Language"
+            value={form.language}
+            options={languages}
+            onChange={(value) => update("language", value)}
+            placeholder="Search all languages…"
+          />
+          <p className="text-xs text-zinc-500">
+            Language and country control date and number formatting on invoices,
+            quotations, payments, and PDFs.
+          </p>
         </CardContent>
       </Card>
 

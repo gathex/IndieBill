@@ -1,5 +1,6 @@
 import {
   Document,
+  Image,
   Page,
   Text,
   View,
@@ -34,11 +35,25 @@ export interface QuotationDocumentProps {
   businessName: string;
   businessAddress?: string | null;
   currency?: string;
+  locale?: string;
+  logoDataUrl?: string | null;
 }
 
 const styles = StyleSheet.create({
   page: { flexGrow: 1, padding: 40, fontSize: 11, color: "#18181b" },
   header: { flexDirection: "row", justifyContent: "space-between", alignItems: "flex-start" },
+  brandRow: { flexDirection: "row", alignItems: "flex-start" },
+  brandCopy: { flexGrow: 1 },
+  headerLogo: { width: 48, height: 48, marginRight: 12, objectFit: "contain" },
+  watermark: {
+    position: "absolute",
+    top: 260,
+    left: 148,
+    width: 300,
+    height: 300,
+    opacity: 0.06,
+    objectFit: "contain",
+  },
   brand: { fontSize: 16, fontWeight: "bold", marginBottom: 4 },
   muted: { fontSize: 9, color: "#71717a" },
   title: { fontSize: 22, fontWeight: "bold", color: "#18181b" },
@@ -89,8 +104,10 @@ export function QuotationDocument({
   businessName,
   businessAddress,
   currency = "USD",
+  locale,
+  logoDataUrl,
 }: QuotationDocumentProps) {
-  const money = (amount: number) => formatCurrency(amount, currency);
+  const money = (amount: number) => formatCurrency(amount, currency, locale);
 
   return (
     <Document
@@ -99,12 +116,22 @@ export function QuotationDocument({
       subject={`Quotation ${quotation.number}`}
     >
       <Page size="A4" style={styles.page}>
+        {logoDataUrl ? (
+          // eslint-disable-next-line jsx-a11y/alt-text
+          <Image src={logoDataUrl} style={styles.watermark} />
+        ) : null}
         <View style={styles.header}>
-          <View>
-            <Text style={styles.brand}>{businessName}</Text>
-            {businessAddress ? (
-              <Text style={styles.muted}>{businessAddress}</Text>
+          <View style={styles.brandRow}>
+            {logoDataUrl ? (
+              // eslint-disable-next-line jsx-a11y/alt-text
+              <Image src={logoDataUrl} style={styles.headerLogo} />
             ) : null}
+            <View style={styles.brandCopy}>
+              <Text style={styles.brand}>{businessName}</Text>
+              {businessAddress ? (
+                <Text style={styles.muted}>{businessAddress}</Text>
+              ) : null}
+            </View>
           </View>
           <View>
             <Text style={styles.title}>QUOTATION</Text>
@@ -126,11 +153,11 @@ export function QuotationDocument({
             <View style={styles.row}>
               <View style={styles.half}>
                 <Text style={styles.label}>Issued</Text>
-                <Text style={styles.value}>{formatDate(quotation.issueDate)}</Text>
+                <Text style={styles.value}>{formatDate(quotation.issueDate, undefined, locale)}</Text>
               </View>
               <View style={styles.half}>
                 <Text style={styles.label}>Valid until</Text>
-                <Text style={styles.value}>{formatDate(quotation.validUntil)}</Text>
+                <Text style={styles.value}>{formatDate(quotation.validUntil, undefined, locale)}</Text>
               </View>
             </View>
           </View>

@@ -23,7 +23,11 @@ export default async function NewInvoicePage() {
           Fill in the details below. Totals are calculated automatically.
         </p>
       </div>
-      <InvoiceFormClient clients={clients} currency={settings.currency} />
+      <InvoiceFormClient
+        clients={clients}
+        currency={settings.currency}
+        locale={settings.locale}
+      />
     </div>
   );
 }

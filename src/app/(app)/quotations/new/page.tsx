@@ -32,6 +32,7 @@ export default async function NewQuotationPage({
       <QuotationFormClient
         clients={clients}
         currency={settings.currency}
+        locale={settings.locale}
         defaultClientId={defaultClientId}
       />
     </div>

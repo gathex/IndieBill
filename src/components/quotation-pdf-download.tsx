@@ -13,6 +13,8 @@ interface QuotationPdfDownloadProps {
   businessName: string;
   businessAddress?: string | null;
   currency?: string;
+  locale?: string;
+  logoDataUrl?: string | null;
 }
 
 export function QuotationPdfDownload({
@@ -20,6 +22,8 @@ export function QuotationPdfDownload({
   businessName,
   businessAddress,
   currency = "USD",
+  locale,
+  logoDataUrl,
 }: QuotationPdfDownloadProps) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -34,6 +38,8 @@ export function QuotationPdfDownload({
           businessName={businessName}
           businessAddress={businessAddress}
           currency={currency}
+          locale={locale}
+          logoDataUrl={logoDataUrl}
         />,
       ).toBlob();
       const url = URL.createObjectURL(blob);

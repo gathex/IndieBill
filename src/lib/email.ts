@@ -1,4 +1,5 @@
 import { Resend } from "resend";
+import { formatCurrency, formatDate } from "./utils";
 
 interface SendInvoiceEmailParams {
   to: string;
@@ -7,6 +8,7 @@ interface SendInvoiceEmailParams {
   clientName: string;
   amount: number;
   currency?: string;
+  locale?: string;
   dueDate?: Date | string | null;
   paymentLink?: string | null;
   pdf?: { filename: string; content: Buffer };
@@ -23,16 +25,17 @@ export async function sendInvoiceEmail(
 
   const resend = new Resend(apiKey);
   const dueDate = params.dueDate
-    ? new Date(params.dueDate).toLocaleDateString("en-US", {
-        year: "numeric",
-        month: "long",
-        day: "numeric",
-      })
+    ? formatDate(
+        params.dueDate,
+        { year: "numeric", month: "long", day: "numeric" },
+        params.locale,
+      )
     : null;
-  const formattedAmount = new Intl.NumberFormat("en-US", {
-    style: "currency",
-    currency: params.currency ?? "USD",
-  }).format(params.amount);
+  const formattedAmount = formatCurrency(
+    params.amount,
+    params.currency ?? "USD",
+    params.locale,
+  );
 
   const { data, error } = await resend.emails.send({
     from: `${params.businessName} <onboarding@resend.dev>`,
@@ -72,6 +75,7 @@ interface SendQuotationEmailParams {
   clientName: string;
   amount: number;
   currency?: string;
+  locale?: string;
   validUntil?: Date | string | null;
   pdf?: { filename: string; content: Buffer };
 }
@@ -86,16 +90,17 @@ export async function sendQuotationEmail(
 
   const resend = new Resend(apiKey);
   const validUntil = params.validUntil
-    ? new Date(params.validUntil).toLocaleDateString("en-US", {
-        year: "numeric",
-        month: "long",
-        day: "numeric",
-      })
+    ? formatDate(
+        params.validUntil,
+        { year: "numeric", month: "long", day: "numeric" },
+        params.locale,
+      )
     : null;
-  const formattedAmount = new Intl.NumberFormat("en-US", {
-    style: "currency",
-    currency: params.currency ?? "USD",
-  }).format(params.amount);
+  const formattedAmount = formatCurrency(
+    params.amount,
+    params.currency ?? "USD",
+    params.locale,
+  );
 
   const { data, error } = await resend.emails.send({
     from: `${params.businessName} <onboarding@resend.dev>`,

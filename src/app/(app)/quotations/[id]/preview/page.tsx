@@ -82,6 +82,8 @@ export default async function QuotationPreviewPage({
             businessName={settings.businessName}
             businessAddress={settings.businessAddress}
             currency={settings.currency}
+            locale={settings.locale}
+            logoDataUrl={settings.logoDataUrl}
           />
         </div>
       </div>
@@ -92,6 +94,8 @@ export default async function QuotationPreviewPage({
           businessName={settings.businessName}
           businessAddress={settings.businessAddress}
           currency={settings.currency}
+          locale={settings.locale}
+          logoDataUrl={settings.logoDataUrl}
         />
       </div>
     </div>

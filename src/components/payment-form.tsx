@@ -10,18 +10,20 @@ interface PaymentFormProps {
   invoiceId: string;
   balance: number;
   currency?: string;
+  locale?: string;
 }
 
 export function PaymentForm({
   invoiceId,
   balance,
   currency = "USD",
+  locale,
 }: PaymentFormProps) {
   return (
     <form action={recordPayment} className="space-y-3">
       <input type="hidden" name="invoiceId" value={invoiceId} />
       <p className="text-xs text-zinc-500">
-        Remaining balance: <span className="font-medium text-zinc-900">{formatCurrency(balance, currency)}</span>
+        Remaining balance: <span className="font-medium text-zinc-900">{formatCurrency(balance, currency, locale)}</span>
       </p>
       <div className="grid gap-3 sm:grid-cols-2">
         <div className="space-y-1">

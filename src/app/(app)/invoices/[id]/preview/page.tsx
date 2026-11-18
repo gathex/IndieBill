@@ -6,12 +6,16 @@ import {
   effectiveStatus,
   getInvoiceById,
 } from "@/lib/invoices";
+import { generatePaymentQr } from "@/lib/qr";
+import { getInvoiceShareUrl } from "@/lib/share";
+import { getInvoiceBalance } from "@/lib/payments";
 import { getUserSettings } from "@/lib/users";
 import { InvoiceSheet } from "@/components/invoice-sheet";
 import { InvoicePdfDownload } from "@/components/invoice-pdf-download";
 import { PrintButton } from "@/components/print-button";
 import { Button } from "@/components/ui/button";
 import type { InvoicePdfData } from "@/components/invoice-document";
+import { ShareInvoiceButton } from "@/components/share-invoice-button";
 
 export default async function InvoicePreviewPage({
   params,
@@ -27,6 +31,19 @@ export default async function InvoicePreviewPage({
   if (!invoice) notFound();
 
   const settings = await getUserSettings(userId);
+  const balance = getInvoiceBalance(invoice.total, invoice.payments);
+  const [shareUrl, qr] = await Promise.all([
+    getInvoiceShareUrl(invoice.id),
+    generatePaymentQr({
+      invoiceNumber: invoice.number,
+      amount: balance > 0 ? balance : invoice.total,
+      currency: settings.currency,
+      locale: settings.locale,
+      businessName: settings.businessName,
+      dueDate: invoice.dueDate,
+      paymentLink: invoice.paymentLink,
+    }),
+  ]);
   const discount = computeInvoiceTotals({
     subtotal: invoice.subtotal,
     discountPercent: invoice.discountPercent,
@@ -76,12 +93,22 @@ export default async function InvoicePreviewPage({
           <Link href={`/invoices/${invoice.id}`}>
             <Button variant="ghost">Details</Button>
           </Link>
+          <ShareInvoiceButton
+            compact
+            url={shareUrl}
+            title={`Invoice ${invoice.number}`}
+            text={`Invoice ${invoice.number} from ${settings.businessName}`}
+          />
           <PrintButton />
           <InvoicePdfDownload
             invoice={pdfData}
             businessName={settings.businessName}
             businessAddress={settings.businessAddress}
             currency={settings.currency}
+            locale={settings.locale}
+            logoDataUrl={settings.logoDataUrl}
+            qrDataUrl={qr.dataUrl}
+            qrLabel={qr.label}
           />
         </div>
       </div>
@@ -92,6 +119,10 @@ export default async function InvoicePreviewPage({
           businessName={settings.businessName}
           businessAddress={settings.businessAddress}
           currency={settings.currency}
+          locale={settings.locale}
+          logoDataUrl={settings.logoDataUrl}
+          qrDataUrl={qr.dataUrl}
+          qrLabel={qr.label}
         />
       </div>
     </div>

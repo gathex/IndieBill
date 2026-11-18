@@ -11,6 +11,7 @@ import { derivePaymentStatus, getInvoiceBalance } from "@/lib/payments";
 import { sendInvoiceEmail } from "@/lib/email";
 import { createPaymentLink } from "@/lib/stripe";
 import { renderInvoicePdf } from "@/lib/pdf";
+import { generatePaymentQr } from "@/lib/qr";
 import { getUserSettings } from "@/lib/users";
 import type { InvoicePdfData } from "@/components/invoice-document";
 
@@ -252,11 +253,21 @@ export async function sendInvoiceEmailAction(formData: FormData) {
   const userId = await requireUserId();
   const invoice = await prisma.invoice.findFirst({
     where: { id, userId },
-    include: { client: true, user: true },
+    include: { client: true, user: true, payments: true },
   });
   if (!invoice) throw new Error("Invoice not found.");
 
   const settings = await getUserSettings(userId);
+  const balance = getInvoiceBalance(invoice.total, invoice.payments);
+  const qr = await generatePaymentQr({
+    invoiceNumber: invoice.number,
+    amount: balance > 0 ? balance : invoice.total,
+    currency: settings.currency,
+    locale: settings.locale,
+    businessName: settings.businessName,
+    dueDate: invoice.dueDate,
+    paymentLink: invoice.paymentLink,
+  });
 
   let skipped = false;
   try {
@@ -266,6 +277,10 @@ export async function sendInvoiceEmailAction(formData: FormData) {
       businessName: settings.businessName,
       businessAddress: settings.businessAddress,
       currency: settings.currency,
+      locale: settings.locale,
+      logoDataUrl: settings.logoDataUrl,
+      qrDataUrl: qr.dataUrl,
+      qrLabel: qr.label,
     });
 
     const result = await sendInvoiceEmail({
@@ -275,6 +290,7 @@ export async function sendInvoiceEmailAction(formData: FormData) {
       clientName: invoice.client.name,
       amount: invoice.total,
       currency: settings.currency,
+      locale: settings.locale,
       dueDate: invoice.dueDate,
       paymentLink: invoice.paymentLink,
       pdf: { filename: `invoice-${invoice.number}.pdf`, content: pdf },

@@ -1,5 +1,6 @@
 import {
   Document,
+  Image,
   Page,
   Text,
   View,
@@ -34,11 +35,27 @@ export interface InvoiceDocumentProps {
   businessName: string;
   businessAddress?: string | null;
   currency?: string;
+  locale?: string;
+  logoDataUrl?: string | null;
+  qrDataUrl?: string | null;
+  qrLabel?: string;
 }
 
 const styles = StyleSheet.create({
   page: { flexGrow: 1, padding: 40, fontSize: 11, color: "#18181b" },
   header: { flexDirection: "row", justifyContent: "space-between", alignItems: "flex-start" },
+  brandRow: { flexDirection: "row", alignItems: "flex-start" },
+  brandCopy: { flexGrow: 1 },
+  headerLogo: { width: 48, height: 48, marginRight: 12, objectFit: "contain" },
+  watermark: {
+    position: "absolute",
+    top: 260,
+    left: 148,
+    width: 300,
+    height: 300,
+    opacity: 0.06,
+    objectFit: "contain",
+  },
   brand: { fontSize: 16, fontWeight: "bold", marginBottom: 4 },
   muted: { fontSize: 9, color: "#71717a" },
   title: { fontSize: 22, fontWeight: "bold", color: "#18181b" },
@@ -71,6 +88,20 @@ const styles = StyleSheet.create({
   totals: { marginTop: 16, alignSelf: "flex-end", width: "45%" },
   totalLine: { flexDirection: "row", justifyContent: "space-between", paddingVertical: 3 },
   totalBold: { fontSize: 13, fontWeight: "bold", paddingTop: 6 },
+  qr: {
+    marginTop: 18,
+    flexDirection: "row",
+    alignItems: "flex-start",
+    borderWidth: 1,
+    borderColor: "#e4e4e7",
+    borderRadius: 4,
+    padding: 12,
+  },
+  qrImage: { width: 64, height: 64 },
+  qrCopy: { flexGrow: 1, width: "75%", marginLeft: 12 },
+  qrLabel: { fontSize: 8, color: "#a1a1aa", textTransform: "uppercase" },
+  qrTitle: { fontSize: 10, fontWeight: "bold", marginTop: 4 },
+  qrText: { fontSize: 9, color: "#71717a", marginTop: 4, lineHeight: 1.4 },
   footer: {
     position: "absolute",
     bottom: 32,
@@ -89,8 +120,12 @@ export function InvoiceDocument({
   businessName,
   businessAddress,
   currency = "USD",
+  locale,
+  logoDataUrl,
+  qrDataUrl,
+  qrLabel = "Scan to pay online",
 }: InvoiceDocumentProps) {
-  const money = (amount: number) => formatCurrency(amount, currency);
+  const money = (amount: number) => formatCurrency(amount, currency, locale);
 
   return (
     <Document
@@ -99,12 +134,22 @@ export function InvoiceDocument({
       subject={`Invoice ${invoice.number}`}
     >
       <Page size="A4" style={styles.page}>
+        {logoDataUrl ? (
+          // eslint-disable-next-line jsx-a11y/alt-text
+          <Image src={logoDataUrl} style={styles.watermark} />
+        ) : null}
         <View style={styles.header}>
-          <View>
-            <Text style={styles.brand}>{businessName}</Text>
-            {businessAddress ? (
-              <Text style={styles.muted}>{businessAddress}</Text>
+          <View style={styles.brandRow}>
+            {logoDataUrl ? (
+              // eslint-disable-next-line jsx-a11y/alt-text
+              <Image src={logoDataUrl} style={styles.headerLogo} />
             ) : null}
+            <View style={styles.brandCopy}>
+              <Text style={styles.brand}>{businessName}</Text>
+              {businessAddress ? (
+                <Text style={styles.muted}>{businessAddress}</Text>
+              ) : null}
+            </View>
           </View>
           <View>
             <Text style={styles.title}>INVOICE</Text>
@@ -126,11 +171,11 @@ export function InvoiceDocument({
             <View style={styles.row}>
               <View style={styles.half}>
                 <Text style={styles.label}>Issued</Text>
-                <Text style={styles.value}>{formatDate(invoice.issueDate)}</Text>
+                <Text style={styles.value}>{formatDate(invoice.issueDate, undefined, locale)}</Text>
               </View>
               <View style={styles.half}>
                 <Text style={styles.label}>Due</Text>
-                <Text style={styles.value}>{formatDate(invoice.dueDate)}</Text>
+                <Text style={styles.value}>{formatDate(invoice.dueDate, undefined, locale)}</Text>
               </View>
             </View>
           </View>
@@ -171,6 +216,21 @@ export function InvoiceDocument({
             <Text>{money(invoice.total)}</Text>
           </View>
         </View>
+
+        {qrDataUrl ? (
+          <View style={styles.qr}>
+            {/* eslint-disable-next-line jsx-a11y/alt-text */}
+            <Image src={qrDataUrl} style={styles.qrImage} />
+            <View style={styles.qrCopy}>
+              <Text style={styles.qrLabel}>Pay by QR code</Text>
+              <Text style={styles.qrTitle}>{qrLabel}</Text>
+              <Text style={styles.qrText}>
+                Point a phone camera at the code to open the payment link or
+                payment details for {invoice.number}.
+              </Text>
+            </View>
+          </View>
+        ) : null}
 
         {invoice.notes ? (
           <View style={styles.section}>

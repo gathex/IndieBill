@@ -49,7 +49,8 @@ export default async function QuotationsPage({
     getUserQuotations(userId),
     getUserSettings(userId),
   ]);
-  const money = (amount: number) => formatCurrency(amount, settings.currency);
+  const money = (amount: number) =>
+    formatCurrency(amount, settings.currency, settings.locale);
 
   const query = q.trim().toLowerCase();
   const filtered = quotations.filter((quotation) => {
@@ -146,8 +147,8 @@ export default async function QuotationsPage({
                             {quotation.client.name}
                           </Link>
                         </td>
-                        <td className="py-3 pr-4 text-zinc-600">{formatDate(quotation.issueDate)}</td>
-                        <td className="py-3 pr-4 text-zinc-600">{formatDate(quotation.validUntil)}</td>
+                        <td className="py-3 pr-4 text-zinc-600">{formatDate(quotation.issueDate, undefined, settings.locale)}</td>
+                        <td className="py-3 pr-4 text-zinc-600">{formatDate(quotation.validUntil, undefined, settings.locale)}</td>
                         <td className="py-3 pr-4 text-right font-medium text-zinc-900">
                           {money(quotation.total)}
                         </td>

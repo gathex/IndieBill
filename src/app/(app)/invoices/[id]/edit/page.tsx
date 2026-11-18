@@ -49,7 +49,12 @@ export default async function InvoiceEditPage({
       <h1 className="text-3xl font-semibold tracking-tight text-zinc-900">
         Edit invoice {invoice.number}
       </h1>
-      <InvoiceFormClient clients={clients} invoice={formInvoice} currency={settings.currency} />
+      <InvoiceFormClient
+        clients={clients}
+        invoice={formInvoice}
+        currency={settings.currency}
+        locale={settings.locale}
+      />
     </div>
   );
 }

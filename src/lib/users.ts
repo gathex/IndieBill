@@ -9,13 +9,25 @@ export async function getUserSettings(userId: string) {
       businessName: true,
       businessAddress: true,
       currency: true,
+      country: true,
+      language: true,
+      logoDataUrl: true,
     },
   });
 
+  const currency = user?.currency ?? "USD";
+  const country = user?.country ?? "US";
+  const language = user?.language ?? "en";
+
   return {
     displayName: user?.name ?? user?.email ?? "There",
+    email: user?.email ?? "",
     businessName: user?.businessName ?? user?.name ?? user?.email ?? "My Business",
     businessAddress: user?.businessAddress ?? null,
-    currency: user?.currency ?? "USD",
+    currency,
+    country,
+    language,
+    logoDataUrl: user?.logoDataUrl ?? null,
+    locale: `${language}-${country}`,
   };
 }

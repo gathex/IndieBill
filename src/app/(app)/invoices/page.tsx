@@ -49,7 +49,8 @@ export default async function InvoicesPage({
     getUserInvoices(userId),
     getUserSettings(userId),
   ]);
-  const money = (amount: number) => formatCurrency(amount, settings.currency);
+  const money = (amount: number) =>
+    formatCurrency(amount, settings.currency, settings.locale);
 
   const query = q.trim().toLowerCase();
   const filtered = invoices.filter((invoice) => {
@@ -137,8 +138,8 @@ export default async function InvoicesPage({
                             {invoice.client.name}
                           </Link>
                         </td>
-                        <td className="py-3 pr-4 text-zinc-600">{formatDate(invoice.issueDate)}</td>
-                        <td className="py-3 pr-4 text-zinc-600">{formatDate(invoice.dueDate)}</td>
+                        <td className="py-3 pr-4 text-zinc-600">{formatDate(invoice.issueDate, undefined, settings.locale)}</td>
+                        <td className="py-3 pr-4 text-zinc-600">{formatDate(invoice.dueDate, undefined, settings.locale)}</td>
                         <td className="py-3 pr-4 text-right font-medium text-zinc-900">
                           {money(invoice.total)}
                           {balance > 0 && balance < invoice.total ? (

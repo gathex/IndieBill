@@ -5,6 +5,7 @@ import { prisma } from "@/lib/db";
 import { formatCurrency, formatDate } from "@/lib/utils";
 import { effectiveStatus } from "@/lib/invoices";
 import { effectiveQuotationStatus } from "@/lib/quotations";
+import { getUserSettings } from "@/lib/users";
 import { InvoiceStatusBadge } from "@/components/invoice-status-badge";
 import { QuotationStatusBadge } from "@/components/quotation-status-badge";
 import { Button } from "@/components/ui/button";
@@ -29,6 +30,9 @@ export default async function ClientDetailPage({
   });
   if (!client) notFound();
 
+  const settings = await getUserSettings(userId);
+  const money = (amount: number) =>
+    formatCurrency(amount, settings.currency, settings.locale);
   const totalBilled = client.invoices.reduce((sum, invoice) => sum + invoice.total, 0);
   const outstanding = client.invoices
     .filter((invoice) => effectiveStatus(invoice.status, invoice.dueDate) !== "PAID")
@@ -61,7 +65,7 @@ export default async function ClientDetailPage({
             <CardTitle className="text-sm font-medium text-zinc-500">Total billed</CardTitle>
           </CardHeader>
           <CardContent className="text-2xl font-bold text-zinc-900">
-            {formatCurrency(totalBilled)}
+            {money(totalBilled)}
           </CardContent>
         </Card>
         <Card>
@@ -69,7 +73,7 @@ export default async function ClientDetailPage({
             <CardTitle className="text-sm font-medium text-zinc-500">Outstanding</CardTitle>
           </CardHeader>
           <CardContent className="text-2xl font-bold text-zinc-900">
-            {formatCurrency(outstanding)}
+            {money(outstanding)}
           </CardContent>
         </Card>
         <Card>
@@ -122,10 +126,10 @@ export default async function ClientDetailPage({
                           {invoice.number}
                         </Link>
                       </td>
-                      <td className="py-3 pr-4 text-zinc-600">{formatDate(invoice.issueDate)}</td>
-                      <td className="py-3 pr-4 text-zinc-600">{formatDate(invoice.dueDate)}</td>
+                      <td className="py-3 pr-4 text-zinc-600">{formatDate(invoice.issueDate, undefined, settings.locale)}</td>
+                      <td className="py-3 pr-4 text-zinc-600">{formatDate(invoice.dueDate, undefined, settings.locale)}</td>
                       <td className="py-3 pr-4 text-right font-medium text-zinc-900">
-                        {formatCurrency(invoice.total)}
+                        {money(invoice.total)}
                       </td>
                       <td className="py-3">
                         <InvoiceStatusBadge
@@ -173,10 +177,10 @@ export default async function ClientDetailPage({
                           {quotation.number}
                         </Link>
                       </td>
-                      <td className="py-3 pr-4 text-zinc-600">{formatDate(quotation.issueDate)}</td>
-                      <td className="py-3 pr-4 text-zinc-600">{formatDate(quotation.validUntil)}</td>
+                      <td className="py-3 pr-4 text-zinc-600">{formatDate(quotation.issueDate, undefined, settings.locale)}</td>
+                      <td className="py-3 pr-4 text-zinc-600">{formatDate(quotation.validUntil, undefined, settings.locale)}</td>
                       <td className="py-3 pr-4 text-right font-medium text-zinc-900">
-                        {formatCurrency(quotation.total)}
+                        {money(quotation.total)}
                       </td>
                       <td className="py-3">
                         <QuotationStatusBadge

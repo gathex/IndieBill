@@ -9,6 +9,8 @@ import {
   type PaymentMethod,
 } from "@/lib/payments";
 import { formatCurrency, formatDate } from "@/lib/utils";
+import { generatePaymentQr } from "@/lib/qr";
+import { getInvoiceShareUrl } from "@/lib/share";
 import { getUserSettings } from "@/lib/users";
 import { InvoiceStatusBadge } from "@/components/invoice-status-badge";
 import { Button } from "@/components/ui/button";
@@ -24,6 +26,7 @@ import { CreatePaymentLinkButton } from "@/components/payment-link-button";
 import { ConfirmSubmitButton } from "@/components/confirm-submit-button";
 import { Notice } from "@/components/notice";
 import { PaymentForm } from "@/components/payment-form";
+import { ShareInvoiceButton } from "@/components/share-invoice-button";
 
 export default async function InvoiceDetailPage({
   params,
@@ -42,10 +45,23 @@ export default async function InvoiceDetailPage({
   if (!invoice) notFound();
 
   const settings = await getUserSettings(userId);
-  const money = (amount: number) => formatCurrency(amount, settings.currency);
+  const money = (amount: number) =>
+    formatCurrency(amount, settings.currency, settings.locale);
   const status = effectiveStatus(invoice.status, invoice.dueDate);
   const paid = sumPayments(invoice.payments);
   const balance = getInvoiceBalance(invoice.total, invoice.payments);
+  const [shareUrl, qr] = await Promise.all([
+    getInvoiceShareUrl(invoice.id),
+    generatePaymentQr({
+      invoiceNumber: invoice.number,
+      amount: balance > 0 ? balance : invoice.total,
+      currency: settings.currency,
+      locale: settings.locale,
+      businessName: settings.businessName,
+      dueDate: invoice.dueDate,
+      paymentLink: invoice.paymentLink,
+    }),
+  ]);
   const discount = computeInvoiceTotals({
     subtotal: invoice.subtotal,
     discountPercent: invoice.discountPercent,
@@ -88,7 +104,7 @@ export default async function InvoiceDetailPage({
           <div className="mt-2 flex flex-wrap items-center gap-3">
             <InvoiceStatusBadge status={status} />
             <span className="text-sm text-zinc-500">
-              Issued {formatDate(invoice.issueDate)} · Due {formatDate(invoice.dueDate)}
+              Issued {formatDate(invoice.issueDate, undefined, settings.locale)} · Due {formatDate(invoice.dueDate, undefined, settings.locale)}
             </span>
           </div>
         </div>
@@ -232,7 +248,43 @@ export default async function InvoiceDetailPage({
                 businessName={settings.businessName}
                 businessAddress={settings.businessAddress}
                 currency={settings.currency}
+                locale={settings.locale}
+                logoDataUrl={settings.logoDataUrl}
+                qrDataUrl={qr.dataUrl}
+                qrLabel={qr.label}
               />
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle>Share & QR payment</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="space-y-2">
+                <p className="text-sm font-medium text-zinc-900">Share invoice</p>
+                <ShareInvoiceButton
+                  url={shareUrl}
+                  title={`Invoice ${invoice.number}`}
+                  text={`Invoice ${invoice.number} from ${settings.businessName}`}
+                  compact
+                />
+              </div>
+              <div className="flex items-start gap-4 border-t border-zinc-200 pt-4">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={qr.dataUrl}
+                  alt={qr.label}
+                  className="h-24 w-24 shrink-0 rounded-md border border-zinc-200"
+                />
+                <div className="min-w-0">
+                  <p className="text-sm font-medium text-zinc-900">Pay by QR code</p>
+                  <p className="mt-1 text-sm text-zinc-600">{qr.label}</p>
+                  <p className="mt-1 text-xs text-zinc-500">
+                    This code is also printed on the A4 invoice and PDF.
+                  </p>
+                </div>
+              </div>
             </CardContent>
           </Card>
 
@@ -278,7 +330,7 @@ export default async function InvoiceDetailPage({
                       <div>
                         <div className="font-medium text-zinc-900">{money(payment.amount)}</div>
                         <div className="text-xs text-zinc-500">
-                          {formatDate(payment.paymentDate)} ·{" "}
+                          {formatDate(payment.paymentDate, undefined, settings.locale)} ·{" "}
                           {PAYMENT_METHOD_LABELS[payment.method as PaymentMethod] ?? payment.method}
                           {payment.reference ? ` · ${payment.reference}` : ""}
                         </div>
@@ -296,6 +348,7 @@ export default async function InvoiceDetailPage({
                     invoiceId={invoice.id}
                     balance={balance}
                     currency={settings.currency}
+                    locale={settings.locale}
                   />
                 </div>
               ) : (

@@ -39,7 +39,8 @@ export default async function QuotationDetailPage({
   if (!quotation) notFound();
 
   const settings = await getUserSettings(userId);
-  const money = (amount: number) => formatCurrency(amount, settings.currency);
+  const money = (amount: number) =>
+    formatCurrency(amount, settings.currency, settings.locale);
   const status = effectiveQuotationStatus(quotation.status, quotation.validUntil);
   const discount = computeQuotationTotals({
     subtotal: quotation.subtotal,
@@ -83,8 +84,8 @@ export default async function QuotationDetailPage({
           <div className="mt-2 flex flex-wrap items-center gap-3">
             <QuotationStatusBadge status={status} />
             <span className="text-sm text-zinc-500">
-              Issued {formatDate(quotation.issueDate)} · Valid until{" "}
-              {formatDate(quotation.validUntil)}
+              Issued {formatDate(quotation.issueDate, undefined, settings.locale)} · Valid until{" "}
+              {formatDate(quotation.validUntil, undefined, settings.locale)}
             </span>
           </div>
         </div>
@@ -239,6 +240,8 @@ export default async function QuotationDetailPage({
                 businessName={settings.businessName}
                 businessAddress={settings.businessAddress}
                 currency={settings.currency}
+                locale={settings.locale}
+                logoDataUrl={settings.logoDataUrl}
               />
             </CardContent>
           </Card>

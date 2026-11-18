@@ -28,7 +28,8 @@ export default async function ClientsPage({
     }),
     getUserSettings(userId),
   ]);
-  const money = (amount: number) => formatCurrency(amount, settings.currency);
+  const money = (amount: number) =>
+    formatCurrency(amount, settings.currency, settings.locale);
 
   const query = q.trim().toLowerCase();
   const filtered = clients.filter(

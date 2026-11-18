@@ -1,6 +1,12 @@
 import { redirect } from "next/navigation";
 import { auth } from "@/auth";
 import { prisma } from "@/lib/db";
+import {
+  buildLocale,
+  getCountryOptions,
+  getCurrencyOptions,
+  getLanguageOptions,
+} from "@/lib/locale-data";
 import { SettingsForm } from "@/components/settings-form";
 
 export default async function SettingsPage() {
@@ -15,8 +21,15 @@ export default async function SettingsPage() {
       businessName: true,
       businessAddress: true,
       currency: true,
+      country: true,
+      language: true,
+      logoDataUrl: true,
     },
   });
+
+  const country = user?.country ?? "US";
+  const language = user?.language ?? "en";
+  const locale = buildLocale(language, country);
 
   return (
     <div className="space-y-6">
@@ -31,6 +44,12 @@ export default async function SettingsPage() {
         businessName={user?.businessName ?? ""}
         businessAddress={user?.businessAddress ?? ""}
         currency={user?.currency ?? "USD"}
+        country={country}
+        language={language}
+        logoDataUrl={user?.logoDataUrl ?? null}
+        countries={getCountryOptions(locale)}
+        currencies={getCurrencyOptions(locale)}
+        languages={getLanguageOptions(locale)}
       />
     </div>
   );

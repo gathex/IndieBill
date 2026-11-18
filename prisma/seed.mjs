@@ -30,6 +30,9 @@ async function main() {
       businessName: "Northstar Studio",
       businessAddress: "123 Market St\nSan Francisco, CA 94103",
       currency: "USD",
+      country: "US",
+      language: "en",
+      logoDataUrl: null,
       passwordHash,
     },
     create: {
@@ -38,6 +41,9 @@ async function main() {
       businessName: "Northstar Studio",
       businessAddress: "123 Market St\nSan Francisco, CA 94103",
       currency: "USD",
+      country: "US",
+      language: "en",
+      logoDataUrl: null,
       passwordHash,
     },
   });

@@ -13,6 +13,10 @@ interface InvoicePdfDownloadProps {
   businessName: string;
   businessAddress?: string | null;
   currency?: string;
+  locale?: string;
+  logoDataUrl?: string | null;
+  qrDataUrl?: string | null;
+  qrLabel?: string;
 }
 
 export function InvoicePdfDownload({
@@ -20,6 +24,10 @@ export function InvoicePdfDownload({
   businessName,
   businessAddress,
   currency = "USD",
+  locale,
+  logoDataUrl,
+  qrDataUrl,
+  qrLabel,
 }: InvoicePdfDownloadProps) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -34,6 +42,10 @@ export function InvoicePdfDownload({
           businessName={businessName}
           businessAddress={businessAddress}
           currency={currency}
+          locale={locale}
+          logoDataUrl={logoDataUrl}
+          qrDataUrl={qrDataUrl}
+          qrLabel={qrLabel}
         />,
       ).toBlob();
       const url = URL.createObjectURL(blob);

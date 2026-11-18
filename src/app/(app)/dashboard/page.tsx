@@ -21,7 +21,8 @@ export default async function DashboardPage() {
     getUserQuotations(userId),
     getUserSettings(userId),
   ]);
-  const money = (amount: number) => formatCurrency(amount, settings.currency);
+  const money = (amount: number) =>
+    formatCurrency(amount, settings.currency, settings.locale);
 
   const monthStart = new Date(new Date().getFullYear(), new Date().getMonth(), 1);
   let outstanding = 0;
@@ -154,8 +155,8 @@ export default async function DashboardPage() {
                         </Link>
                       </td>
                       <td className="py-3 pr-4 text-zinc-700">{invoice.client?.name ?? "—"}</td>
-                      <td className="py-3 pr-4 text-zinc-600">{formatDate(invoice.issueDate)}</td>
-                      <td className="py-3 pr-4 text-zinc-600">{formatDate(invoice.dueDate)}</td>
+                      <td className="py-3 pr-4 text-zinc-600">{formatDate(invoice.issueDate, undefined, settings.locale)}</td>
+                      <td className="py-3 pr-4 text-zinc-600">{formatDate(invoice.dueDate, undefined, settings.locale)}</td>
                       <td className="py-3 pr-4 text-right font-medium text-zinc-900">
                         {money(invoice.total)}
                       </td>
@@ -209,8 +210,8 @@ export default async function DashboardPage() {
                         </Link>
                       </td>
                       <td className="py-3 pr-4 text-zinc-700">{quotation.client?.name ?? "—"}</td>
-                      <td className="py-3 pr-4 text-zinc-600">{formatDate(quotation.issueDate)}</td>
-                      <td className="py-3 pr-4 text-zinc-600">{formatDate(quotation.validUntil)}</td>
+                      <td className="py-3 pr-4 text-zinc-600">{formatDate(quotation.issueDate, undefined, settings.locale)}</td>
+                      <td className="py-3 pr-4 text-zinc-600">{formatDate(quotation.validUntil, undefined, settings.locale)}</td>
                       <td className="py-3 pr-4 text-right font-medium text-zinc-900">
                         {money(quotation.total)}
                       </td>
