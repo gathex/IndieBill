@@ -2,6 +2,56 @@
 
 @custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
 
+/* ─── IndieBill animation keyframes ─────────────────────────────────────── */
+
+@keyframes page-in {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes modal-in {
+  from { opacity: 0; transform: scale(0.97); }
+  to   { opacity: 1; transform: scale(1); }
+}
+
+@keyframes dropdown-in {
+  from { opacity: 0; transform: translateY(-4px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes bar-grow {
+  from { transform: scaleY(0); }
+  to   { transform: scaleY(1); }
+}
+
+/* ─── Utility classes (disabled when user prefers reduced motion) ─────────── */
+
+.animate-page-in {
+  animation: page-in 180ms ease-out both;
+}
+
+.animate-modal-in {
+  animation: modal-in 160ms ease-out both;
+}
+
+.animate-dropdown-in {
+  animation: dropdown-in 140ms ease-out both;
+}
+
+.animate-bar-grow {
+  animation: bar-grow 500ms ease-out both;
+  transform-origin: bottom;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-page-in,
+  .animate-modal-in,
+  .animate-dropdown-in,
+  .animate-bar-grow {
+    animation: none;
+  }
+}
+
 :root {
   --background: #ffffff;
   --foreground: #171717;

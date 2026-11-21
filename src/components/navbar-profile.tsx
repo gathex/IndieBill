@@ -91,7 +91,7 @@ export function NavbarProfile({ user }: NavbarProfileProps) {
       </button>
 
       {isOpen && (
-        <div className="absolute right-0 top-full mt-2 w-64 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 p-1.5 shadow-xl shadow-zinc-950/5 dark:shadow-black/50 z-50 animate-in fade-in zoom-in-95 duration-100">
+        <div className="absolute right-0 top-full mt-2 w-64 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 p-1.5 shadow-xl shadow-zinc-950/5 dark:shadow-black/50 z-50 animate-dropdown-in">
           {/* User Info Header */}
           <div className="flex items-center gap-3 px-3 py-2.5">
             {avatarUrl ? (

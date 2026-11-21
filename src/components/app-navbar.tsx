@@ -124,7 +124,7 @@ export function AppNavbar({ user }: AppNavbarProps) {
             </button>
 
             {openDropdown === "billing" && (
-              <div className="absolute left-0 top-full mt-2 w-56 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 p-1.5 shadow-xl shadow-zinc-950/5 dark:shadow-black/50 z-50 animate-in fade-in zoom-in-95 duration-100">
+              <div className="absolute left-0 top-full mt-2 w-56 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 p-1.5 shadow-xl shadow-zinc-950/5 dark:shadow-black/50 z-50 animate-dropdown-in">
                 <Link
                   href="/invoices"
                   onClick={() => setOpenDropdown(null)}
@@ -190,7 +190,7 @@ export function AppNavbar({ user }: AppNavbarProps) {
             </button>
 
             {openDropdown === "finance" && (
-              <div className="absolute left-0 top-full mt-2 w-56 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 p-1.5 shadow-xl shadow-zinc-950/5 dark:shadow-black/50 z-50 animate-in fade-in zoom-in-95 duration-100">
+              <div className="absolute left-0 top-full mt-2 w-56 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 p-1.5 shadow-xl shadow-zinc-950/5 dark:shadow-black/50 z-50 animate-dropdown-in">
                 <Link
                   href="/payments"
                   onClick={() => setOpenDropdown(null)}

@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent } from "@/components/ui/card";
+import { useAutoAnimate } from "@formkit/auto-animate/react";
 import {
   EXPENSE_CATEGORIES,
   EXPENSE_PAYMENT_METHODS,
