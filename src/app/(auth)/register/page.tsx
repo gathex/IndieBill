@@ -15,7 +15,7 @@ import {
 } from "@/components/ui/card";
 import { registerUser } from "@/actions/auth";
 import { GoogleSignInButton } from "@/components/google-sign-in-button";
-import { IndieBillLogo } from "@/components/IndieBillLogo";
+import { BrandLogo } from "@/components/BrandLogo";
 
 export default function RegisterPage() {
   const router = useRouter();
@@ -50,7 +50,7 @@ export default function RegisterPage() {
         <CardHeader className="text-center pb-4">
           <div className="flex justify-center mb-2">
             <Link href="/" aria-label="IndieBill home">
-              <IndieBillLogo size={36} />
+              <BrandLogo size={36} />
             </Link>
           </div>
           <CardTitle className="text-2xl font-bold tracking-tight">

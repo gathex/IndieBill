@@ -36,6 +36,7 @@ model User {
   quotations Quotation[]
   payments   Payment[]
   catalogItems CatalogItem[]
+  expenses   Expense[]
 }
 
 model Account {
@@ -208,4 +209,24 @@ model CatalogItem {
 
   @@index([userId, isActive])
   @@index([userId, name])
+}
+
+model Expense {
+  id            String   @id @default(cuid())
+  userId        String
+  title         String
+  category      String
+  amount        Float    @default(0)
+  date          DateTime @default(now())
+  vendor        String?
+  paymentMethod String?
+  taxAmount     Float    @default(0)
+  notes         String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, date])
+  @@index([userId, category])
 }

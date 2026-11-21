@@ -424,16 +424,96 @@ async function main() {
     }
   }
 
-  const [clientCount, invoiceCount, quotationCount, paymentCount, catalogItemCount] = await Promise.all([
+  const expenseSpecs = [
+    {
+      title: "Figma Professional Annual Plan",
+      category: "Software",
+      amount: 144,
+      date: new Date(Date.now() - 14 * 24 * 60 * 60 * 1000),
+      vendor: "Figma, Inc.",
+      paymentMethod: "Card",
+      taxAmount: 12,
+      notes: "Design team collaboration and design system tokens sync",
+    },
+    {
+      title: "Vercel Pro Team & Custom Domain",
+      category: "Software",
+      amount: 40,
+      date: new Date(Date.now() - 10 * 24 * 60 * 60 * 1000),
+      vendor: "Vercel Inc.",
+      paymentMethod: "Card",
+      taxAmount: 3.5,
+      notes: "Production hosting and serverless Edge deployments",
+    },
+    {
+      title: "WeWork Hot Desk & Meeting Space",
+      category: "Office",
+      amount: 250,
+      date: new Date(Date.now() - 22 * 24 * 60 * 60 * 1000),
+      vendor: "WeWork",
+      paymentMethod: "Bank Transfer",
+      taxAmount: 20,
+      notes: "Monthly hot desk access and client consultation rooms",
+    },
+    {
+      title: "Ergonomic 4K Display & Desk Setup",
+      category: "Hardware",
+      amount: 420,
+      date: new Date(Date.now() - 40 * 24 * 60 * 60 * 1000),
+      vendor: "Dell Tech / Amazon",
+      paymentMethod: "Card",
+      taxAmount: 35,
+      notes: "32-inch 4K USB-C monitor with color calibration for design work",
+    },
+    {
+      title: "Google Workspace & Cloud Storage",
+      category: "Software",
+      amount: 36,
+      date: new Date(Date.now() - 4 * 24 * 60 * 60 * 1000),
+      vendor: "Google LLC",
+      paymentMethod: "Card",
+      taxAmount: 2.88,
+      notes: "Custom business email, Google Meet, and 2TB Drive",
+    },
+    {
+      title: "Contract Code Review & Frontend QA",
+      category: "Subcontractor",
+      amount: 450,
+      date: new Date(Date.now() - 8 * 24 * 60 * 60 * 1000),
+      vendor: "Alex Chen",
+      paymentMethod: "Bank Transfer",
+      taxAmount: 0,
+      notes: "Independent contractor assisting on React 19 test migration",
+    },
+  ];
+
+  for (const spec of expenseSpecs) {
+    const existing = await prisma.expense.findFirst({
+      where: { userId: user.id, title: spec.title },
+    });
+    if (existing) {
+      await prisma.expense.update({
+        where: { id: existing.id },
+        data: spec,
+      });
+    } else {
+      await prisma.expense.create({
+        data: { ...spec, userId: user.id },
+      });
+    }
+  }
+
+  const [clientCount, invoiceCount, quotationCount, paymentCount, catalogItemCount, expenseCount] = await Promise.all([
     prisma.client.count({ where: { userId: user.id } }),
     prisma.invoice.count({ where: { userId: user.id } }),
     prisma.quotation.count({ where: { userId: user.id } }),
     prisma.payment.count({ where: { userId: user.id } }),
     prisma.catalogItem.count({ where: { userId: user.id } }),
+    prisma.expense.count({ where: { userId: user.id } }),
   ]);
 
   console.log(
-    `Seeded ${clientCount} clients, ${invoiceCount} invoices, ${quotationCount} quotations, ${paymentCount} payments, and ${catalogItemCount} catalog items for ${user.email}.`,
+    `Seeded ${clientCount} clients, ${invoiceCount} invoices, ${quotationCount} quotations, ${paymentCount} payments, ${catalogItemCount} catalog items, and ${expenseCount} expenses for ${user.email}.`,
   );
 }
 

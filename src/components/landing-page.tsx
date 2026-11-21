@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { LandingDemo } from "@/components/landing-demo";
-import { DotGrid } from "@/components/DotGrid";
+import { HeroDotGrid } from "@/components/hero-dot-grid";
 import { IndieBillLogo } from "@/components/IndieBillLogo";
 
 type IconProps = { className?: string };
@@ -319,30 +319,11 @@ export function LandingPage({ isLoggedIn = false }: { isLoggedIn?: boolean }) {
       </header>
 
       <main>
-        <section className="relative overflow-hidden border-b border-zinc-100 dark:border-zinc-800 bg-gradient-to-b from-zinc-50 via-white to-white dark:from-zinc-950 dark:via-zinc-950 dark:to-zinc-900">
-          <DotGrid
-            baseColor="#121212"
-            activeColor="#ffffff"
-            shape="circle"
-            dotSize={3}
-            gap={10}
-            proximity={170}
-            strength={1}
-            bounce={0.6}
-            tension={0.55}
-            returnDuration={0.8}
-            shockRadius={320}
-            shockStrength={5}
-            swell={1.2}
-            stretch={0.5}
-            glow={0.6}
-            fade={0}
-            intro
-            opacity={1}
-            mouseInteraction
-            clickShock
-            className="absolute inset-0 z-0"
-          />
+        <section className="relative isolate overflow-hidden border-b border-zinc-100 dark:border-zinc-800 bg-white dark:bg-zinc-950">
+          <div className="absolute inset-0 z-0 w-full h-full">
+            <HeroDotGrid />
+          </div>
+
           <div className="relative z-10 mx-auto grid max-w-6xl items-center gap-12 px-6 py-20 lg:grid-cols-[1.05fr_0.95fr] lg:py-28">
             <div>
               <span className="inline-flex items-center gap-2 rounded-full border border-indigo-200 dark:border-indigo-500/30 bg-indigo-50 dark:bg-indigo-500/15 px-3 py-1.5 text-xs font-semibold text-indigo-700 dark:text-indigo-400">

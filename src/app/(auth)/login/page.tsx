@@ -15,7 +15,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { GoogleSignInButton } from "@/components/google-sign-in-button";
-import { IndieBillLogo } from "@/components/IndieBillLogo";
+import { BrandLogo } from "@/components/BrandLogo";
 
 function LoginForm() {
   const router = useRouter();
@@ -66,7 +66,7 @@ function LoginForm() {
       <CardHeader className="text-center pb-4">
         <div className="flex justify-center mb-2">
           <Link href="/" aria-label="IndieBill home">
-            <IndieBillLogo size={36} />
+            <BrandLogo size={36} />
           </Link>
         </div>
         <CardTitle className="text-2xl font-bold tracking-tight">

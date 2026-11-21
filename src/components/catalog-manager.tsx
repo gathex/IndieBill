@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useMemo, useTransition } from "react";
-import { formatCurrency } from "@/lib/utils";
+import { formatCurrency, cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -35,7 +35,7 @@ interface CatalogManagerProps {
   locale?: string;
 }
 
-const commonUnits = ["hr", "item", "project", "month", "day", "audit", "session"];
+const STANDARD_UNITS = ["hr", "day", "project", "item", "month", "session", "audit"];
 
 export function CatalogManager({
   initialItems,
@@ -54,7 +54,8 @@ export function CatalogManager({
   const [formName, setFormName] = useState("");
   const [formDescription, setFormDescription] = useState("");
   const [formRate, setFormRate] = useState("");
-  const [formUnit, setFormUnit] = useState("");
+  const [unitType, setUnitType] = useState("hr");
+  const [customUnit, setCustomUnit] = useState("");
   const [formHsnSac, setFormHsnSac] = useState("");
   const [formTaxRate, setFormTaxRate] = useState("");
   const [formIsActive, setFormIsActive] = useState(true);
@@ -70,7 +71,8 @@ export function CatalogManager({
     setFormName("");
     setFormDescription("");
     setFormRate("");
-    setFormUnit("");
+    setUnitType("hr");
+    setCustomUnit("");
     setFormHsnSac("");
     setFormTaxRate("");
     setFormIsActive(true);
@@ -83,7 +85,18 @@ export function CatalogManager({
     setFormName(item.name);
     setFormDescription(item.description ?? "");
     setFormRate(String(item.rate));
-    setFormUnit(item.unit ?? "");
+    if (item.unit) {
+      if (STANDARD_UNITS.includes(item.unit)) {
+        setUnitType(item.unit);
+        setCustomUnit("");
+      } else {
+        setUnitType("custom");
+        setCustomUnit(item.unit);
+      }
+    } else {
+      setUnitType("hr");
+      setCustomUnit("");
+    }
     setFormHsnSac(item.hsnSac ?? "");
     setFormTaxRate(item.defaultTaxRate !== null ? String(item.defaultTaxRate) : "");
     setFormIsActive(item.isActive);
@@ -119,11 +132,13 @@ export function CatalogManager({
       return;
     }
 
+    const selectedUnit = unitType === "custom" ? customUnit.trim() : unitType.trim();
+
     const payload: CatalogItemInput = {
       name,
       description: formDescription.trim() || null,
       rate,
-      unit: formUnit.trim() || null,
+      unit: selectedUnit || null,
       hsnSac: formHsnSac.trim() || null,
       defaultTaxRate: taxRate,
       isActive: formIsActive,
@@ -404,32 +419,44 @@ export function CatalogManager({
       {isModalOpen ? (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-xs animate-in fade-in duration-200">
           <div
-            className="w-full max-w-lg rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 shadow-2xl p-6 space-y-5"
+            className="w-full max-w-lg rounded-2xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 shadow-2xl p-6 space-y-5"
             role="dialog"
             aria-modal="true"
           >
-            <div className="flex items-center justify-between border-b border-zinc-100 dark:border-zinc-800 pb-3">
-              <h2 className="text-lg font-semibold text-zinc-900 dark:text-zinc-100">
-                {editingItem ? "Edit Catalog Item" : "New Catalog Item"}
-              </h2>
+            <div className="flex items-center justify-between border-b border-zinc-100 dark:border-zinc-800 pb-3.5">
+              <div>
+                <h2 className="text-lg font-semibold text-zinc-900 dark:text-zinc-100">
+                  {editingItem ? "Edit Catalog Item" : "New Catalog Item"}
+                </h2>
+                <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5">
+                  {editingItem
+                    ? "Update details, rates, and tax preferences for this item."
+                    : "Add a reusable product or service to your catalog."}
+                </p>
+              </div>
               <button
                 type="button"
                 onClick={closeModal}
-                className="text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200 text-lg leading-none"
+                className="rounded-lg p-1.5 text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors"
+                aria-label="Close modal"
               >
-                ✕
+                <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <line x1="18" y1="6" x2="6" y2="18" />
+                  <line x1="6" y1="6" x2="18" y2="18" />
+                </svg>
               </button>
             </div>
 
-            <form onSubmit={handleFormSubmit} className="space-y-4">
+            <form onSubmit={handleFormSubmit} className="space-y-5">
               {formError ? (
-                <div className="rounded-md bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-900 p-3 text-sm text-red-600 dark:text-red-400">
+                <div className="rounded-lg bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-900 p-3 text-sm text-red-600 dark:text-red-400">
                   {formError}
                 </div>
               ) : null}
 
+              {/* Row 1: Name (full width) */}
               <div className="space-y-1.5">
-                <Label htmlFor="catalog-name">
+                <Label htmlFor="catalog-name" className="text-xs font-medium text-zinc-700 dark:text-zinc-300">
                   Name <span className="text-red-500">*</span>
                 </Label>
                 <Input
@@ -437,107 +464,171 @@ export function CatalogManager({
                   placeholder="e.g. UI/UX Design, Backend API Development"
                   value={formName}
                   onChange={(e) => setFormName(e.target.value)}
+                  className="h-10 text-sm"
                   required
                 />
               </div>
 
-              <div className="grid grid-cols-2 gap-3">
+              {/* Row 2: 2-column grid: Rate and Unit */}
+              <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-1.5">
-                  <Label htmlFor="catalog-rate">
-                    Rate ({currency}) <span className="text-red-500">*</span>
+                  <Label htmlFor="catalog-rate" className="text-xs font-medium text-zinc-700 dark:text-zinc-300">
+                    Rate ({currency === "INR" || !currency ? "INR" : currency}) <span className="text-red-500">*</span>
                   </Label>
-                  <Input
-                    id="catalog-rate"
-                    type="number"
-                    step="any"
-                    min="0"
-                    placeholder="0.00"
-                    value={formRate}
-                    onChange={(e) => setFormRate(e.target.value)}
-                    required
-                  />
+                  <div className="relative">
+                    <span className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 text-sm font-medium text-zinc-500 dark:text-zinc-400">
+                      {currency === "USD" ? "$" : currency === "EUR" ? "€" : currency === "GBP" ? "£" : "₹"}
+                    </span>
+                    <Input
+                      id="catalog-rate"
+                      type="number"
+                      step="any"
+                      min="0"
+                      placeholder="0.00"
+                      value={formRate}
+                      onChange={(e) => setFormRate(e.target.value)}
+                      className="pl-8 h-10 text-sm"
+                      required
+                    />
+                  </div>
                 </div>
+
                 <div className="space-y-1.5">
-                  <Label htmlFor="catalog-unit">Unit (e.g. hr, project)</Label>
-                  <Input
-                    id="catalog-unit"
-                    placeholder="hr, item, project"
-                    value={formUnit}
-                    onChange={(e) => setFormUnit(e.target.value)}
-                  />
-                  <div className="flex flex-wrap gap-1 mt-1">
-                    {commonUnits.map((u) => (
-                      <button
-                        key={u}
-                        type="button"
-                        onClick={() => setFormUnit(u)}
-                        className={`text-[10px] rounded px-1.5 py-0.5 border ${
-                          formUnit === u
-                            ? "bg-zinc-900 text-white dark:bg-zinc-100 dark:text-zinc-900 border-transparent"
-                            : "bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-300 border-zinc-200 dark:border-zinc-700"
-                        }`}
-                      >
-                        {u}
-                      </button>
-                    ))}
+                  <Label htmlFor="catalog-unit" className="text-xs font-medium text-zinc-700 dark:text-zinc-300">
+                    Unit
+                  </Label>
+                  <div className="space-y-2">
+                    <select
+                      id="catalog-unit"
+                      value={unitType}
+                      onChange={(e) => {
+                        setUnitType(e.target.value);
+                        if (e.target.value !== "custom") {
+                          setCustomUnit("");
+                        }
+                      }}
+                      className="w-full h-10 rounded-md border border-zinc-300 bg-white px-3 py-2 text-sm text-zinc-900 shadow-sm focus:border-zinc-500 focus:outline-none focus:ring-2 focus:ring-zinc-400/20 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100 dark:focus:border-zinc-500"
+                    >
+                      <option value="hr">hr</option>
+                      <option value="day">day</option>
+                      <option value="project">project</option>
+                      <option value="item">item</option>
+                      <option value="month">month</option>
+                      <option value="session">session</option>
+                      <option value="audit">audit</option>
+                      <option value="custom">Custom...</option>
+                    </select>
+                    {unitType === "custom" && (
+                      <Input
+                        placeholder="Enter custom unit (e.g. word, page)"
+                        value={customUnit}
+                        onChange={(e) => setCustomUnit(e.target.value)}
+                        className="h-10 text-sm animate-in fade-in duration-150"
+                        autoFocus
+                      />
+                    )}
                   </div>
                 </div>
               </div>
 
-              <div className="grid grid-cols-2 gap-3">
+              {/* Row 3: 2-column grid: HSN/SAC and Default Tax Rate */}
+              <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-1.5">
-                  <Label htmlFor="catalog-hsn">HSN / SAC Code</Label>
+                  <Label htmlFor="catalog-hsn" className="text-xs font-medium text-zinc-700 dark:text-zinc-300">
+                    HSN / SAC Code
+                  </Label>
                   <Input
                     id="catalog-hsn"
                     placeholder="e.g. 998314"
                     value={formHsnSac}
                     onChange={(e) => setFormHsnSac(e.target.value)}
+                    className="h-10 text-sm"
                   />
                 </div>
                 <div className="space-y-1.5">
-                  <Label htmlFor="catalog-tax">Default Tax Rate %</Label>
-                  <Input
-                    id="catalog-tax"
-                    type="number"
-                    step="0.01"
-                    min="0"
-                    max="100"
-                    placeholder="e.g. 18 or 8.5"
-                    value={formTaxRate}
-                    onChange={(e) => setFormTaxRate(e.target.value)}
-                  />
+                  <Label htmlFor="catalog-tax" className="text-xs font-medium text-zinc-700 dark:text-zinc-300">
+                    Default Tax Rate
+                  </Label>
+                  <div className="relative">
+                    <Input
+                      id="catalog-tax"
+                      type="number"
+                      step="0.01"
+                      min="0"
+                      max="100"
+                      placeholder="e.g. 18"
+                      value={formTaxRate}
+                      onChange={(e) => setFormTaxRate(e.target.value)}
+                      className="pr-8 h-10 text-sm"
+                    />
+                    <span className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3 text-sm font-medium text-zinc-500 dark:text-zinc-400">
+                      %
+                    </span>
+                  </div>
                 </div>
               </div>
 
+              {/* Row 4: Description */}
               <div className="space-y-1.5">
-                <Label htmlFor="catalog-desc">Description (Optional)</Label>
+                <div className="flex items-center justify-between">
+                  <Label htmlFor="catalog-desc" className="text-xs font-medium text-zinc-700 dark:text-zinc-300">
+                    Description
+                  </Label>
+                  <span className="text-xs text-zinc-400 dark:text-zinc-500">Optional</span>
+                </div>
                 <Textarea
                   id="catalog-desc"
-                  rows={3}
+                  rows={2}
                   placeholder="Detailed scope, specifications, or deliverables included in this item…"
                   value={formDescription}
                   onChange={(e) => setFormDescription(e.target.value)}
+                  className="resize-none text-sm"
                 />
               </div>
 
-              <div className="flex items-center gap-2 pt-1">
-                <input
-                  type="checkbox"
-                  id="catalog-is-active"
-                  checked={formIsActive}
-                  onChange={(e) => setFormIsActive(e.target.checked)}
-                  className="h-4 w-4 rounded border-zinc-300 dark:border-zinc-700 text-zinc-900 focus:ring-zinc-500"
-                />
-                <Label htmlFor="catalog-is-active" className="cursor-pointer">
-                  Active (show in invoice/quotation catalog picker)
-                </Label>
+              {/* Row 5: Compact Active Toggle Switch */}
+              <div className="flex items-center justify-between rounded-xl border border-zinc-200/80 dark:border-zinc-800 bg-zinc-50/60 dark:bg-zinc-800/30 p-3.5 transition-colors">
+                <div className="space-y-0.5">
+                  <p className="text-sm font-medium text-zinc-900 dark:text-zinc-100">Active</p>
+                  <p className="text-xs text-zinc-500 dark:text-zinc-400">
+                    Show in invoice & quotation picker
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  role="switch"
+                  aria-checked={formIsActive}
+                  onClick={() => setFormIsActive((prev) => !prev)}
+                  className={cn(
+                    "relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-zinc-400 dark:focus-visible:ring-zinc-600",
+                    formIsActive ? "bg-zinc-900 dark:bg-zinc-100" : "bg-zinc-200 dark:bg-zinc-700"
+                  )}
+                >
+                  <span
+                    className={cn(
+                      "pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white dark:bg-zinc-900 shadow-sm ring-0 transition duration-200 ease-in-out",
+                      formIsActive ? "translate-x-5" : "translate-x-0"
+                    )}
+                  />
+                </button>
               </div>
 
-              <div className="flex justify-end gap-2 pt-3 border-t border-zinc-100 dark:border-zinc-800">
-                <Button type="button" variant="outline" onClick={closeModal} disabled={isPending}>
+              {/* Modal Footer */}
+              <div className="flex items-center justify-end gap-2.5 pt-4 border-t border-zinc-100 dark:border-zinc-800">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={closeModal}
+                  disabled={isPending}
+                  className="h-9 px-4 text-xs font-medium"
+                >
                   Cancel
                 </Button>
-                <Button type="submit" disabled={isPending}>
+                <Button
+                  type="submit"
+                  disabled={isPending}
+                  className="h-9 px-4 text-xs font-medium"
+                >
                   {isPending ? "Saving…" : editingItem ? "Update item" : "Create item"}
                 </Button>
               </div>

@@ -3,11 +3,22 @@ import { NextResponse } from "next/server";
 
 export const proxy = auth((req) => {
   const { nextUrl } = req;
+  const pathname = nextUrl.pathname;
+
+  // Always allow static files, images, brand assets, icons
+  if (
+    pathname.startsWith("/brand") ||
+    pathname.startsWith("/api") ||
+    pathname.startsWith("/_next") ||
+    /\.(?:png|jpg|jpeg|svg|gif|webp|ico|css|js|map)$/i.test(pathname)
+  ) {
+    return NextResponse.next();
+  }
+
   const isLoggedIn = Boolean(req.auth?.user);
-  const isPublicPage = nextUrl.pathname === "/";
+  const isPublicPage = pathname === "/";
   const isAuthPage =
-    nextUrl.pathname.startsWith("/login") ||
-    nextUrl.pathname.startsWith("/register");
+    pathname.startsWith("/login") || pathname.startsWith("/register");
 
   if (isAuthPage && isLoggedIn) {
     return NextResponse.redirect(new URL("/dashboard", nextUrl));
@@ -21,5 +32,7 @@ export const proxy = auth((req) => {
 });
 
 export const config = {
-  matcher: ["/((?!api|_next/static|_next/image|favicon.ico).*)"],
+  matcher: [
+    "/((?!api|_next/static|_next/image|brand|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp|ico)$).*)",
+  ],
 };

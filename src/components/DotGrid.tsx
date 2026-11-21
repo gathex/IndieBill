@@ -83,11 +83,11 @@ function parseColor(color: string): [number, number, number, number] {
 }
 
 export function DotGrid({
-  baseColor = "#121212",
-  activeColor = "#ffffff",
+  baseColor = "#d4d4d8",
+  activeColor = "#3b82f6",
   shape = "circle",
-  dotSize = 3,
-  gap = 10,
+  dotSize = 2,
+  gap = 20,
   proximity = 170,
   strength = 1,
   bounce = 0.6,
