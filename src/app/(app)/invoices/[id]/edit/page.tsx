@@ -3,6 +3,7 @@ import { auth } from "@/auth";
 import { getInvoiceById } from "@/lib/invoices";
 import { getUserClients } from "@/lib/clients";
 import { getUserSettings } from "@/lib/users";
+import { getUserCatalogItems } from "@/lib/catalog";
 import { InvoiceFormClient, type InvoiceFormInvoice } from "@/components/invoice-form";
 
 export default async function InvoiceEditPage({
@@ -22,10 +23,22 @@ export default async function InvoiceEditPage({
     notFound();
   }
 
-  const [clients, settings] = await Promise.all([
+  const [clients, settings, catalogItems] = await Promise.all([
     getUserClients(userId),
     getUserSettings(userId),
+    getUserCatalogItems(userId, { activeOnly: true }),
   ]);
+
+  const serializedCatalogItems = catalogItems.map((item) => ({
+    id: item.id,
+    name: item.name,
+    description: item.description,
+    rate: item.rate,
+    unit: item.unit,
+    hsnSac: item.hsnSac,
+    defaultTaxRate: item.defaultTaxRate,
+    isActive: item.isActive,
+  }));
 
   const formInvoice: InvoiceFormInvoice = {
     id: invoice.id,
@@ -36,11 +49,13 @@ export default async function InvoiceEditPage({
     notes: invoice.notes ?? "",
     discountPercent: invoice.discountPercent,
     taxRate: invoice.taxRate,
+    gstEnabled: invoice.gstEnabled,
     items: invoice.items.map((item) => ({
       description: item.description,
       quantity: item.quantity,
       rate: item.rate,
       amount: item.amount,
+      hsnSac: item.hsnSac,
     })),
   };
 
@@ -54,6 +69,9 @@ export default async function InvoiceEditPage({
         invoice={formInvoice}
         currency={settings.currency}
         locale={settings.locale}
+        businessState={settings.state}
+        businessGstin={settings.gstin}
+        catalogItems={serializedCatalogItems}
       />
     </div>
   );

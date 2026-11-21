@@ -1,23 +1,11 @@
 import Link from "next/link";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { LandingDemo } from "@/components/landing-demo";
+import { DotGrid } from "@/components/DotGrid";
+import { IndieBillLogo } from "@/components/IndieBillLogo";
 
 type IconProps = { className?: string };
 
-function LogoMark({ className = "h-9 w-9" }: IconProps) {
-  return (
-    <svg className={className} viewBox="0 0 40 40" fill="none" aria-hidden="true">
-      <rect width="40" height="40" rx="11" fill="var(--logo-bg)" />
-      <path
-        d="M12 13.5h16M12 20h16M12 26.5h9"
-        stroke="var(--logo-fg)"
-        strokeWidth="2.4"
-        strokeLinecap="round"
-      />
-      <circle cx="28" cy="26.5" r="3.5" fill="#34d399" />
-    </svg>
-  );
-}
 
 function ArrowIcon({ className = "h-4 w-4" }: IconProps) {
   return (
@@ -164,7 +152,7 @@ const steps = [
   {
     number: "01",
     title: "Set up your business once",
-    body: "Add your business details, logo, currency, and payment information. Invoicely remembers them for every document you create.",
+    body: "Add your business details, logo, currency, and payment information. IndieBill remembers them for every document you create.",
   },
   {
     number: "02",
@@ -302,9 +290,8 @@ export function LandingPage({ isLoggedIn = false }: { isLoggedIn?: boolean }) {
     <div className="min-h-screen bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100">
       <header className="sticky top-0 z-50 border-b border-zinc-200/80 bg-white/85 backdrop-blur dark:border-zinc-800 dark:bg-zinc-950/85">
         <div className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-6 py-4">
-          <Link href="/" className="flex items-center gap-2.5" aria-label="Invoicely home">
-            <LogoMark className="h-9 w-9" />
-            <span className="text-lg font-bold tracking-tight">Invoicely</span>
+          <Link href="/" className="flex items-center gap-2.5" aria-label="IndieBill home">
+            <IndieBillLogo size={32} />
           </Link>
           <nav className="hidden items-center gap-7 text-sm font-medium text-zinc-600 dark:text-zinc-400 md:flex" aria-label="Main navigation">
             <Link href="#features" className="transition hover:text-zinc-900 dark:hover:text-zinc-50">Features</Link>
@@ -332,8 +319,31 @@ export function LandingPage({ isLoggedIn = false }: { isLoggedIn?: boolean }) {
       </header>
 
       <main>
-        <section className="overflow-hidden border-b border-zinc-100 dark:border-zinc-800 bg-gradient-to-b from-zinc-50 via-white to-white dark:from-zinc-950 dark:via-zinc-950 dark:to-zinc-900">
-          <div className="mx-auto grid max-w-6xl items-center gap-12 px-6 py-20 lg:grid-cols-[1.05fr_0.95fr] lg:py-28">
+        <section className="relative overflow-hidden border-b border-zinc-100 dark:border-zinc-800 bg-gradient-to-b from-zinc-50 via-white to-white dark:from-zinc-950 dark:via-zinc-950 dark:to-zinc-900">
+          <DotGrid
+            baseColor="#121212"
+            activeColor="#ffffff"
+            shape="circle"
+            dotSize={3}
+            gap={10}
+            proximity={170}
+            strength={1}
+            bounce={0.6}
+            tension={0.55}
+            returnDuration={0.8}
+            shockRadius={320}
+            shockStrength={5}
+            swell={1.2}
+            stretch={0.5}
+            glow={0.6}
+            fade={0}
+            intro
+            opacity={1}
+            mouseInteraction
+            clickShock
+            className="absolute inset-0 z-0"
+          />
+          <div className="relative z-10 mx-auto grid max-w-6xl items-center gap-12 px-6 py-20 lg:grid-cols-[1.05fr_0.95fr] lg:py-28">
             <div>
               <span className="inline-flex items-center gap-2 rounded-full border border-indigo-200 dark:border-indigo-500/30 bg-indigo-50 dark:bg-indigo-500/15 px-3 py-1.5 text-xs font-semibold text-indigo-700 dark:text-indigo-400">
                 <span className="h-1.5 w-1.5 rounded-full bg-indigo-500" />
@@ -344,7 +354,7 @@ export function LandingPage({ isLoggedIn = false }: { isLoggedIn?: boolean }) {
                 <span className="bg-gradient-to-r from-indigo-600 to-emerald-500 bg-clip-text text-transparent">get paid faster.</span>
               </h1>
               <p className="mt-6 max-w-xl text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-                Create beautiful invoices and quotations, share them anywhere, and track every payment in one calm workspace. Invoicely handles the paperwork so you can get back to the work you love.
+                Create beautiful invoices and quotations, share them anywhere, and track every payment in one calm workspace. IndieBill handles the paperwork so you can get back to the work you love.
               </p>
               <div className="mt-8 flex flex-wrap items-center gap-3">
                 <Link
@@ -399,7 +409,7 @@ export function LandingPage({ isLoggedIn = false }: { isLoggedIn?: boolean }) {
                 The tools you need to run your billing, minus the busywork.
               </h2>
               <p className="mt-4 text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-                From the first quote to the final payment, Invoicely keeps your documents consistent, your clients informed, and your numbers clear.
+                From the first quote to the final payment, IndieBill keeps your documents consistent, your clients informed, and your numbers clear.
               </p>
             </div>
             <div className="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
@@ -442,7 +452,7 @@ export function LandingPage({ isLoggedIn = false }: { isLoggedIn?: boolean }) {
             <div className="mx-auto max-w-2xl text-center">
               <p className="text-sm font-semibold uppercase tracking-[0.18em] text-indigo-600 dark:text-indigo-400">Interactive demo</p>
               <h2 className="mt-3 text-3xl font-semibold tracking-tight text-zinc-900 dark:text-zinc-100 sm:text-4xl">
-                Take Invoicely for a spin.
+                Take IndieBill for a spin.
               </h2>
               <p className="mt-4 text-base leading-8 text-zinc-600 dark:text-zinc-400">
                 Switch between an invoice, a quotation, and your payments dashboard to see how the whole flow fits together. No account needed to look around.
@@ -549,9 +559,8 @@ export function LandingPage({ isLoggedIn = false }: { isLoggedIn?: boolean }) {
       <footer className="border-t border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900">
         <div className="mx-auto flex max-w-6xl flex-col gap-8 px-6 py-12 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <Link href="/" className="flex items-center gap-2.5" aria-label="Invoicely home">
-              <LogoMark className="h-8 w-8" />
-              <span className="text-base font-bold tracking-tight">Invoicely</span>
+            <Link href="/" className="flex items-center gap-2.5" aria-label="IndieBill home">
+              <IndieBillLogo size={28} />
             </Link>
             <p className="mt-3 max-w-sm text-sm leading-6 text-zinc-500 dark:text-zinc-400">
               Invoices, quotations, and payments in one simple workspace for independent professionals.
@@ -572,7 +581,7 @@ export function LandingPage({ isLoggedIn = false }: { isLoggedIn?: boolean }) {
         </div>
         <div className="border-t border-zinc-100 dark:border-zinc-800">
           <div className="mx-auto max-w-6xl px-6 py-5 text-xs text-zinc-400 dark:text-zinc-500">
-            © {new Date().getFullYear()} Invoicely. Built for the work you do.
+            © {new Date().getFullYear()} IndieBill. Built for the work you do.
           </div>
         </div>
       </footer>

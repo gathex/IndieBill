@@ -337,7 +337,7 @@ export function LandingDemo({
             <span className="h-2.5 w-2.5 rounded-full bg-emerald-400" />
           </div>
           <span className="truncate text-[11px] font-medium text-zinc-400 dark:text-zinc-500">
-            invoicely.app / {view}
+            indiebill.app / {view}
           </span>
           <span className="rounded-full bg-zinc-100 dark:bg-zinc-800 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wide text-zinc-600 dark:text-zinc-300">
             Demo data

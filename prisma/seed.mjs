@@ -360,15 +360,80 @@ async function main() {
     });
   }
 
-  const [clientCount, invoiceCount, quotationCount, paymentCount] = await Promise.all([
+  const catalogItemSpecs = [
+    {
+      name: "UI/UX Design Retainer",
+      description: "Dedicated monthly product design sprints, wireframing, and design system maintenance",
+      rate: 3500,
+      unit: "month",
+      hsnSac: "998314",
+      defaultTaxRate: 8.5,
+      isActive: true,
+    },
+    {
+      name: "Full-Stack Web Development",
+      description: "Custom Next.js & React web application architecture, API development, and frontend implementation",
+      rate: 120,
+      unit: "hr",
+      hsnSac: "998313",
+      defaultTaxRate: 8.5,
+      isActive: true,
+    },
+    {
+      name: "Brand Identity Package",
+      description: "Comprehensive logo design, brand guidelines, typography system, and vector asset deliverables",
+      rate: 2200,
+      unit: "project",
+      hsnSac: "998314",
+      defaultTaxRate: 8.5,
+      isActive: true,
+    },
+    {
+      name: "Design System & Component Library",
+      description: "Figma design tokens, reusable React/Tailwind component library, and documentation handoff",
+      rate: 1800,
+      unit: "item",
+      hsnSac: "998314",
+      defaultTaxRate: 8.5,
+      isActive: true,
+    },
+    {
+      name: "Technical SEO & Performance Audit",
+      description: "Core Web Vitals audit, Lighthouse optimization, structured schema data, and performance remediation",
+      rate: 750,
+      unit: "audit",
+      hsnSac: "998315",
+      defaultTaxRate: 0,
+      isActive: true,
+    },
+  ];
+
+  for (const spec of catalogItemSpecs) {
+    const existing = await prisma.catalogItem.findFirst({
+      where: { userId: user.id, name: spec.name },
+    });
+    if (existing) {
+      await prisma.catalogItem.update({
+        where: { id: existing.id },
+        data: spec,
+      });
+    } else {
+      await prisma.catalogItem.create({
+        data: { ...spec, userId: user.id },
+      });
+    }
+  }
+
+  const [clientCount, invoiceCount, quotationCount, paymentCount, catalogItemCount] = await Promise.all([
     prisma.client.count({ where: { userId: user.id } }),
     prisma.invoice.count({ where: { userId: user.id } }),
     prisma.quotation.count({ where: { userId: user.id } }),
     prisma.payment.count({ where: { userId: user.id } }),
+    prisma.catalogItem.count({ where: { userId: user.id } }),
   ]);
 
   console.log(
-    `Seeded ${clientCount} clients, ${invoiceCount} invoices, ${quotationCount} quotations, and ${paymentCount} payments for ${user.email}.`,
+    `Seeded ${clientCount} clients, ${invoiceCount} invoices, ${quotationCount} quotations, ${paymentCount} payments, and ${catalogItemCount} catalog items for ${user.email}.`,
   );
 }
 

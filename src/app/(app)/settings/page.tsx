@@ -28,6 +28,8 @@ export default async function SettingsPage() {
       qrVpa: true,
       qrUpiId: true,
       qrAccountNumber: true,
+      gstin: true,
+      state: true,
     },
   });
 
@@ -55,6 +57,8 @@ export default async function SettingsPage() {
         qrVpa={user?.qrVpa ?? ""}
         qrUpiId={user?.qrUpiId ?? ""}
         qrAccountNumber={user?.qrAccountNumber ?? ""}
+        gstin={user?.gstin ?? ""}
+        state={user?.state ?? ""}
         countries={getCountryOptions(locale)}
         currencies={getCurrencyOptions(locale)}
         languages={getLanguageOptions(locale)}

@@ -10,6 +10,7 @@ import { generatePaymentQr } from "@/lib/qr";
 import { getInvoiceShareUrl } from "@/lib/share";
 import { getInvoiceBalance } from "@/lib/payments";
 import { getUserSettings } from "@/lib/users";
+import { getStateDisplayName } from "@/lib/gst";
 import { InvoiceSheet } from "@/components/invoice-sheet";
 import { InvoicePdfDownload } from "@/components/invoice-pdf-download";
 import { PrintButton } from "@/components/print-button";
@@ -63,6 +64,17 @@ export default async function InvoicePreviewPage({
     subtotal: invoice.subtotal,
     discount,
     tax: invoice.tax,
+    taxRate: invoice.taxRate,
+    gstEnabled: invoice.gstEnabled,
+    taxType: invoice.taxType,
+    cgstAmount: invoice.cgstAmount,
+    sgstAmount: invoice.sgstAmount,
+    igstAmount: invoice.igstAmount,
+    businessGstin: settings.gstin,
+    businessState: settings.state,
+    clientGstin: invoice.client.gstin,
+    clientState: invoice.client.state,
+    placeOfSupply: getStateDisplayName(invoice.client.state) || invoice.client.state || null,
     total: invoice.total,
     notes: invoice.notes,
     clientName: invoice.client.name,
@@ -73,6 +85,7 @@ export default async function InvoicePreviewPage({
       quantity: item.quantity,
       rate: item.rate,
       amount: item.amount,
+      hsnSac: item.hsnSac,
     })),
   };
 
@@ -108,6 +121,7 @@ export default async function InvoicePreviewPage({
             invoice={pdfData}
             businessName={settings.businessName}
             businessAddress={settings.businessAddress}
+            businessGstin={settings.gstin}
             currency={settings.currency}
             locale={settings.locale}
             logoDataUrl={settings.logoDataUrl}
@@ -122,6 +136,7 @@ export default async function InvoicePreviewPage({
           invoice={pdfData}
           businessName={settings.businessName}
           businessAddress={settings.businessAddress}
+          businessGstin={settings.gstin}
           currency={settings.currency}
           locale={settings.locale}
           logoDataUrl={settings.logoDataUrl}

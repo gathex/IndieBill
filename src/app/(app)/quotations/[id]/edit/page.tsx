@@ -3,6 +3,7 @@ import { auth } from "@/auth";
 import { getQuotationById } from "@/lib/quotations";
 import { getUserClients } from "@/lib/clients";
 import { getUserSettings } from "@/lib/users";
+import { getUserCatalogItems } from "@/lib/catalog";
 import {
   QuotationFormClient,
   type QuotationFormQuotation,
@@ -25,10 +26,22 @@ export default async function QuotationEditPage({
     notFound();
   }
 
-  const [clients, settings] = await Promise.all([
+  const [clients, settings, catalogItems] = await Promise.all([
     getUserClients(userId),
     getUserSettings(userId),
+    getUserCatalogItems(userId, { activeOnly: true }),
   ]);
+
+  const serializedCatalogItems = catalogItems.map((item) => ({
+    id: item.id,
+    name: item.name,
+    description: item.description,
+    rate: item.rate,
+    unit: item.unit,
+    hsnSac: item.hsnSac,
+    defaultTaxRate: item.defaultTaxRate,
+    isActive: item.isActive,
+  }));
 
   const formQuotation: QuotationFormQuotation = {
     id: quotation.id,
@@ -39,11 +52,13 @@ export default async function QuotationEditPage({
     notes: quotation.notes ?? "",
     discountPercent: quotation.discountPercent,
     taxRate: quotation.taxRate,
+    gstEnabled: quotation.gstEnabled,
     items: quotation.items.map((item) => ({
       description: item.description,
       quantity: item.quantity,
       rate: item.rate,
       amount: item.amount,
+      hsnSac: item.hsnSac,
     })),
   };
 
@@ -57,6 +72,9 @@ export default async function QuotationEditPage({
         quotation={formQuotation}
         currency={settings.currency}
         locale={settings.locale}
+        businessState={settings.state}
+        businessGstin={settings.gstin}
+        catalogItems={serializedCatalogItems}
       />
     </div>
   );

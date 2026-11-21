@@ -10,6 +10,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { SearchableSelect } from "@/components/searchable-select";
 import { updateSettings } from "@/actions/settings";
 import type { LocaleOption } from "@/lib/locale-data";
+import { INDIAN_STATES } from "@/lib/gst";
 
 interface SettingsFormProps {
   name: string;
@@ -23,6 +24,8 @@ interface SettingsFormProps {
   qrVpa: string;
   qrUpiId: string;
   qrAccountNumber: string;
+  gstin?: string;
+  state?: string;
   countries: LocaleOption[];
   currencies: LocaleOption[];
   languages: LocaleOption[];
@@ -47,6 +50,8 @@ export function SettingsForm({
   qrVpa,
   qrUpiId,
   qrAccountNumber,
+  gstin = "",
+  state = "",
   countries,
   currencies,
   languages,
@@ -64,6 +69,8 @@ export function SettingsForm({
     qrVpa,
     qrUpiId,
     qrAccountNumber,
+    gstin,
+    state,
   });
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
@@ -218,6 +225,47 @@ export function SettingsForm({
             Language and country control date and number formatting on invoices,
             quotations, payments, and PDFs.
           </p>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardContent className="space-y-4 pt-6">
+          <div>
+            <h2 className="text-lg font-semibold text-zinc-900 dark:text-zinc-100">
+              Indian GST Details
+            </h2>
+            <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400">
+              Optional GST identification number and state for invoices and quotations with CGST, SGST, or IGST breakdown.
+            </p>
+          </div>
+          <div className="grid gap-4 sm:grid-cols-2">
+            <div className="space-y-2">
+              <Label htmlFor="gstin">GSTIN</Label>
+              <Input
+                id="gstin"
+                value={form.gstin}
+                onChange={(e) => update("gstin", e.target.value.toUpperCase())}
+                placeholder="e.g. 27AAPFU0939F1ZV"
+                maxLength={15}
+              />
+              <p className="text-xs text-zinc-500 dark:text-zinc-400">
+                15-character Goods and Services Tax Identification Number.
+              </p>
+            </div>
+            <div className="space-y-2">
+              <SearchableSelect
+                id="state"
+                label="State / Union Territory"
+                value={form.state}
+                options={INDIAN_STATES}
+                onChange={(value) => update("state", value)}
+                placeholder="Select state or UT…"
+              />
+              <p className="text-xs text-zinc-500 dark:text-zinc-400">
+                Used to determine intra-state (CGST+SGST) vs inter-state (IGST).
+              </p>
+            </div>
+          </div>
         </CardContent>
       </Card>
 

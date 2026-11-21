@@ -12,6 +12,7 @@ interface InvoicePdfDownloadProps {
   invoice: InvoicePdfData;
   businessName: string;
   businessAddress?: string | null;
+  businessGstin?: string | null;
   currency?: string;
   locale?: string;
   logoDataUrl?: string | null;
@@ -23,6 +24,7 @@ export function InvoicePdfDownload({
   invoice,
   businessName,
   businessAddress,
+  businessGstin,
   currency = "USD",
   locale,
   logoDataUrl,
@@ -41,6 +43,7 @@ export function InvoicePdfDownload({
           invoice={invoice}
           businessName={businessName}
           businessAddress={businessAddress}
+          businessGstin={businessGstin}
           currency={currency}
           locale={locale}
           logoDataUrl={logoDataUrl}

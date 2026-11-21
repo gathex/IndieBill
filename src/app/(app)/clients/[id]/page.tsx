@@ -6,6 +6,7 @@ import { formatCurrency, formatDate } from "@/lib/utils";
 import { effectiveStatus } from "@/lib/invoices";
 import { effectiveQuotationStatus } from "@/lib/quotations";
 import { getUserSettings } from "@/lib/users";
+import { getStateDisplayName } from "@/lib/gst";
 import { InvoiceStatusBadge } from "@/components/invoice-status-badge";
 import { QuotationStatusBadge } from "@/components/quotation-status-badge";
 import { Button } from "@/components/ui/button";
@@ -52,6 +53,8 @@ export default async function ClientDetailPage({
             {client.email}
             {client.company ? ` · ${client.company}` : ""}
             {client.phone ? ` · ${client.phone}` : ""}
+            {client.gstin ? ` · GSTIN: ${client.gstin}` : ""}
+            {client.state ? ` · State: ${getStateDisplayName(client.state)}` : ""}
           </p>
         </div>
         <Link href={`/clients/${client.id}/edit`}>

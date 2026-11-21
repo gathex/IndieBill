@@ -12,6 +12,7 @@ import { formatCurrency, formatDate } from "@/lib/utils";
 import { generatePaymentQr } from "@/lib/qr";
 import { getInvoiceShareUrl } from "@/lib/share";
 import { getUserSettings } from "@/lib/users";
+import { getStateDisplayName } from "@/lib/gst";
 import { InvoiceStatusBadge } from "@/components/invoice-status-badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -81,6 +82,17 @@ export default async function InvoiceDetailPage({
     subtotal: invoice.subtotal,
     discount,
     tax: invoice.tax,
+    taxRate: invoice.taxRate,
+    gstEnabled: invoice.gstEnabled,
+    taxType: invoice.taxType,
+    cgstAmount: invoice.cgstAmount,
+    sgstAmount: invoice.sgstAmount,
+    igstAmount: invoice.igstAmount,
+    businessGstin: settings.gstin,
+    businessState: settings.state,
+    clientGstin: invoice.client.gstin,
+    clientState: invoice.client.state,
+    placeOfSupply: getStateDisplayName(invoice.client.state) || invoice.client.state || null,
     total: invoice.total,
     notes: invoice.notes,
     clientName: invoice.client.name,
@@ -91,8 +103,11 @@ export default async function InvoiceDetailPage({
       quantity: item.quantity,
       rate: item.rate,
       amount: item.amount,
+      hsnSac: item.hsnSac,
     })),
   };
+
+  const showHsn = Boolean(invoice.gstEnabled || invoice.items.some((i) => i.hsnSac));
 
   return (
     <div className="space-y-6">
@@ -143,17 +158,30 @@ export default async function InvoiceDetailPage({
               <div className="overflow-x-auto">
                 <table className="w-full text-sm">
                   <thead>
-                    <tr className="border-b text-left text-xs uppercase tracking-wide text-zinc-500 dark:text-zinc-400">
-                      <th className="py-2 pr-4 font-medium">Description</th>
-                      <th className="py-2 pr-4 font-medium text-right">Qty</th>
-                      <th className="py-2 pr-4 font-medium text-right">Rate</th>
-                      <th className="py-2 pr-4 font-medium text-right">Amount</th>
-                    </tr>
+                    {showHsn ? (
+                      <tr className="border-b text-left text-xs uppercase tracking-wide text-zinc-500 dark:text-zinc-400">
+                        <th className="py-2 pr-4 font-medium">Description</th>
+                        <th className="py-2 pr-4 font-medium">HSN/SAC</th>
+                        <th className="py-2 pr-4 font-medium text-right">Qty</th>
+                        <th className="py-2 pr-4 font-medium text-right">Rate</th>
+                        <th className="py-2 pr-4 font-medium text-right">Amount</th>
+                      </tr>
+                    ) : (
+                      <tr className="border-b text-left text-xs uppercase tracking-wide text-zinc-500 dark:text-zinc-400">
+                        <th className="py-2 pr-4 font-medium">Description</th>
+                        <th className="py-2 pr-4 font-medium text-right">Qty</th>
+                        <th className="py-2 pr-4 font-medium text-right">Rate</th>
+                        <th className="py-2 pr-4 font-medium text-right">Amount</th>
+                      </tr>
+                    )}
                   </thead>
                   <tbody>
                     {invoice.items.map((item) => (
                       <tr key={item.id} className="border-b last:border-0">
                         <td className="py-3 pr-4 text-zinc-800 dark:text-zinc-200">{item.description}</td>
+                        {showHsn ? (
+                          <td className="py-3 pr-4 text-zinc-600 dark:text-zinc-400">{item.hsnSac || "-"}</td>
+                        ) : null}
                         <td className="py-3 pr-4 text-right text-zinc-600 dark:text-zinc-400">{item.quantity}</td>
                         <td className="py-3 pr-4 text-right text-zinc-600 dark:text-zinc-400">{money(item.rate)}</td>
                         <td className="py-3 pr-4 text-right font-medium text-zinc-900 dark:text-zinc-100">
@@ -164,25 +192,55 @@ export default async function InvoiceDetailPage({
                   </tbody>
                   <tfoot className="border-t">
                     <tr>
-                      <td colSpan={3} className="py-2 pr-4 text-right text-sm text-zinc-600 dark:text-zinc-400">
+                      <td colSpan={showHsn ? 4 : 3} className="py-2 pr-4 text-right text-sm text-zinc-600 dark:text-zinc-400">
                         Subtotal
                       </td>
                       <td className="py-2 text-right text-sm text-zinc-800 dark:text-zinc-200">{money(invoice.subtotal)}</td>
                     </tr>
                     <tr>
-                      <td colSpan={3} className="py-1 pr-4 text-right text-sm text-zinc-600 dark:text-zinc-400">
+                      <td colSpan={showHsn ? 4 : 3} className="py-1 pr-4 text-right text-sm text-zinc-600 dark:text-zinc-400">
                         Discount ({invoice.discountPercent}%)
                       </td>
                       <td className="py-1 text-right text-sm text-zinc-800 dark:text-zinc-200">-{money(discount)}</td>
                     </tr>
+                    {invoice.gstEnabled && invoice.taxType === "INTRA_STATE" ? (
+                      <>
+                        <tr>
+                          <td colSpan={showHsn ? 4 : 3} className="py-1 pr-4 text-right text-sm text-zinc-600 dark:text-zinc-400">
+                            CGST ({(invoice.taxRate) / 2}%)
+                          </td>
+                          <td className="py-1 text-right text-sm text-zinc-800 dark:text-zinc-200">
+                            {money(invoice.cgstAmount)}
+                          </td>
+                        </tr>
+                        <tr>
+                          <td colSpan={showHsn ? 4 : 3} className="py-1 pr-4 text-right text-sm text-zinc-600 dark:text-zinc-400">
+                            SGST ({(invoice.taxRate) / 2}%)
+                          </td>
+                          <td className="py-1 text-right text-sm text-zinc-800 dark:text-zinc-200">
+                            {money(invoice.sgstAmount)}
+                          </td>
+                        </tr>
+                      </>
+                    ) : invoice.gstEnabled && invoice.taxType === "INTER_STATE" ? (
+                      <tr>
+                        <td colSpan={showHsn ? 4 : 3} className="py-1 pr-4 text-right text-sm text-zinc-600 dark:text-zinc-400">
+                          IGST ({invoice.taxRate}%)
+                        </td>
+                        <td className="py-1 text-right text-sm text-zinc-800 dark:text-zinc-200">
+                          {money(invoice.igstAmount)}
+                        </td>
+                      </tr>
+                    ) : (
+                      <tr>
+                        <td colSpan={showHsn ? 4 : 3} className="py-1 pr-4 text-right text-sm text-zinc-600 dark:text-zinc-400">
+                          Tax ({invoice.taxRate}%)
+                        </td>
+                        <td className="py-1 text-right text-sm text-zinc-800 dark:text-zinc-200">{money(invoice.tax)}</td>
+                      </tr>
+                    )}
                     <tr>
-                      <td colSpan={3} className="py-1 pr-4 text-right text-sm text-zinc-600 dark:text-zinc-400">
-                        Tax ({invoice.taxRate}%)
-                      </td>
-                      <td className="py-1 text-right text-sm text-zinc-800 dark:text-zinc-200">{money(invoice.tax)}</td>
-                    </tr>
-                    <tr>
-                      <td colSpan={3} className="py-3 pr-4 text-right text-sm font-semibold text-zinc-900 dark:text-zinc-100">
+                      <td colSpan={showHsn ? 4 : 3} className="py-3 pr-4 text-right text-sm font-semibold text-zinc-900 dark:text-zinc-100">
                         Total
                       </td>
                       <td className="py-3 text-right text-lg font-bold text-zinc-900 dark:text-zinc-100">
@@ -206,6 +264,8 @@ export default async function InvoiceDetailPage({
               {invoice.client.company ? <p>{invoice.client.company}</p> : null}
               <p>{invoice.client.email}</p>
               {invoice.client.phone ? <p>{invoice.client.phone}</p> : null}
+              {invoice.client.gstin ? <p className="font-medium">GSTIN: {invoice.client.gstin}</p> : null}
+              {invoice.client.state ? <p>Place of Supply: {getStateDisplayName(invoice.client.state)}</p> : null}
             </CardContent>
           </Card>
 
@@ -251,6 +311,7 @@ export default async function InvoiceDetailPage({
                 invoice={pdfData}
                 businessName={settings.businessName}
                 businessAddress={settings.businessAddress}
+                businessGstin={settings.gstin}
                 currency={settings.currency}
                 locale={settings.locale}
                 logoDataUrl={settings.logoDataUrl}

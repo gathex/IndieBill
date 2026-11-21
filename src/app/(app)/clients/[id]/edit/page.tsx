@@ -25,6 +25,8 @@ export default async function EditClientPage({ params }: { params: Promise<{ id:
           company: client.company,
           phone: client.phone,
           notes: client.notes,
+          gstin: client.gstin,
+          state: client.state,
         }}
       />
     </div>

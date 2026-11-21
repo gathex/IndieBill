@@ -6,7 +6,9 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { SearchableSelect } from "@/components/searchable-select";
 import { createClient, updateClient } from "@/actions/clients";
+import { INDIAN_STATES } from "@/lib/gst";
 
 interface ClientFormClientProps {
   next?: string;
@@ -17,6 +19,8 @@ interface ClientFormClientProps {
     company: string | null;
     phone: string | null;
     notes: string | null;
+    gstin?: string | null;
+    state?: string | null;
   } | null;
 }
 
@@ -29,6 +33,8 @@ export function ClientFormClient({ client, next }: ClientFormClientProps) {
   const [company, setCompany] = useState(client?.company ?? "");
   const [phone, setPhone] = useState(client?.phone ?? "");
   const [notes, setNotes] = useState(client?.notes ?? "");
+  const [gstin, setGstin] = useState(client?.gstin ?? "");
+  const [state, setState] = useState(client?.state ?? "");
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
 
@@ -37,7 +43,7 @@ export function ClientFormClient({ client, next }: ClientFormClientProps) {
     setError(null);
     setSubmitting(true);
     try {
-      const input = { name, email, company, phone, notes };
+      const input = { name, email, company, phone, notes, gstin, state };
       if (client) {
         await updateClient(client.id, input);
         router.push(`/clients/${client.id}`);
@@ -71,6 +77,26 @@ export function ClientFormClient({ client, next }: ClientFormClientProps) {
         <div className="space-y-2">
           <Label htmlFor="phone">Phone</Label>
           <Input id="phone" value={phone} onChange={(e) => setPhone(e.target.value)} />
+        </div>
+        <div className="space-y-2">
+          <Label htmlFor="gstin">GSTIN (Optional)</Label>
+          <Input
+            id="gstin"
+            value={gstin}
+            onChange={(e) => setGstin(e.target.value.toUpperCase())}
+            placeholder="e.g. 27AAPFU0939F1ZV"
+            maxLength={15}
+          />
+        </div>
+        <div className="space-y-2">
+          <SearchableSelect
+            id="client-state"
+            label="State / Union Territory (Optional)"
+            value={state}
+            options={INDIAN_STATES}
+            onChange={(value) => setState(value)}
+            placeholder="Select state or UT…"
+          />
         </div>
       </div>
       <div className="space-y-2">

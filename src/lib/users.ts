@@ -16,6 +16,8 @@ export async function getUserSettings(userId: string) {
       qrVpa: true,
       qrUpiId: true,
       qrAccountNumber: true,
+      gstin: true,
+      state: true,
     },
   });
 
@@ -36,6 +38,8 @@ export async function getUserSettings(userId: string) {
     qrVpa: user?.qrVpa ?? null,
     qrUpiId: user?.qrUpiId ?? null,
     qrAccountNumber: user?.qrAccountNumber ?? null,
+    gstin: user?.gstin ?? null,
+    state: user?.state ?? null,
     locale: `${language}-${country}`,
   };
 }

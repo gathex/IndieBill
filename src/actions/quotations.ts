@@ -12,6 +12,7 @@ import {
   createQuotationNumber,
   round2,
 } from "@/lib/quotations";
+import { computeGstTotals, getStateDisplayName } from "@/lib/gst";
 import { sendQuotationEmail } from "@/lib/email";
 import { renderQuotationPdf } from "@/lib/pdf";
 import { getUserSettings } from "@/lib/users";
@@ -25,12 +26,14 @@ const quotationSchema = z.object({
   notes: z.string().nullable(),
   discountPercent: z.number().min(0).max(100),
   taxRate: z.number().min(0).max(100),
+  gstEnabled: z.boolean().optional().default(false),
   items: z
     .array(
       z.object({
         description: z.string().min(1, "Every item needs a description."),
         quantity: z.number().positive(),
         rate: z.number().min(0),
+        hsnSac: z.string().max(20).optional().nullable(),
       }),
     )
     .min(1, "Add at least one line item."),
@@ -52,12 +55,19 @@ function revalidateQuotations() {
   revalidatePath("/clients");
 }
 
-function calculateTotals(input: QuotationInput) {
+function calculateQuotationTotals(
+  input: QuotationInput,
+  businessState?: string | null,
+  clientState?: string | null,
+) {
   const subtotal = input.items.reduce((sum, item) => sum + item.quantity * item.rate, 0);
-  return computeQuotationTotals({
+  return computeGstTotals({
     subtotal,
     discountPercent: input.discountPercent,
     taxRate: input.taxRate,
+    gstEnabled: input.gstEnabled,
+    businessState,
+    clientState,
   });
 }
 
@@ -67,7 +77,7 @@ async function buildPdfData(
 ): Promise<QuotationPdfData> {
   const quotation = await prisma.quotation.findFirst({
     where: { id: quotationId, userId },
-    include: { client: true, items: true },
+    include: { client: true, items: true, user: true },
   });
   if (!quotation) throw new Error("Quotation not found.");
 
@@ -84,6 +94,17 @@ async function buildPdfData(
       taxRate: quotation.taxRate,
     }).discount,
     tax: quotation.tax,
+    taxRate: quotation.taxRate,
+    gstEnabled: quotation.gstEnabled,
+    taxType: quotation.taxType,
+    cgstAmount: quotation.cgstAmount,
+    sgstAmount: quotation.sgstAmount,
+    igstAmount: quotation.igstAmount,
+    businessGstin: quotation.user?.gstin ?? null,
+    businessState: quotation.user?.state ?? null,
+    clientGstin: quotation.client?.gstin ?? null,
+    clientState: quotation.client?.state ?? null,
+    placeOfSupply: getStateDisplayName(quotation.client?.state) || quotation.client?.state || null,
     total: quotation.total,
     notes: quotation.notes,
     clientName: quotation.client.name,
@@ -94,6 +115,7 @@ async function buildPdfData(
       quantity: item.quantity,
       rate: item.rate,
       amount: item.amount,
+      hsnSac: item.hsnSac,
     })),
   };
 }
@@ -102,10 +124,16 @@ export async function createQuotation(input: QuotationInput) {
   const userId = await requireUserId();
   const data = quotationSchema.parse(input);
 
-  const client = await prisma.client.findFirst({ where: { id: data.clientId, userId } });
+  const [client, user] = await Promise.all([
+    prisma.client.findFirst({ where: { id: data.clientId, userId } }),
+    prisma.user.findUnique({
+      where: { id: userId },
+      select: { state: true, gstin: true },
+    }),
+  ]);
   if (!client) throw new Error("Client not found.");
 
-  const totals = calculateTotals(data);
+  const totals = calculateQuotationTotals(data, user?.state, client.state);
   let quotation;
   for (let attempt = 0; attempt < 5; attempt += 1) {
     const number = await createQuotationNumber(userId);
@@ -122,6 +150,11 @@ export async function createQuotation(input: QuotationInput) {
           discountPercent: data.discountPercent,
           taxRate: data.taxRate,
           tax: totals.tax,
+          gstEnabled: totals.gstEnabled,
+          taxType: totals.taxType,
+          cgstAmount: totals.cgstAmount,
+          sgstAmount: totals.sgstAmount,
+          igstAmount: totals.igstAmount,
           total: totals.total,
           notes: data.notes,
           items: {
@@ -130,6 +163,7 @@ export async function createQuotation(input: QuotationInput) {
               quantity: item.quantity,
               rate: item.rate,
               amount: round2(item.quantity * item.rate),
+              hsnSac: item.hsnSac?.trim() || null,
             })),
           },
         },
@@ -151,13 +185,18 @@ export async function updateQuotation(id: string, input: QuotationInput) {
   const userId = await requireUserId();
   const data = quotationSchema.parse(input);
 
-  const existing = await prisma.quotation.findFirst({ where: { id, userId } });
+  const [existing, client, user] = await Promise.all([
+    prisma.quotation.findFirst({ where: { id, userId } }),
+    prisma.client.findFirst({ where: { id: data.clientId, userId } }),
+    prisma.user.findUnique({
+      where: { id: userId },
+      select: { state: true, gstin: true },
+    }),
+  ]);
   if (!existing) throw new Error("Quotation not found.");
-
-  const client = await prisma.client.findFirst({ where: { id: data.clientId, userId } });
   if (!client) throw new Error("Client not found.");
 
-  const totals = calculateTotals(data);
+  const totals = calculateQuotationTotals(data, user?.state, client.state);
   await prisma.quotation.update({
     where: { id },
     data: {
@@ -169,6 +208,11 @@ export async function updateQuotation(id: string, input: QuotationInput) {
       discountPercent: data.discountPercent,
       taxRate: data.taxRate,
       tax: totals.tax,
+      gstEnabled: totals.gstEnabled,
+      taxType: totals.taxType,
+      cgstAmount: totals.cgstAmount,
+      sgstAmount: totals.sgstAmount,
+      igstAmount: totals.igstAmount,
       total: totals.total,
       notes: data.notes,
       items: {
@@ -178,6 +222,7 @@ export async function updateQuotation(id: string, input: QuotationInput) {
           quantity: item.quantity,
           rate: item.rate,
           amount: round2(item.quantity * item.rate),
+          hsnSac: item.hsnSac?.trim() || null,
         })),
       },
     },
@@ -232,6 +277,7 @@ export async function sendQuotationEmailAction(formData: FormData) {
       quotation: pdfData,
       businessName: settings.businessName,
       businessAddress: settings.businessAddress,
+      businessGstin: settings.gstin,
       currency: settings.currency,
       locale: settings.locale,
       logoDataUrl: settings.logoDataUrl,
@@ -290,6 +336,11 @@ export async function convertQuotationToInvoice(quotationId: string): Promise<{ 
           discountPercent: quotation.discountPercent,
           taxRate: quotation.taxRate,
           tax: quotation.tax,
+          gstEnabled: quotation.gstEnabled,
+          taxType: quotation.taxType,
+          cgstAmount: quotation.cgstAmount,
+          sgstAmount: quotation.sgstAmount,
+          igstAmount: quotation.igstAmount,
           total: quotation.total,
           notes: quotation.notes,
           items: {
@@ -298,6 +349,7 @@ export async function convertQuotationToInvoice(quotationId: string): Promise<{ 
               quantity: item.quantity,
               rate: item.rate,
               amount: item.amount,
+              hsnSac: item.hsnSac,
             })),
           },
         },

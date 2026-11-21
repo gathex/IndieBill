@@ -5,6 +5,7 @@ interface QuotationSheetProps {
   quotation: QuotationPdfData;
   businessName: string;
   businessAddress?: string | null;
+  businessGstin?: string | null;
   currency?: string;
   locale?: string;
   logoDataUrl?: string | null;
@@ -14,11 +15,14 @@ export function QuotationSheet({
   quotation,
   businessName,
   businessAddress,
+  businessGstin,
   currency = "USD",
   locale,
   logoDataUrl,
 }: QuotationSheetProps) {
   const money = (amount: number) => formatCurrency(amount, currency, locale);
+  const showHsn = Boolean(quotation.gstEnabled || quotation.items.some((i) => i.hsnSac));
+  const effectiveBusinessGstin = quotation.businessGstin || businessGstin;
 
   return (
     <article className="a4-sheet relative overflow-hidden bg-white px-[15mm] py-[14mm] text-[11px] leading-relaxed text-zinc-900">
@@ -50,6 +54,11 @@ export function QuotationSheet({
                   {businessAddress}
                 </p>
               ) : null}
+              {effectiveBusinessGstin ? (
+                <p className="mt-1 text-[9px] text-zinc-500">
+                  GSTIN: {effectiveBusinessGstin}
+                </p>
+              ) : null}
             </div>
           </div>
           <div className="text-right">
@@ -73,6 +82,12 @@ export function QuotationSheet({
               <div className="text-zinc-600">{quotation.clientCompany}</div>
             ) : null}
             <div className="text-zinc-600">{quotation.clientEmail ?? ""}</div>
+            {quotation.clientGstin ? (
+              <div className="text-zinc-600 font-medium">GSTIN: {quotation.clientGstin}</div>
+            ) : null}
+            {quotation.placeOfSupply ? (
+              <div className="text-zinc-600">Place of Supply: {quotation.placeOfSupply}</div>
+            ) : null}
           </div>
           <div className="grid grid-cols-2 gap-4 text-right">
             <div>
@@ -96,26 +111,54 @@ export function QuotationSheet({
 
         <table className="mt-8 w-full table-fixed border-collapse text-left">
           <thead>
-            <tr className="bg-zinc-100 text-[9px] uppercase tracking-wider text-zinc-500">
-              <th className="w-[40%] px-2 py-2 font-semibold">Description</th>
-              <th className="w-[12%] px-2 py-2 text-right font-semibold">Qty</th>
-              <th className="w-[20%] px-2 py-2 text-right font-semibold">Rate</th>
-              <th className="w-[28%] px-2 py-2 text-right font-semibold">Amount</th>
-            </tr>
+            {showHsn ? (
+              <tr className="bg-zinc-100 text-[9px] uppercase tracking-wider text-zinc-500">
+                <th className="w-[35%] px-2 py-2 font-semibold">Description</th>
+                <th className="w-[15%] px-2 py-2 font-semibold">HSN/SAC</th>
+                <th className="w-[12%] px-2 py-2 text-right font-semibold">Qty</th>
+                <th className="w-[18%] px-2 py-2 text-right font-semibold">Rate</th>
+                <th className="w-[20%] px-2 py-2 text-right font-semibold">Amount</th>
+              </tr>
+            ) : (
+              <tr className="bg-zinc-100 text-[9px] uppercase tracking-wider text-zinc-500">
+                <th className="w-[40%] px-2 py-2 font-semibold">Description</th>
+                <th className="w-[12%] px-2 py-2 text-right font-semibold">Qty</th>
+                <th className="w-[20%] px-2 py-2 text-right font-semibold">Rate</th>
+                <th className="w-[28%] px-2 py-2 text-right font-semibold">Amount</th>
+              </tr>
+            )}
           </thead>
           <tbody>
             {quotation.items.map((item, index) => (
               <tr key={index} className="border-b border-zinc-200">
-                <td className="px-2 py-2 align-top">{item.description}</td>
-                <td className="px-2 py-2 text-right align-top text-zinc-600">
-                  {item.quantity}
-                </td>
-                <td className="px-2 py-2 text-right align-top text-zinc-600">
-                  {money(item.rate)}
-                </td>
-                <td className="px-2 py-2 text-right align-top font-medium">
-                  {money(item.amount)}
-                </td>
+                {showHsn ? (
+                  <>
+                    <td className="px-2 py-2 align-top">{item.description}</td>
+                    <td className="px-2 py-2 align-top text-zinc-600">{item.hsnSac || "-"}</td>
+                    <td className="px-2 py-2 text-right align-top text-zinc-600">
+                      {item.quantity}
+                    </td>
+                    <td className="px-2 py-2 text-right align-top text-zinc-600">
+                      {money(item.rate)}
+                    </td>
+                    <td className="px-2 py-2 text-right align-top font-medium">
+                      {money(item.amount)}
+                    </td>
+                  </>
+                ) : (
+                  <>
+                    <td className="px-2 py-2 align-top">{item.description}</td>
+                    <td className="px-2 py-2 text-right align-top text-zinc-600">
+                      {item.quantity}
+                    </td>
+                    <td className="px-2 py-2 text-right align-top text-zinc-600">
+                      {money(item.rate)}
+                    </td>
+                    <td className="px-2 py-2 text-right align-top font-medium">
+                      {money(item.amount)}
+                    </td>
+                  </>
+                )}
               </tr>
             ))}
           </tbody>
@@ -130,10 +173,28 @@ export function QuotationSheet({
             <span className="text-zinc-500">Discount</span>
             <span>-{money(quotation.discount)}</span>
           </div>
-          <div className="flex justify-between py-1">
-            <span className="text-zinc-500">Tax</span>
-            <span>{money(quotation.tax)}</span>
-          </div>
+          {quotation.gstEnabled && quotation.taxType === "INTRA_STATE" ? (
+            <>
+              <div className="flex justify-between py-1">
+                <span className="text-zinc-500">CGST ({(quotation.taxRate ?? 0) / 2}%)</span>
+                <span>{money(quotation.cgstAmount ?? 0)}</span>
+              </div>
+              <div className="flex justify-between py-1">
+                <span className="text-zinc-500">SGST ({(quotation.taxRate ?? 0) / 2}%)</span>
+                <span>{money(quotation.sgstAmount ?? 0)}</span>
+              </div>
+            </>
+          ) : quotation.gstEnabled && quotation.taxType === "INTER_STATE" ? (
+            <div className="flex justify-between py-1">
+              <span className="text-zinc-500">IGST ({quotation.taxRate ?? 0}%)</span>
+              <span>{money(quotation.igstAmount ?? quotation.tax)}</span>
+            </div>
+          ) : (
+            <div className="flex justify-between py-1">
+              <span className="text-zinc-500">Tax</span>
+              <span>{money(quotation.tax)}</span>
+            </div>
+          )}
           <div className="mt-2 flex justify-between border-t border-zinc-300 pt-3 text-sm font-bold">
             <span>Total</span>
             <span>{money(quotation.total)}</span>

@@ -7,6 +7,7 @@ import {
   getQuotationById,
 } from "@/lib/quotations";
 import { getUserSettings } from "@/lib/users";
+import { getStateDisplayName } from "@/lib/gst";
 import { QuotationSheet } from "@/components/quotation-sheet";
 import { QuotationPdfDownload } from "@/components/quotation-pdf-download";
 import { PrintButton } from "@/components/print-button";
@@ -42,6 +43,17 @@ export default async function QuotationPreviewPage({
     subtotal: quotation.subtotal,
     discount,
     tax: quotation.tax,
+    taxRate: quotation.taxRate,
+    gstEnabled: quotation.gstEnabled,
+    taxType: quotation.taxType,
+    cgstAmount: quotation.cgstAmount,
+    sgstAmount: quotation.sgstAmount,
+    igstAmount: quotation.igstAmount,
+    businessGstin: settings.gstin,
+    businessState: settings.state,
+    clientGstin: quotation.client.gstin,
+    clientState: quotation.client.state,
+    placeOfSupply: getStateDisplayName(quotation.client.state) || quotation.client.state || null,
     total: quotation.total,
     notes: quotation.notes,
     clientName: quotation.client.name,
@@ -52,6 +64,7 @@ export default async function QuotationPreviewPage({
       quantity: item.quantity,
       rate: item.rate,
       amount: item.amount,
+      hsnSac: item.hsnSac,
     })),
   };
 
@@ -81,6 +94,7 @@ export default async function QuotationPreviewPage({
             quotation={pdfData}
             businessName={settings.businessName}
             businessAddress={settings.businessAddress}
+            businessGstin={settings.gstin}
             currency={settings.currency}
             locale={settings.locale}
             logoDataUrl={settings.logoDataUrl}
@@ -93,6 +107,7 @@ export default async function QuotationPreviewPage({
           quotation={pdfData}
           businessName={settings.businessName}
           businessAddress={settings.businessAddress}
+          businessGstin={settings.gstin}
           currency={settings.currency}
           locale={settings.locale}
           logoDataUrl={settings.logoDataUrl}

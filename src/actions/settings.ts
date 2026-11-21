@@ -9,6 +9,7 @@ import {
   isValidCurrencyCode,
   isValidLanguageCode,
 } from "@/lib/locale-data";
+import { isValidGstin } from "@/lib/gst";
 
 const logoDataUrlSchema = z
   .string()
@@ -31,6 +32,14 @@ const settingsSchema = z.object({
   qrVpa: z.string().max(120).optional(),
   qrUpiId: z.string().max(120).optional(),
   qrAccountNumber: z.string().max(60).optional(),
+  gstin: z
+    .string()
+    .max(15)
+    .optional()
+    .refine((val) => !val || !val.trim() || isValidGstin(val), {
+      message: "GSTIN must be a valid 15-character Indian GST identification number.",
+    }),
+  state: z.string().max(100).optional(),
 });
 
 export type SettingsInput = z.infer<typeof settingsSchema>;
@@ -55,6 +64,8 @@ export async function updateSettings(input: SettingsInput) {
       qrVpa: data.qrVpa?.trim() || null,
       qrUpiId: data.qrUpiId?.trim() || null,
       qrAccountNumber: data.qrAccountNumber?.trim() || null,
+      gstin: data.gstin?.trim().toUpperCase() || null,
+      state: data.state?.trim() || null,
     },
   });
 

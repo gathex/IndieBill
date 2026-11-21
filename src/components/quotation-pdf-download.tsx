@@ -12,6 +12,7 @@ interface QuotationPdfDownloadProps {
   quotation: QuotationPdfData;
   businessName: string;
   businessAddress?: string | null;
+  businessGstin?: string | null;
   currency?: string;
   locale?: string;
   logoDataUrl?: string | null;
@@ -21,6 +22,7 @@ export function QuotationPdfDownload({
   quotation,
   businessName,
   businessAddress,
+  businessGstin,
   currency = "USD",
   locale,
   logoDataUrl,
@@ -37,6 +39,7 @@ export function QuotationPdfDownload({
           quotation={quotation}
           businessName={businessName}
           businessAddress={businessAddress}
+          businessGstin={businessGstin}
           currency={currency}
           locale={locale}
           logoDataUrl={logoDataUrl}

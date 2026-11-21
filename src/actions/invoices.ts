@@ -7,6 +7,7 @@ import { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/db";
 import { auth } from "@/auth";
 import { computeInvoiceTotals, createInvoiceNumber, round2 } from "@/lib/invoices";
+import { computeGstTotals, getStateDisplayName } from "@/lib/gst";
 import { derivePaymentStatus, getInvoiceBalance } from "@/lib/payments";
 import { sendInvoiceEmail } from "@/lib/email";
 import { createPaymentLink } from "@/lib/stripe";
@@ -23,12 +24,14 @@ const invoiceSchema = z.object({
   notes: z.string().nullable(),
   discountPercent: z.number().min(0).max(100),
   taxRate: z.number().min(0).max(100),
+  gstEnabled: z.boolean().optional().default(false),
   items: z
     .array(
       z.object({
         description: z.string().min(1, "Every item needs a description."),
         quantity: z.number().positive(),
         rate: z.number().min(0),
+        hsnSac: z.string().max(20).optional().nullable(),
       }),
     )
     .min(1, "Add at least one line item."),
@@ -51,12 +54,19 @@ function revalidateInvoices() {
   revalidatePath("/clients");
 }
 
-function calculateTotals(input: InvoiceInput) {
+function calculateInvoiceTotals(
+  input: InvoiceInput,
+  businessState?: string | null,
+  clientState?: string | null,
+) {
   const subtotal = input.items.reduce((sum, item) => sum + item.quantity * item.rate, 0);
-  return computeInvoiceTotals({
+  return computeGstTotals({
     subtotal,
     discountPercent: input.discountPercent,
     taxRate: input.taxRate,
+    gstEnabled: input.gstEnabled,
+    businessState,
+    clientState,
   });
 }
 
@@ -82,6 +92,17 @@ async function buildPdfData(invoiceId: string, userId: string): Promise<InvoiceP
     subtotal: invoice.subtotal,
     discount: totals.discount,
     tax: invoice.tax,
+    taxRate: invoice.taxRate,
+    gstEnabled: invoice.gstEnabled,
+    taxType: invoice.taxType,
+    cgstAmount: invoice.cgstAmount,
+    sgstAmount: invoice.sgstAmount,
+    igstAmount: invoice.igstAmount,
+    businessGstin: invoice.user?.gstin ?? null,
+    businessState: invoice.user?.state ?? null,
+    clientGstin: invoice.client?.gstin ?? null,
+    clientState: invoice.client?.state ?? null,
+    placeOfSupply: getStateDisplayName(invoice.client?.state) || invoice.client?.state || null,
     total: invoice.total,
     notes: invoice.notes,
     clientName: invoice.client.name,
@@ -92,6 +113,7 @@ async function buildPdfData(invoiceId: string, userId: string): Promise<InvoiceP
       quantity: item.quantity,
       rate: item.rate,
       amount: item.amount,
+      hsnSac: item.hsnSac,
     })),
   };
 }
@@ -100,10 +122,16 @@ export async function createInvoice(input: InvoiceInput) {
   const userId = await requireUserId();
   const data = invoiceSchema.parse(input);
 
-  const client = await prisma.client.findFirst({ where: { id: data.clientId, userId } });
+  const [client, user] = await Promise.all([
+    prisma.client.findFirst({ where: { id: data.clientId, userId } }),
+    prisma.user.findUnique({
+      where: { id: userId },
+      select: { state: true, gstin: true },
+    }),
+  ]);
   if (!client) throw new Error("Client not found.");
 
-  const totals = calculateTotals(data);
+  const totals = calculateInvoiceTotals(data, user?.state, client.state);
 
   let invoice;
   for (let attempt = 0; attempt < 5; attempt += 1) {
@@ -121,6 +149,11 @@ export async function createInvoice(input: InvoiceInput) {
           discountPercent: data.discountPercent,
           taxRate: data.taxRate,
           tax: totals.tax,
+          gstEnabled: totals.gstEnabled,
+          taxType: totals.taxType,
+          cgstAmount: totals.cgstAmount,
+          sgstAmount: totals.sgstAmount,
+          igstAmount: totals.igstAmount,
           total: totals.total,
           notes: data.notes,
           items: {
@@ -129,6 +162,7 @@ export async function createInvoice(input: InvoiceInput) {
               quantity: item.quantity,
               rate: item.rate,
               amount: round2(item.quantity * item.rate),
+              hsnSac: item.hsnSac?.trim() || null,
             })),
           },
         },
@@ -151,16 +185,21 @@ export async function updateInvoice(id: string, input: InvoiceInput) {
   const userId = await requireUserId();
   const data = invoiceSchema.parse(input);
 
-  const existing = await prisma.invoice.findFirst({
-    where: { id, userId },
-    include: { payments: true },
-  });
+  const [existing, client, user] = await Promise.all([
+    prisma.invoice.findFirst({
+      where: { id, userId },
+      include: { payments: true },
+    }),
+    prisma.client.findFirst({ where: { id: data.clientId, userId } }),
+    prisma.user.findUnique({
+      where: { id: userId },
+      select: { state: true, gstin: true },
+    }),
+  ]);
   if (!existing) throw new Error("Invoice not found.");
-
-  const client = await prisma.client.findFirst({ where: { id: data.clientId, userId } });
   if (!client) throw new Error("Client not found.");
 
-  const totals = calculateTotals(data);
+  const totals = calculateInvoiceTotals(data, user?.state, client.state);
   const paymentStatus = derivePaymentStatus(totals.total, existing.payments);
   const nextStatus =
     paymentStatus === "PAID"
@@ -180,6 +219,11 @@ export async function updateInvoice(id: string, input: InvoiceInput) {
       discountPercent: data.discountPercent,
       taxRate: data.taxRate,
       tax: totals.tax,
+      gstEnabled: totals.gstEnabled,
+      taxType: totals.taxType,
+      cgstAmount: totals.cgstAmount,
+      sgstAmount: totals.sgstAmount,
+      igstAmount: totals.igstAmount,
       total: totals.total,
       notes: data.notes,
       items: {
@@ -189,6 +233,7 @@ export async function updateInvoice(id: string, input: InvoiceInput) {
           quantity: item.quantity,
           rate: item.rate,
           amount: round2(item.quantity * item.rate),
+          hsnSac: item.hsnSac?.trim() || null,
         })),
       },
     },
@@ -280,6 +325,7 @@ export async function sendInvoiceEmailAction(formData: FormData) {
       invoice: pdfData,
       businessName: settings.businessName,
       businessAddress: settings.businessAddress,
+      businessGstin: settings.gstin,
       currency: settings.currency,
       locale: settings.locale,
       logoDataUrl: settings.logoDataUrl,

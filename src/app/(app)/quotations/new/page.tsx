@@ -2,6 +2,7 @@ import { redirect } from "next/navigation";
 import { auth } from "@/auth";
 import { getUserClients } from "@/lib/clients";
 import { getUserSettings } from "@/lib/users";
+import { getUserCatalogItems } from "@/lib/catalog";
 import { QuotationFormClient } from "@/components/quotation-form";
 
 export default async function NewQuotationPage({
@@ -14,12 +15,24 @@ export default async function NewQuotationPage({
   if (!userId) redirect("/login");
 
   const { clientId } = await searchParams;
-  const [clients, settings] = await Promise.all([
+  const [clients, settings, catalogItems] = await Promise.all([
     getUserClients(userId),
     getUserSettings(userId),
+    getUserCatalogItems(userId, { activeOnly: true }),
   ]);
   if (clients.length === 0) redirect("/clients/new?next=/quotations/new");
   const defaultClientId = clients.some((client) => client.id === clientId) ? clientId : undefined;
+
+  const serializedCatalogItems = catalogItems.map((item) => ({
+    id: item.id,
+    name: item.name,
+    description: item.description,
+    rate: item.rate,
+    unit: item.unit,
+    hsnSac: item.hsnSac,
+    defaultTaxRate: item.defaultTaxRate,
+    isActive: item.isActive,
+  }));
 
   return (
     <div className="space-y-6">
@@ -33,7 +46,10 @@ export default async function NewQuotationPage({
         clients={clients}
         currency={settings.currency}
         locale={settings.locale}
+        businessState={settings.state}
+        businessGstin={settings.gstin}
         defaultClientId={defaultClientId}
+        catalogItems={serializedCatalogItems}
       />
     </div>
   );

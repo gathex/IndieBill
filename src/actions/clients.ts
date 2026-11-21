@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { prisma } from "@/lib/db";
 import { auth } from "@/auth";
+import { isValidGstin } from "@/lib/gst";
 
 const clientSchema = z.object({
   name: z.string().min(1, "Client name is required.").max(120),
@@ -11,6 +12,14 @@ const clientSchema = z.object({
   company: z.string().max(120),
   phone: z.string().max(40),
   notes: z.string().max(2000),
+  gstin: z
+    .string()
+    .max(15)
+    .optional()
+    .refine((val) => !val || !val.trim() || isValidGstin(val), {
+      message: "Client GSTIN must be a valid 15-character Indian GST identification number.",
+    }),
+  state: z.string().max(100).optional(),
 });
 
 export type ClientInput = z.infer<typeof clientSchema>;
@@ -29,6 +38,8 @@ function normalize(input: ClientInput) {
     company: input.company.trim() || null,
     phone: input.phone.trim() || null,
     notes: input.notes.trim() || null,
+    gstin: input.gstin?.trim().toUpperCase() || null,
+    state: input.state?.trim() || null,
   };
 }
 

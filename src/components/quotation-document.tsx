@@ -17,6 +17,17 @@ export interface QuotationPdfData {
   subtotal: number;
   discount: number;
   tax: number;
+  taxRate?: number;
+  gstEnabled?: boolean;
+  taxType?: string;
+  cgstAmount?: number;
+  sgstAmount?: number;
+  igstAmount?: number;
+  businessGstin?: string | null;
+  businessState?: string | null;
+  clientGstin?: string | null;
+  clientState?: string | null;
+  placeOfSupply?: string | null;
   total: number;
   notes: string | null;
   clientName: string;
@@ -27,6 +38,7 @@ export interface QuotationPdfData {
     quantity: number;
     rate: number;
     amount: number;
+    hsnSac?: string | null;
   }>;
 }
 
@@ -34,6 +46,7 @@ export interface QuotationDocumentProps {
   quotation: QuotationPdfData;
   businessName: string;
   businessAddress?: string | null;
+  businessGstin?: string | null;
   currency?: string;
   locale?: string;
   logoDataUrl?: string | null;
@@ -81,6 +94,11 @@ const styles = StyleSheet.create({
   colQty: { width: "12%" },
   colRate: { width: "20%" },
   colAmount: { width: "28%" },
+  colDescHsn: { width: "35%" },
+  colHsn: { width: "15%" },
+  colQtyHsn: { width: "12%" },
+  colRateHsn: { width: "18%" },
+  colAmountHsn: { width: "20%" },
   cell: { fontSize: 10 },
   right: { textAlign: "right" },
   totals: { marginTop: 16, alignSelf: "flex-end", width: "45%" },
@@ -103,11 +121,14 @@ export function QuotationDocument({
   quotation,
   businessName,
   businessAddress,
+  businessGstin,
   currency = "USD",
   locale,
   logoDataUrl,
 }: QuotationDocumentProps) {
   const money = (amount: number) => formatCurrency(amount, currency, locale);
+  const showHsn = Boolean(quotation.gstEnabled || quotation.items.some((i) => i.hsnSac));
+  const effectiveBusinessGstin = quotation.businessGstin || businessGstin;
 
   return (
     <Document
@@ -131,6 +152,9 @@ export function QuotationDocument({
               {businessAddress ? (
                 <Text style={styles.muted}>{businessAddress}</Text>
               ) : null}
+              {effectiveBusinessGstin ? (
+                <Text style={styles.muted}>GSTIN: {effectiveBusinessGstin}</Text>
+              ) : null}
             </View>
           </View>
           <View>
@@ -148,6 +172,12 @@ export function QuotationDocument({
               <Text style={styles.value}>{quotation.clientCompany}</Text>
             ) : null}
             <Text style={styles.value}>{quotation.clientEmail ?? ""}</Text>
+            {quotation.clientGstin ? (
+              <Text style={styles.value}>GSTIN: {quotation.clientGstin}</Text>
+            ) : null}
+            {quotation.placeOfSupply ? (
+              <Text style={styles.value}>Place of Supply: {quotation.placeOfSupply}</Text>
+            ) : null}
           </View>
           <View style={styles.half}>
             <View style={styles.row}>
@@ -165,17 +195,41 @@ export function QuotationDocument({
 
         <View style={styles.table}>
           <View style={styles.tableHead}>
-            <Text style={[styles.cell, styles.colDesc]}>Description</Text>
-            <Text style={[styles.cell, styles.colQty, styles.right]}>Qty</Text>
-            <Text style={[styles.cell, styles.colRate, styles.right]}>Rate</Text>
-            <Text style={[styles.cell, styles.colAmount, styles.right]}>Amount</Text>
+            {showHsn ? (
+              <>
+                <Text style={[styles.cell, styles.colDescHsn]}>Description</Text>
+                <Text style={[styles.cell, styles.colHsn]}>HSN/SAC</Text>
+                <Text style={[styles.cell, styles.colQtyHsn, styles.right]}>Qty</Text>
+                <Text style={[styles.cell, styles.colRateHsn, styles.right]}>Rate</Text>
+                <Text style={[styles.cell, styles.colAmountHsn, styles.right]}>Amount</Text>
+              </>
+            ) : (
+              <>
+                <Text style={[styles.cell, styles.colDesc]}>Description</Text>
+                <Text style={[styles.cell, styles.colQty, styles.right]}>Qty</Text>
+                <Text style={[styles.cell, styles.colRate, styles.right]}>Rate</Text>
+                <Text style={[styles.cell, styles.colAmount, styles.right]}>Amount</Text>
+              </>
+            )}
           </View>
           {quotation.items.map((item, index) => (
             <View key={index} style={styles.tableRow}>
-              <Text style={[styles.cell, styles.colDesc]}>{item.description}</Text>
-              <Text style={[styles.cell, styles.colQty, styles.right]}>{item.quantity}</Text>
-              <Text style={[styles.cell, styles.colRate, styles.right]}>{money(item.rate)}</Text>
-              <Text style={[styles.cell, styles.colAmount, styles.right]}>{money(item.amount)}</Text>
+              {showHsn ? (
+                <>
+                  <Text style={[styles.cell, styles.colDescHsn]}>{item.description}</Text>
+                  <Text style={[styles.cell, styles.colHsn]}>{item.hsnSac || "-"}</Text>
+                  <Text style={[styles.cell, styles.colQtyHsn, styles.right]}>{item.quantity}</Text>
+                  <Text style={[styles.cell, styles.colRateHsn, styles.right]}>{money(item.rate)}</Text>
+                  <Text style={[styles.cell, styles.colAmountHsn, styles.right]}>{money(item.amount)}</Text>
+                </>
+              ) : (
+                <>
+                  <Text style={[styles.cell, styles.colDesc]}>{item.description}</Text>
+                  <Text style={[styles.cell, styles.colQty, styles.right]}>{item.quantity}</Text>
+                  <Text style={[styles.cell, styles.colRate, styles.right]}>{money(item.rate)}</Text>
+                  <Text style={[styles.cell, styles.colAmount, styles.right]}>{money(item.amount)}</Text>
+                </>
+              )}
             </View>
           ))}
         </View>
@@ -189,10 +243,28 @@ export function QuotationDocument({
             <Text style={styles.cell}>Discount</Text>
             <Text style={styles.cell}>-{money(quotation.discount)}</Text>
           </View>
-          <View style={styles.totalLine}>
-            <Text style={styles.cell}>Tax</Text>
-            <Text style={styles.cell}>{money(quotation.tax)}</Text>
-          </View>
+          {quotation.gstEnabled && quotation.taxType === "INTRA_STATE" ? (
+            <>
+              <View style={styles.totalLine}>
+                <Text style={styles.cell}>CGST ({(quotation.taxRate ?? 0) / 2}%)</Text>
+                <Text style={styles.cell}>{money(quotation.cgstAmount ?? 0)}</Text>
+              </View>
+              <View style={styles.totalLine}>
+                <Text style={styles.cell}>SGST ({(quotation.taxRate ?? 0) / 2}%)</Text>
+                <Text style={styles.cell}>{money(quotation.sgstAmount ?? 0)}</Text>
+              </View>
+            </>
+          ) : quotation.gstEnabled && quotation.taxType === "INTER_STATE" ? (
+            <View style={styles.totalLine}>
+              <Text style={styles.cell}>IGST ({quotation.taxRate ?? 0}%)</Text>
+              <Text style={styles.cell}>{money(quotation.igstAmount ?? quotation.tax)}</Text>
+            </View>
+          ) : (
+            <View style={styles.totalLine}>
+              <Text style={styles.cell}>Tax</Text>
+              <Text style={styles.cell}>{money(quotation.tax)}</Text>
+            </View>
+          )}
           <View style={[styles.totalLine, styles.totalBold]}>
             <Text>Total</Text>
             <Text>{money(quotation.total)}</Text>

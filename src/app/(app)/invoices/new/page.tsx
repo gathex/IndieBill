@@ -2,6 +2,7 @@ import { redirect } from "next/navigation";
 import { auth } from "@/auth";
 import { getUserClients } from "@/lib/clients";
 import { getUserSettings } from "@/lib/users";
+import { getUserCatalogItems } from "@/lib/catalog";
 import { InvoiceFormClient } from "@/components/invoice-form";
 
 export default async function NewInvoicePage() {
@@ -9,11 +10,23 @@ export default async function NewInvoicePage() {
   const userId = session?.user?.id;
   if (!userId) redirect("/login");
 
-  const [clients, settings] = await Promise.all([
+  const [clients, settings, catalogItems] = await Promise.all([
     getUserClients(userId),
     getUserSettings(userId),
+    getUserCatalogItems(userId, { activeOnly: true }),
   ]);
   if (clients.length === 0) redirect("/clients/new?next=/invoices/new");
+
+  const serializedCatalogItems = catalogItems.map((item) => ({
+    id: item.id,
+    name: item.name,
+    description: item.description,
+    rate: item.rate,
+    unit: item.unit,
+    hsnSac: item.hsnSac,
+    defaultTaxRate: item.defaultTaxRate,
+    isActive: item.isActive,
+  }));
 
   return (
     <div className="space-y-6">
@@ -27,6 +40,9 @@ export default async function NewInvoicePage() {
         clients={clients}
         currency={settings.currency}
         locale={settings.locale}
+        businessState={settings.state}
+        businessGstin={settings.gstin}
+        catalogItems={serializedCatalogItems}
       />
     </div>
   );
