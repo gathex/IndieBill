@@ -28,6 +28,27 @@ export function LandingAnimator() {
         },
       );
 
+      // ── Video showcase entrance
+      const videoEl = document.querySelector("[data-gsap='video-showcase']");
+      if (videoEl) {
+        gsap.fromTo(
+          videoEl,
+          { opacity: 0, y: 20 },
+          {
+            opacity: 1,
+            y: 0,
+            duration: 0.65,
+            ease: "power2.out",
+            clearProps: "transform,opacity",
+            scrollTrigger: {
+              trigger: videoEl,
+              start: "top 85%",
+              once: true,
+            },
+          },
+        );
+      }
+
       // ── Scroll-triggered sections & cards
       const scrollGroups = [
         "[data-gsap='stats-item']",

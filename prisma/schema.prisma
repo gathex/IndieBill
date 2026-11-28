@@ -3,7 +3,7 @@ generator client {
 }
 
 datasource db {
-  provider = "sqlite"
+  provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
@@ -30,6 +30,8 @@ model User {
   remindBeforeDays Int      @default(3)
   remindOnDueDate  Boolean  @default(true)
   remindAfterDays  String   @default("3,7,14")
+  plan             String   @default("FREE")
+  isSuspended      Boolean  @default(false)
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
 

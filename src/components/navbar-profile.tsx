@@ -15,9 +15,10 @@ export interface NavbarUser {
 
 interface NavbarProfileProps {
   user?: NavbarUser | null;
+  isAdmin?: boolean;
 }
 
-export function NavbarProfile({ user }: NavbarProfileProps) {
+export function NavbarProfile({ user, isAdmin = false }: NavbarProfileProps) {
   const [isOpen, setIsOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
   const pathname = usePathname();
@@ -143,6 +144,32 @@ export function NavbarProfile({ user }: NavbarProfileProps) {
             </svg>
             <span>Settings</span>
           </Link>
+
+          {isAdmin && (
+            <Link
+              href="/admin"
+              onClick={() => setIsOpen(false)}
+              className="flex items-center justify-between gap-2.5 rounded-lg px-3 py-2 text-sm font-medium text-indigo-700 dark:text-indigo-300 hover:bg-indigo-50 dark:hover:bg-indigo-950/40 transition-colors"
+            >
+              <span className="flex items-center gap-2.5">
+                <svg
+                  className="h-4 w-4 text-indigo-500 dark:text-indigo-400"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+                </svg>
+                <span>Admin Panel</span>
+              </span>
+              <span className="rounded px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide bg-indigo-100 text-indigo-700 dark:bg-indigo-900/50 dark:text-indigo-300">
+                Admin
+              </span>
+            </Link>
+          )}
 
           <div className="my-1 border-t border-zinc-100 dark:border-zinc-800" />
 

@@ -9,18 +9,26 @@ export async function getRequestOrigin(): Promise<string> {
     const headersList = await headers();
     const host =
       headersList.get("x-forwarded-host") ??
-      headersList.get("host") ??
-      "localhost:3000";
-    const protocol =
-      headersList.get("x-forwarded-proto") ??
-      (host.includes("localhost") || host.startsWith("127.0.0.1")
-        ? "http"
-        : "https");
+      headersList.get("host");
 
-    return `${protocol}://${host}`;
+    if (host) {
+      const protocol =
+        headersList.get("x-forwarded-proto") ??
+        (host.includes("localhost") || host.startsWith("127.0.0.1")
+          ? "http"
+          : "https");
+
+      return `${protocol}://${host}`;
+    }
   } catch {
-    return "http://localhost:3000";
+    // Fallback below when headers() is unavailable (e.g. background cron jobs)
   }
+
+  if (process.env.VERCEL_URL) {
+    return `https://${process.env.VERCEL_URL.replace(/\/$/, "")}`;
+  }
+
+  return "http://localhost:3000";
 }
 
 export async function getInvoiceShareUrl(invoiceId: string): Promise<string> {

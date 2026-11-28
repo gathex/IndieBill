@@ -5,12 +5,13 @@ export const proxy = auth((req) => {
   const { nextUrl } = req;
   const pathname = nextUrl.pathname;
 
-  // Always allow static files, images, brand assets, icons
+  // Always allow static files, images, brand assets, videos, icons
   if (
     pathname.startsWith("/brand") ||
+    pathname.startsWith("/videos") ||
     pathname.startsWith("/api") ||
     pathname.startsWith("/_next") ||
-    /\.(?:png|jpg|jpeg|svg|gif|webp|ico|css|js|map)$/i.test(pathname)
+    /\.(?:png|jpg|jpeg|svg|gif|webp|ico|css|js|map|mp4|webm)$/i.test(pathname)
   ) {
     return NextResponse.next();
   }
@@ -37,6 +38,6 @@ export const proxy = auth((req) => {
 
 export const config = {
   matcher: [
-    "/((?!api|_next/static|_next/image|brand|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp|ico)$).*)",
+    "/((?!api|_next/static|_next/image|brand|videos|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp|ico|mp4|webm)$).*)",
   ],
 };

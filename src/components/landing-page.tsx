@@ -6,6 +6,7 @@ import { IndieBillLogo } from "@/components/IndieBillLogo";
 import { LandingAnimator } from "@/components/LandingAnimator";
 import { SpeedDialCardPreview } from "@/components/speed-dial-card-preview";
 import { LandingQuickNav } from "@/components/landing-quick-nav";
+import { HeroVideoShowcase } from "@/components/hero-video-showcase";
 
 type IconProps = { className?: string };
 
@@ -331,7 +332,7 @@ export function LandingPage({ isLoggedIn = false }: { isLoggedIn?: boolean }) {
             <HeroDotGrid />
           </div>
 
-          <div className="relative z-10 mx-auto grid max-w-6xl items-center gap-12 px-6 py-20 lg:grid-cols-[1.05fr_0.95fr] lg:py-28">
+          <div className="relative z-10 mx-auto grid max-w-6xl items-center gap-12 px-6 pt-16 pb-12 sm:pt-20 sm:pb-16 lg:grid-cols-[1.05fr_0.95fr] lg:pt-24 lg:pb-16">
             <div>
               <span data-gsap="hero-item" className="inline-flex items-center gap-2 rounded-full border border-indigo-200 dark:border-indigo-500/30 bg-indigo-50 dark:bg-indigo-500/15 px-3 py-1.5 text-xs font-semibold text-indigo-700 dark:text-indigo-400">
                 <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
@@ -374,6 +375,11 @@ export function LandingPage({ isLoggedIn = false }: { isLoggedIn?: boolean }) {
               </div>
             </div>
             <div data-gsap="hero-item"><InvoiceMockup /></div>
+          </div>
+
+          {/* Product Video Showcase */}
+          <div className="relative z-10 mx-auto max-w-5xl px-6 pb-20 lg:pb-28">
+            <HeroVideoShowcase />
           </div>
         </section>
 

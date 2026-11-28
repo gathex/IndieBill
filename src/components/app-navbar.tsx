@@ -11,9 +11,10 @@ import { cn } from "@/lib/utils";
 
 interface AppNavbarProps {
   user?: NavbarUser | null;
+  isAdmin?: boolean;
 }
 
-export function AppNavbar({ user }: AppNavbarProps) {
+export function AppNavbar({ user, isAdmin = false }: AppNavbarProps) {
   const pathname = usePathname();
   const [openDropdown, setOpenDropdown] = useState<"billing" | "finance" | null>(null);
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -267,12 +268,27 @@ export function AppNavbar({ user }: AppNavbarProps) {
           >
             Catalog
           </Link>
+
+          {/* 6. Admin (only rendered when isAdmin is true) */}
+          {isAdmin && (
+            <Link
+              href="/admin"
+              className={cn(
+                "px-3 py-1.5 rounded-lg text-sm font-medium transition-colors",
+                pathname.startsWith("/admin")
+                  ? "bg-indigo-50 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300 font-semibold"
+                  : "text-indigo-600 dark:text-indigo-400 hover:bg-indigo-50/70 dark:hover:bg-indigo-950/40"
+              )}
+            >
+              Admin
+            </Link>
+          )}
         </nav>
 
         {/* Right: Controls (Theme Toggle + User Avatar + Mobile Hamburger) */}
         <div className="flex items-center gap-2 sm:gap-3">
           <ThemeToggle />
-          <NavbarProfile user={user} />
+          <NavbarProfile user={user} isAdmin={isAdmin} />
 
           {/* Mobile Hamburger Button */}
           <button
@@ -434,6 +450,20 @@ export function AppNavbar({ user }: AppNavbarProps) {
               >
                 Catalog
               </Link>
+              {isAdmin && (
+                <Link
+                  href="/admin"
+                  onClick={() => setMobileOpen(false)}
+                  className={cn(
+                    "block rounded-lg px-3 py-2 text-sm font-medium transition-colors",
+                    pathname.startsWith("/admin")
+                      ? "bg-indigo-50 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300 font-semibold"
+                      : "text-indigo-600 dark:text-indigo-400 hover:bg-indigo-50/70 dark:hover:bg-indigo-950/40"
+                  )}
+                >
+                  Admin
+                </Link>
+              )}
             </div>
           </div>
 

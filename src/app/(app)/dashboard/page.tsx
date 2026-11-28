@@ -91,11 +91,10 @@ export default async function DashboardPage() {
                 Net Profit
               </CardTitle>
               <span
-                className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${
-                  financials.netProfit >= 0
-                    ? "bg-emerald-50 text-emerald-700 dark:bg-emerald-950/50 dark:text-emerald-300"
-                    : "bg-rose-50 text-rose-700 dark:bg-rose-950/50 dark:text-rose-300"
-                }`}
+                className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${financials.netProfit >= 0
+                  ? "bg-emerald-50 text-emerald-700 dark:bg-emerald-950/50 dark:text-emerald-300"
+                  : "bg-rose-50 text-rose-700 dark:bg-rose-950/50 dark:text-rose-300"
+                  }`}
               >
                 {financials.netProfit >= 0 ? "+" : ""}
                 {financials.profitMarginPercent}% margin
@@ -104,11 +103,10 @@ export default async function DashboardPage() {
           </CardHeader>
           <CardContent>
             <div
-              className={`text-2xl font-bold tracking-tight ${
-                financials.netProfit >= 0
-                  ? "text-emerald-600 dark:text-emerald-400"
-                  : "text-rose-600 dark:text-rose-400"
-              }`}
+              className={`text-2xl font-bold tracking-tight ${financials.netProfit >= 0
+                ? "text-emerald-600 dark:text-emerald-400"
+                : "text-rose-600 dark:text-rose-400"
+                }`}
             >
               {money(financials.netProfit)}
             </div>
