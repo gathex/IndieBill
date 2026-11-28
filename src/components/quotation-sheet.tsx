@@ -16,7 +16,7 @@ export function QuotationSheet({
   businessName,
   businessAddress,
   businessGstin,
-  currency = "USD",
+  currency = "INR",
   locale,
   logoDataUrl,
 }: QuotationSheetProps) {

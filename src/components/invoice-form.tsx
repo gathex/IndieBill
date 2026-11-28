@@ -67,10 +67,21 @@ const emptyItem = (): InvoiceItemRow => ({
   hsnSac: "",
 });
 
+function addDaysToIsoDate(isoDate: string, days: number): string {
+  const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(isoDate);
+  if (!match) return "";
+  const year = Number(match[1]);
+  const month = Number(match[2]) - 1;
+  const day = Number(match[3]);
+  const date = new Date(Date.UTC(year, month, day));
+  date.setUTCDate(date.getUTCDate() + days);
+  return date.toISOString().slice(0, 10);
+}
+
 export function InvoiceFormClient({
   clients,
   invoice,
-  currency = "USD",
+  currency = "INR",
   locale,
   businessState,
   businessGstin,
@@ -80,6 +91,9 @@ export function InvoiceFormClient({
   const isEdit = Boolean(invoice);
   const [itemsParentRef] = useAutoAnimate<HTMLDivElement>();
 
+  const initialIssueDate = invoice?.issueDate
+    ? invoice.issueDate.slice(0, 10)
+    : new Date().toISOString().slice(0, 10);
   const [clientId, setClientId] = useState(invoice?.clientId ?? clients[0]?.id ?? "");
   const [status, setStatus] = useState<InvoiceStatus>(() => {
     const initial = invoice?.status;
@@ -87,10 +101,15 @@ export function InvoiceFormClient({
       ? "SENT"
       : ((initial as InvoiceStatus) ?? "DRAFT");
   });
-  const [issueDate, setIssueDate] = useState(
-    invoice?.issueDate ? invoice.issueDate.slice(0, 10) : new Date().toISOString().slice(0, 10),
+  const [issueDate, setIssueDate] = useState(initialIssueDate);
+  const [dueDate, setDueDate] = useState(
+    invoice
+      ? invoice.dueDate
+        ? invoice.dueDate.slice(0, 10)
+        : ""
+      : addDaysToIsoDate(initialIssueDate, 14),
   );
-  const [dueDate, setDueDate] = useState(invoice?.dueDate ? invoice.dueDate.slice(0, 10) : "");
+  const [dueDateTouched, setDueDateTouched] = useState(Boolean(invoice));
   const [notes, setNotes] = useState(invoice?.notes ?? "");
   const [discountPercent, setDiscountPercent] = useState(String(invoice?.discountPercent ?? 0));
   const [taxRate, setTaxRate] = useState(String(invoice?.taxRate ?? 0));
@@ -193,22 +212,26 @@ export function InvoiceFormClient({
       return;
     }
 
+    const statusValue =
+      status === "PARTIAL" || status === "OVERDUE" ? "SENT" : status;
+    if (statusValue === "SENT" && !dueDate.trim()) {
+      setError("Please add a due date before marking this invoice as Sent.");
+      return;
+    }
+
     setSubmitting(true);
     try {
       const input = {
         clientId,
         status,
         issueDate: issueDate || new Date().toISOString(),
-        dueDate: dueDate || null,
+        dueDate: dueDate.trim() || null,
         notes: notes.trim() || null,
         discountPercent: parseFloat(discountPercent) || 0,
         taxRate: parseFloat(taxRate) || 0,
         gstEnabled,
         items: cleanedItems,
       };
-
-  const statusValue =
-    status === "PARTIAL" || status === "OVERDUE" ? "SENT" : status;
 
       const result = invoice
         ? await updateInvoice(invoice.id, {
@@ -263,11 +286,37 @@ export function InvoiceFormClient({
         </div>
         <div className="space-y-2">
           <Label htmlFor="issueDate">Issue date</Label>
-          <Input id="issueDate" type="date" value={issueDate} onChange={(e) => setIssueDate(e.target.value)} />
+          <Input
+            id="issueDate"
+            type="date"
+            value={issueDate}
+            onChange={(e) => {
+              const nextIssue = e.target.value;
+              setIssueDate(nextIssue);
+              if (!isEdit && !dueDateTouched && nextIssue) {
+                setDueDate(addDaysToIsoDate(nextIssue, 14));
+              }
+            }}
+          />
         </div>
         <div className="space-y-2">
-          <Label htmlFor="dueDate">Due date</Label>
-          <Input id="dueDate" type="date" value={dueDate} onChange={(e) => setDueDate(e.target.value)} />
+          <Label htmlFor="dueDate">
+            Due date{status === "SENT" ? <span className="text-red-500"> *</span> : null}
+          </Label>
+          <Input
+            id="dueDate"
+            type="date"
+            value={dueDate}
+            onChange={(e) => {
+              setDueDateTouched(true);
+              setDueDate(e.target.value);
+            }}
+          />
+          {!dueDate && status === "DRAFT" ? (
+            <p className="text-xs text-zinc-500 dark:text-zinc-400">
+              Optional for drafts, required before marking as Sent.
+            </p>
+          ) : null}
         </div>
         <div className="space-y-2">
           <Label htmlFor="discountPercent">Discount %</Label>

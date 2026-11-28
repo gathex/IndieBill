@@ -166,6 +166,7 @@ export default async function InvoicesPage({
                               <form action={setInvoiceStatus}>
                                 <input type="hidden" name="id" value={invoice.id} />
                                 <input type="hidden" name="status" value="SENT" />
+                                <input type="hidden" name="returnTo" value="list" />
                                 <Button variant="outline" size="sm" type="submit">Send</Button>
                               </form>
                             ) : null}

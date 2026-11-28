@@ -190,7 +190,7 @@ export function RecurringManager({
   initialSchedules,
   clients,
   catalogItems = [],
-  currency = "USD",
+  currency = "INR",
   locale,
   businessState,
   businessGstin,

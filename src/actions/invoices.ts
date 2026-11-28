@@ -16,26 +16,39 @@ import { getUserSettings } from "@/lib/users";
 import { getInvoiceShareUrl } from "@/lib/share";
 import type { InvoicePdfData } from "@/components/invoice-document";
 
-const invoiceSchema = z.object({
-  clientId: z.string().min(1, "Select a client."),
-  status: z.enum(["DRAFT", "SENT", "PAID"]),
-  issueDate: z.string().min(1),
-  dueDate: z.string().nullable(),
-  notes: z.string().nullable(),
-  discountPercent: z.number().min(0).max(100),
-  taxRate: z.number().min(0).max(100),
-  gstEnabled: z.boolean().optional().default(false),
-  items: z
-    .array(
-      z.object({
-        description: z.string().min(1, "Every item needs a description."),
-        quantity: z.number().positive(),
-        rate: z.number().min(0),
-        hsnSac: z.string().max(20).optional().nullable(),
-      }),
-    )
-    .min(1, "Add at least one line item."),
-});
+const invoiceSchema = z
+  .object({
+    clientId: z.string().min(1, "Select a client."),
+    status: z.enum(["DRAFT", "SENT", "PAID"]),
+    issueDate: z.string().min(1),
+    dueDate: z.string().nullable(),
+    notes: z.string().nullable(),
+    discountPercent: z.number().min(0).max(100),
+    taxRate: z.number().min(0).max(100),
+    gstEnabled: z.boolean().optional().default(false),
+    items: z
+      .array(
+        z.object({
+          description: z.string().min(1, "Every item needs a description."),
+          quantity: z.number().positive(),
+          rate: z.number().min(0),
+          hsnSac: z.string().max(20).optional().nullable(),
+        }),
+      )
+      .min(1, "Add at least one line item."),
+  })
+  .superRefine((data, ctx) => {
+    if (data.status === "SENT") {
+      const trimmed = data.dueDate?.trim() ?? "";
+      if (!trimmed || Number.isNaN(new Date(trimmed).getTime())) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ["dueDate"],
+          message: "Please add a due date before marking this invoice as Sent.",
+        });
+      }
+    }
+  });
 
 export type InvoiceItemInput = z.infer<typeof invoiceSchema>["items"][number];
 export type InvoiceInput = z.infer<typeof invoiceSchema>;
@@ -239,6 +252,7 @@ export async function updateInvoice(id: string, input: InvoiceInput) {
 
 export async function setInvoiceStatus(formData: FormData) {
   const id = String(formData.get("id") ?? "");
+  const returnTo = String(formData.get("returnTo") ?? "");
   const status = z
     .enum(["DRAFT", "SENT", "PAID"])
     .parse(String(formData.get("status") ?? "SENT"));
@@ -248,6 +262,14 @@ export async function setInvoiceStatus(formData: FormData) {
     include: { payments: true },
   });
   if (!invoice) throw new Error("Invoice not found.");
+
+  if (status === "SENT" && (!invoice.dueDate || Number.isNaN(invoice.dueDate.getTime()))) {
+    const target =
+      returnTo === "list"
+        ? "/invoices?notice=due-date-required"
+        : `/invoices/${id}?notice=due-date-required`;
+    redirect(target);
+  }
 
   if (status === "PAID") {
     const balance = getInvoiceBalance(invoice.total, invoice.payments);

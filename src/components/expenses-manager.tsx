@@ -52,7 +52,7 @@ const CATEGORY_COLORS: Record<string, string> = {
 
 export function ExpensesManager({
   initialExpenses,
-  currency = "USD",
+  currency = "INR",
   locale,
 }: ExpensesManagerProps) {
   const [expenses, setExpenses] = useState<SerializedExpense[]>(initialExpenses);

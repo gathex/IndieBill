@@ -140,7 +140,7 @@ export function InvoiceDocument({
   businessName,
   businessAddress,
   businessGstin,
-  currency = "USD",
+  currency = "INR",
   locale,
   logoDataUrl,
   qrDataUrl,

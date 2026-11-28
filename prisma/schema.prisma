@@ -18,8 +18,8 @@ model User {
   businessName   String?
   businessAddress String?
   phone          String?
-  currency       String   @default("USD")
-  country        String   @default("US")
+  currency       String   @default("INR")
+  country        String   @default("IN")
   language       String   @default("en")
   logoDataUrl    String?
   qrName          String?

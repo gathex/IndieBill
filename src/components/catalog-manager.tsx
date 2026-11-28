@@ -2,7 +2,7 @@
 
 import { useState, useMemo, useTransition } from "react";
 import { useAutoAnimate } from "@formkit/auto-animate/react";
-import { formatCurrency, cn } from "@/lib/utils";
+import { formatCurrency, getCurrencySymbol, cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -41,7 +41,7 @@ const STANDARD_UNITS = ["hr", "day", "project", "item", "month", "session", "aud
 
 export function CatalogManager({
   initialItems,
-  currency = "USD",
+  currency = "INR",
   locale,
 }: CatalogManagerProps) {
   const [items, setItems] = useState<SerializedCatalogItem[]>(initialItems);
@@ -474,11 +474,11 @@ export function CatalogManager({
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-1.5">
                   <Label htmlFor="catalog-rate" className="text-xs font-medium text-zinc-700 dark:text-zinc-300">
-                    Rate ({currency === "INR" || !currency ? "INR" : currency}) <span className="text-red-500">*</span>
+                    Rate ({currency || "INR"}) <span className="text-red-500">*</span>
                   </Label>
                   <div className="relative">
                     <span className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 text-sm font-medium text-zinc-500 dark:text-zinc-400">
-                      {currency === "USD" ? "$" : currency === "EUR" ? "€" : currency === "GBP" ? "£" : "₹"}
+                      {getCurrencySymbol(currency, locale)}
                     </span>
                     <Input
                       id="catalog-rate"

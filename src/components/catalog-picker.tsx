@@ -16,7 +16,7 @@ interface CatalogPickerProps {
 export function CatalogPicker({
   onSelect,
   items: propItems,
-  currency = "USD",
+  currency = "INR",
   locale,
   buttonLabel = "Select from catalog",
   size = "sm",

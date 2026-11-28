@@ -32,8 +32,8 @@ export const getUserSettings = cache(async function getUserSettings(userId: stri
     },
   });
 
-  const currency = user?.currency ?? "USD";
-  const country = user?.country ?? "US";
+  const currency = user?.currency ?? "INR";
+  const country = user?.country ?? "IN";
   const language = user?.language ?? "en";
 
   return {

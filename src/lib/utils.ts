@@ -5,12 +5,12 @@ export function cn(...inputs: Array<string | false | null | undefined>): string 
 const currencyFormatters = new Map<string, Intl.NumberFormat>();
 
 function normalizeLocale(locale?: string): string {
-  return locale?.trim() || "en-US";
+  return locale?.trim() || "en-IN";
 }
 
 export function formatCurrency(
   amount: number,
-  currency = "USD",
+  currency = "INR",
   locale?: string,
 ): string {
   const resolvedLocale = normalizeLocale(locale);
@@ -24,6 +24,33 @@ export function formatCurrency(
     currencyFormatters.set(key, formatter);
   }
   return formatter.format(amount);
+}
+
+const CURRENCY_SYMBOL_FALLBACKS: Record<string, string> = {
+  INR: "₹",
+  USD: "$",
+  EUR: "€",
+  GBP: "£",
+  JPY: "¥",
+  CAD: "$",
+  AUD: "$",
+  CHF: "CHF",
+};
+
+export function getCurrencySymbol(currency = "INR", locale?: string): string {
+  const resolvedCurrency = currency?.trim() || "INR";
+  try {
+    const parts = new Intl.NumberFormat(normalizeLocale(locale), {
+      style: "currency",
+      currency: resolvedCurrency,
+      currencyDisplay: "narrowSymbol",
+    }).formatToParts(0);
+    const symbolPart = parts.find((part) => part.type === "currency");
+    if (symbolPart?.value) return symbolPart.value;
+  } catch {
+    // Fall through to static symbol map for unsupported codes
+  }
+  return CURRENCY_SYMBOL_FALLBACKS[resolvedCurrency] ?? resolvedCurrency;
 }
 
 export function formatDate(

@@ -23,7 +23,7 @@ export function QuotationPdfDownload({
   businessName,
   businessAddress,
   businessGstin,
-  currency = "USD",
+  currency = "INR",
   locale,
   logoDataUrl,
 }: QuotationPdfDownloadProps) {

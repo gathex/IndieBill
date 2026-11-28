@@ -69,10 +69,7 @@ export function OnboardingWizard({
     phone: initialData.phone || "",
     businessAddress: initialData.businessAddress || "",
     state: initialData.state || "",
-    currency:
-      initialData.currency && initialData.currency !== "USD"
-        ? initialData.currency
-        : "INR",
+    currency: initialData.currency || "INR",
     gstRegistered: Boolean(initialData.gstin),
     gstin: initialData.gstin || "",
     defaultGstRate:

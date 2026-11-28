@@ -16,7 +16,7 @@ interface PaymentFormProps {
 export function PaymentForm({
   invoiceId,
   balance,
-  currency = "USD",
+  currency = "INR",
   locale,
 }: PaymentFormProps) {
   return (

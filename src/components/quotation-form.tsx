@@ -79,7 +79,7 @@ const statusOptions: Array<{ value: EditableStatus; label: string }> = [
 export function QuotationFormClient({
   clients,
   quotation,
-  currency = "USD",
+  currency = "INR",
   locale,
   businessState,
   businessGstin,

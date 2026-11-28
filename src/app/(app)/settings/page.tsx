@@ -43,7 +43,7 @@ export default async function SettingsPage() {
     },
   });
 
-  const country = user?.country ?? "US";
+  const country = user?.country ?? "IN";
   const language = user?.language ?? "en";
   const locale = buildLocale(language, country);
 
@@ -60,7 +60,7 @@ export default async function SettingsPage() {
         businessName={user?.businessName ?? ""}
         businessAddress={user?.businessAddress ?? ""}
         phone={user?.phone ?? ""}
-        currency={user?.currency ?? "USD"}
+        currency={user?.currency ?? "INR"}
         country={country}
         language={language}
         logoDataUrl={user?.logoDataUrl ?? null}

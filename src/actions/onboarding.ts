@@ -69,7 +69,7 @@ export async function completeOnboarding(
   const inferredCountry =
     data.currency === "INR" || Boolean(data.state)
       ? "IN"
-      : existing?.country || "US";
+      : existing?.country || "IN";
 
   await prisma.user.update({
     where: { id: userId },

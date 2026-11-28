@@ -122,7 +122,7 @@ export function QuotationDocument({
   businessName,
   businessAddress,
   businessGstin,
-  currency = "USD",
+  currency = "INR",
   locale,
   logoDataUrl,
 }: QuotationDocumentProps) {

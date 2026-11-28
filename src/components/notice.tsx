@@ -1,5 +1,6 @@
 const messages: Record<string, string> = {
   "invoice-deleted": "Invoice deleted.",
+  "due-date-required": "Please add a due date before marking an invoice as Sent.",
   "email-sent": "Invoice email sent with PDF attached.",
   "client-missing-email": "The client does not have an email address configured. Please edit the client and add an email before sending.",
   "email-skipped":
@@ -45,6 +46,7 @@ export function Notice({
     notice === "payment-already-paid" ||
     notice === "payment-error" ||
     notice === "payment-duplicate" ||
+    notice === "due-date-required" ||
     Boolean(errorMessage);
 
   const isSkippedEmail =
