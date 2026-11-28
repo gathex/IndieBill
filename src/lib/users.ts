@@ -1,6 +1,7 @@
+import { cache } from "react";
 import { prisma } from "./db";
 
-export async function getUserSettings(userId: string) {
+export const getUserSettings = cache(async function getUserSettings(userId: string) {
   const user = await prisma.user.findUnique({
     where: { id: userId },
     select: {
@@ -50,4 +51,4 @@ export async function getUserSettings(userId: string) {
     remindAfterDays: user?.remindAfterDays ?? "3,7,14",
     locale: `${language}-${country}`,
   };
-}
+});

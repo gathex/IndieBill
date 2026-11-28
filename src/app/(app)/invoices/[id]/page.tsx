@@ -44,16 +44,19 @@ export default async function InvoiceDetailPage({
   const userId = session?.user?.id;
   if (!userId) redirect("/login");
 
-  const invoice = await getInvoiceById(id, userId);
+  const [invoice, settings, reminderLogs] = await Promise.all([
+    getInvoiceById(id, userId),
+    getUserSettings(userId),
+    getInvoiceReminderLogs(id, userId),
+  ]);
   if (!invoice) notFound();
 
-  const settings = await getUserSettings(userId);
   const money = (amount: number) =>
     formatCurrency(amount, settings.currency, settings.locale);
   const status = effectiveStatus(invoice.status, invoice.dueDate);
   const paid = sumPayments(invoice.payments);
   const balance = getInvoiceBalance(invoice.total, invoice.payments);
-  const [shareUrl, qr, reminderLogs] = await Promise.all([
+  const [shareUrl, qr] = await Promise.all([
     getInvoiceShareUrl(invoice.id),
     generatePaymentQr({
       invoiceNumber: invoice.number,
@@ -68,7 +71,6 @@ export default async function InvoiceDetailPage({
       qrUpiId: settings.qrUpiId,
       qrAccountNumber: settings.qrAccountNumber,
     }),
-    getInvoiceReminderLogs(invoice.id, userId),
   ]);
   const mailtoUrl = buildMailtoUrl({
     to: invoice.client.email,

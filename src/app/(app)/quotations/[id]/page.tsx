@@ -39,10 +39,11 @@ export default async function QuotationDetailPage({
   const userId = session?.user?.id;
   if (!userId) redirect("/login");
 
-  const quotation = await getQuotationById(id, userId);
+  const [quotation, settings] = await Promise.all([
+    getQuotationById(id, userId),
+    getUserSettings(userId),
+  ]);
   if (!quotation) notFound();
-
-  const settings = await getUserSettings(userId);
   const shareUrl = await getQuotationShareUrl(quotation.id);
   const money = (amount: number) =>
     formatCurrency(amount, settings.currency, settings.locale);

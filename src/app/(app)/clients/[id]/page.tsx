@@ -22,16 +22,17 @@ export default async function ClientDetailPage({
   const userId = session?.user?.id;
   if (!userId) redirect("/login");
 
-  const client = await prisma.client.findFirst({
-    where: { id, userId },
-    include: {
-      invoices: { orderBy: { issueDate: "desc" } },
-      quotations: { orderBy: { issueDate: "desc" } },
-    },
-  });
+  const [client, settings] = await Promise.all([
+    prisma.client.findFirst({
+      where: { id, userId },
+      include: {
+        invoices: { orderBy: { issueDate: "desc" } },
+        quotations: { orderBy: { issueDate: "desc" } },
+      },
+    }),
+    getUserSettings(userId),
+  ]);
   if (!client) notFound();
-
-  const settings = await getUserSettings(userId);
   const money = (amount: number) =>
     formatCurrency(amount, settings.currency, settings.locale);
   const totalBilled = client.invoices.reduce((sum, invoice) => sum + invoice.total, 0);
