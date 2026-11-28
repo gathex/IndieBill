@@ -150,7 +150,10 @@ export function QuickActionFab() {
   );
   const fabRef = useRef<HTMLDivElement>(null);
   const pathname = usePathname();
-  const isFormRoute = pathname.endsWith("/new") || pathname.endsWith("/edit");
+  const isFormRoute =
+    pathname.endsWith("/new") ||
+    pathname.endsWith("/edit") ||
+    pathname.startsWith("/onboarding");
 
   // Close when pathname changes
   const prevPathRef = useRef(pathname);

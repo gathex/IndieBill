@@ -16,6 +16,7 @@ interface SettingsFormProps {
   name: string;
   businessName: string;
   businessAddress: string;
+  phone?: string;
   currency: string;
   country: string;
   language: string;
@@ -24,6 +25,10 @@ interface SettingsFormProps {
   qrVpa: string;
   qrUpiId: string;
   qrAccountNumber: string;
+  bankName?: string;
+  bankIfsc?: string;
+  invoicePrefix?: string;
+  defaultGstRate?: number | null;
   gstin?: string;
   state?: string;
   countries: LocaleOption[];
@@ -42,6 +47,7 @@ export function SettingsForm({
   name,
   businessName,
   businessAddress,
+  phone = "",
   currency,
   country,
   language,
@@ -50,6 +56,10 @@ export function SettingsForm({
   qrVpa,
   qrUpiId,
   qrAccountNumber,
+  bankName = "",
+  bankIfsc = "",
+  invoicePrefix = "INV-",
+  defaultGstRate = null,
   gstin = "",
   state = "",
   countries,
@@ -61,6 +71,7 @@ export function SettingsForm({
     name,
     businessName,
     businessAddress,
+    phone,
     currency: fallbackCode(currency, currencies, "USD"),
     country: fallbackCode(country, countries, "US"),
     language: fallbackCode(language, languages, "en"),
@@ -69,6 +80,10 @@ export function SettingsForm({
     qrVpa,
     qrUpiId,
     qrAccountNumber,
+    bankName,
+    bankIfsc,
+    invoicePrefix,
+    defaultGstRate: defaultGstRate != null ? String(defaultGstRate) : "",
     gstin,
     state,
   });
@@ -114,7 +129,14 @@ export function SettingsForm({
     setError(null);
     setSaved(false);
     try {
-      await updateSettings(form as Parameters<typeof updateSettings>[0]);
+      const parsedRate =
+        form.defaultGstRate.trim() !== "" && Number.isFinite(Number(form.defaultGstRate))
+          ? Number(form.defaultGstRate)
+          : null;
+      await updateSettings({
+        ...form,
+        defaultGstRate: parsedRate,
+      } as Parameters<typeof updateSettings>[0]);
       setSaved(true);
       router.refresh();
     } catch (err) {
@@ -142,6 +164,27 @@ export function SettingsForm({
                 placeholder="Freelancer Studio"
               />
               <p className="text-xs text-zinc-500 dark:text-zinc-400">Shown on invoices and emails.</p>
+            </div>
+          </div>
+          <div className="grid gap-4 sm:grid-cols-2">
+            <div className="space-y-2">
+              <Label htmlFor="phone">Business phone</Label>
+              <Input
+                id="phone"
+                value={form.phone}
+                onChange={(e) => update("phone", e.target.value)}
+                placeholder="+91 98765 43210"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="invoicePrefix">Invoice number prefix</Label>
+              <Input
+                id="invoicePrefix"
+                value={form.invoicePrefix}
+                onChange={(e) => update("invoicePrefix", e.target.value)}
+                placeholder="INV-"
+                maxLength={20}
+              />
             </div>
           </div>
           <div className="space-y-2">
@@ -265,6 +308,19 @@ export function SettingsForm({
                 Used to determine intra-state (CGST+SGST) vs inter-state (IGST).
               </p>
             </div>
+            <div className="space-y-2">
+              <Label htmlFor="defaultGstRate">Default GST %</Label>
+              <Input
+                id="defaultGstRate"
+                type="number"
+                step="0.01"
+                min="0"
+                max="100"
+                value={form.defaultGstRate}
+                onChange={(e) => update("defaultGstRate", e.target.value)}
+                placeholder="e.g. 18"
+              />
+            </div>
           </div>
         </CardContent>
       </Card>
@@ -315,6 +371,25 @@ export function SettingsForm({
                 value={form.qrAccountNumber}
                 onChange={(e) => update("qrAccountNumber", e.target.value)}
                 placeholder="Bank account number"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="bankName">Bank name</Label>
+              <Input
+                id="bankName"
+                value={form.bankName}
+                onChange={(e) => update("bankName", e.target.value)}
+                placeholder="e.g. HDFC Bank"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="bankIfsc">IFSC code</Label>
+              <Input
+                id="bankIfsc"
+                value={form.bankIfsc}
+                onChange={(e) => update("bankIfsc", e.target.value.toUpperCase())}
+                placeholder="e.g. HDFC0001234"
+                maxLength={20}
               />
             </div>
           </div>

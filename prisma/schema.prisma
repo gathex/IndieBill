@@ -17,6 +17,7 @@ model User {
   passwordHash   String?
   businessName   String?
   businessAddress String?
+  phone          String?
   currency       String   @default("USD")
   country        String   @default("US")
   language       String   @default("en")
@@ -25,8 +26,13 @@ model User {
   qrVpa           String?
   qrUpiId         String?
   qrAccountNumber String?
+  bankName        String?
+  bankIfsc        String?
   gstin           String?
   state           String?
+  defaultGstRate  Float?
+  invoicePrefix   String   @default("INV-")
+  onboardingCompleted Boolean @default(false)
   remindersEnabled Boolean  @default(true)
   remindBeforeDays Int      @default(3)
   remindOnDueDate  Boolean  @default(true)

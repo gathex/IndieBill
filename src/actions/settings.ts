@@ -24,6 +24,7 @@ const settingsSchema = z.object({
   name: z.string().max(120),
   businessName: z.string().max(120),
   businessAddress: z.string().max(500),
+  phone: z.string().max(40).optional(),
   currency: z.string().refine(isValidCurrencyCode, "Unsupported currency"),
   country: z.string().refine(isValidCountryCode, "Unsupported country"),
   language: z.string().refine(isValidLanguageCode, "Unsupported language"),
@@ -32,6 +33,10 @@ const settingsSchema = z.object({
   qrVpa: z.string().max(120).optional(),
   qrUpiId: z.string().max(120).optional(),
   qrAccountNumber: z.string().max(60).optional(),
+  bankName: z.string().max(120).optional(),
+  bankIfsc: z.string().max(20).optional(),
+  invoicePrefix: z.string().max(20).optional(),
+  defaultGstRate: z.union([z.number().min(0).max(100), z.nan(), z.null()]).optional(),
   gstin: z
     .string()
     .max(15)
@@ -48,12 +53,18 @@ export async function updateSettings(input: SettingsInput) {
   const userId = await requireUserId();
 
   const data = settingsSchema.parse(input);
+  const parsedGstRate =
+    typeof data.defaultGstRate === "number" && Number.isFinite(data.defaultGstRate)
+      ? data.defaultGstRate
+      : null;
+
   await prisma.user.update({
     where: { id: userId },
     data: {
       name: data.name.trim() || null,
       businessName: data.businessName.trim() || null,
       businessAddress: data.businessAddress.trim() || null,
+      phone: data.phone?.trim() || null,
       currency: data.currency,
       country: data.country,
       language: data.language,
@@ -62,8 +73,13 @@ export async function updateSettings(input: SettingsInput) {
       qrVpa: data.qrVpa?.trim() || null,
       qrUpiId: data.qrUpiId?.trim() || null,
       qrAccountNumber: data.qrAccountNumber?.trim() || null,
+      bankName: data.bankName?.trim() || null,
+      bankIfsc: data.bankIfsc?.trim().toUpperCase() || null,
+      invoicePrefix: data.invoicePrefix?.trim() || "INV-",
+      defaultGstRate: parsedGstRate,
       gstin: data.gstin?.trim().toUpperCase() || null,
       state: data.state?.trim() || null,
+      onboardingCompleted: true,
     },
   });
 

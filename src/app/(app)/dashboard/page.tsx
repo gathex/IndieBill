@@ -23,6 +23,10 @@ export default async function DashboardPage() {
     getUserSettings(userId),
     getUserFinancialReport(userId, 6),
   ]);
+
+  if (!settings.onboardingCompleted && !settings.hasBusinessName) {
+    redirect("/onboarding");
+  }
   const money = (amount: number) =>
     formatCurrency(amount, settings.currency, settings.locale);
 

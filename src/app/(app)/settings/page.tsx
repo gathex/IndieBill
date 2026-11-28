@@ -21,6 +21,7 @@ export default async function SettingsPage() {
       name: true,
       businessName: true,
       businessAddress: true,
+      phone: true,
       currency: true,
       country: true,
       language: true,
@@ -29,6 +30,10 @@ export default async function SettingsPage() {
       qrVpa: true,
       qrUpiId: true,
       qrAccountNumber: true,
+      bankName: true,
+      bankIfsc: true,
+      invoicePrefix: true,
+      defaultGstRate: true,
       gstin: true,
       state: true,
       remindersEnabled: true,
@@ -54,6 +59,7 @@ export default async function SettingsPage() {
         name={user?.name ?? ""}
         businessName={user?.businessName ?? ""}
         businessAddress={user?.businessAddress ?? ""}
+        phone={user?.phone ?? ""}
         currency={user?.currency ?? "USD"}
         country={country}
         language={language}
@@ -62,6 +68,10 @@ export default async function SettingsPage() {
         qrVpa={user?.qrVpa ?? ""}
         qrUpiId={user?.qrUpiId ?? ""}
         qrAccountNumber={user?.qrAccountNumber ?? ""}
+        bankName={user?.bankName ?? ""}
+        bankIfsc={user?.bankIfsc ?? ""}
+        invoicePrefix={user?.invoicePrefix ?? "INV-"}
+        defaultGstRate={user?.defaultGstRate ?? null}
         gstin={user?.gstin ?? ""}
         state={user?.state ?? ""}
         countries={getCountryOptions(locale)}

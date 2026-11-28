@@ -58,15 +58,25 @@ export async function getInvoiceById(id: string, userId: string) {
 }
 
 export async function createInvoiceNumber(userId: string): Promise<string> {
-  const invoices = await prisma.invoice.findMany({
-    where: { userId },
-    select: { number: true },
-  });
+  const [user, invoices] = await Promise.all([
+    prisma.user.findUnique({
+      where: { id: userId },
+      select: { invoicePrefix: true },
+    }),
+    prisma.invoice.findMany({
+      where: { userId },
+      select: { number: true },
+    }),
+  ]);
+  const prefix = user?.invoicePrefix?.trim() || "INV-";
+  const escapedPrefix = prefix.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  const prefixRegex = new RegExp(`^${escapedPrefix}`);
   const highest = invoices.reduce((max, invoice) => {
-    const value = Number.parseInt(invoice.number.replace(/^INV-/, ""), 10);
+    const stripped = invoice.number.replace(prefixRegex, "").replace(/^INV-/, "");
+    const value = Number.parseInt(stripped, 10);
     return Number.isFinite(value) ? Math.max(max, value) : max;
   }, 0);
-  return `INV-${String(highest + 1).padStart(4, "0")}`;
+  return `${prefix}${String(highest + 1).padStart(4, "0")}`;
 }
 
 export function effectiveStatus(
