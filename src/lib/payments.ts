@@ -7,18 +7,18 @@ export const PAYMENT_METHODS = [
   "BANK_TRANSFER",
   "CASH",
   "CHECK",
-  "STRIPE",
+  "RAZORPAY",
   "OTHER",
 ] as const;
 
 export type PaymentMethod = (typeof PAYMENT_METHODS)[number];
 
-export const PAYMENT_METHOD_LABELS: Record<PaymentMethod, string> = {
+export const PAYMENT_METHOD_LABELS: Record<string, string> = {
   MANUAL: "Manual",
   BANK_TRANSFER: "Bank transfer",
   CASH: "Cash",
   CHECK: "Check",
-  STRIPE: "Online (Stripe)",
+  RAZORPAY: "Online (Razorpay)",
   OTHER: "Other",
 };
 
@@ -64,18 +64,22 @@ export async function getInvoicePayments(invoiceId: string, userId: string) {
   });
 }
 
-interface RecordStripePaymentInput {
+
+
+interface RecordRazorpayPaymentInput {
   invoiceId: string;
   amount?: number;
   reference: string;
+  notes?: string;
 }
 
-/** Records a Stripe checkout payment idempotently and updates the invoice status. */
-export async function recordStripePayment({
+/** Records a Razorpay payment idempotently and updates the invoice status. */
+export async function recordRazorpayPayment({
   invoiceId,
   amount,
   reference,
-}: RecordStripePaymentInput) {
+  notes = "Paid online via Razorpay.",
+}: RecordRazorpayPaymentInput) {
   const invoice = await prisma.invoice.findUnique({
     where: { id: invoiceId },
     include: { payments: true },
@@ -107,10 +111,10 @@ export async function recordStripePayment({
         userId: invoice.userId,
         invoiceId: invoice.id,
         amount: paymentAmount,
-        method: "STRIPE",
+        method: "RAZORPAY",
         reference,
         paymentDate: new Date(),
-        notes: "Paid online via Stripe.",
+        notes,
       },
     });
     const newPaid = round2(paid + paymentAmount);

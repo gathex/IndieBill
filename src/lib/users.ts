@@ -18,6 +18,10 @@ export async function getUserSettings(userId: string) {
       qrAccountNumber: true,
       gstin: true,
       state: true,
+      remindersEnabled: true,
+      remindBeforeDays: true,
+      remindOnDueDate: true,
+      remindAfterDays: true,
     },
   });
 
@@ -40,6 +44,10 @@ export async function getUserSettings(userId: string) {
     qrAccountNumber: user?.qrAccountNumber ?? null,
     gstin: user?.gstin ?? null,
     state: user?.state ?? null,
+    remindersEnabled: user?.remindersEnabled ?? true,
+    remindBeforeDays: user?.remindBeforeDays ?? 3,
+    remindOnDueDate: user?.remindOnDueDate ?? true,
+    remindAfterDays: user?.remindAfterDays ?? "3,7,14",
     locale: `${language}-${country}`,
   };
 }

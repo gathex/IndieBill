@@ -2,56 +2,6 @@
 
 @custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
 
-/* ─── IndieBill animation keyframes ─────────────────────────────────────── */
-
-@keyframes page-in {
-  from { opacity: 0; transform: translateY(6px); }
-  to   { opacity: 1; transform: translateY(0); }
-}
-
-@keyframes modal-in {
-  from { opacity: 0; transform: scale(0.97); }
-  to   { opacity: 1; transform: scale(1); }
-}
-
-@keyframes dropdown-in {
-  from { opacity: 0; transform: translateY(-4px); }
-  to   { opacity: 1; transform: translateY(0); }
-}
-
-@keyframes bar-grow {
-  from { transform: scaleY(0); }
-  to   { transform: scaleY(1); }
-}
-
-/* ─── Utility classes (disabled when user prefers reduced motion) ─────────── */
-
-.animate-page-in {
-  animation: page-in 180ms ease-out both;
-}
-
-.animate-modal-in {
-  animation: modal-in 160ms ease-out both;
-}
-
-.animate-dropdown-in {
-  animation: dropdown-in 140ms ease-out both;
-}
-
-.animate-bar-grow {
-  animation: bar-grow 500ms ease-out both;
-  transform-origin: bottom;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .animate-page-in,
-  .animate-modal-in,
-  .animate-dropdown-in,
-  .animate-bar-grow {
-    animation: none;
-  }
-}
-
 :root {
   --background: #ffffff;
   --foreground: #171717;
@@ -80,9 +30,15 @@ body {
 
 .a4-sheet {
   width: 210mm;
+  max-width: 794px;
   min-height: 297mm;
+  margin-left: auto;
+  margin-right: auto;
+  flex-shrink: 0;
+  transform-origin: top;
   display: flex;
   flex-direction: column;
+  box-sizing: border-box;
   -webkit-print-color-adjust: exact;
   print-color-adjust: exact;
 }
@@ -93,6 +49,7 @@ body {
 }
 
 @media print {
+
   html,
   body {
     background: #ffffff !important;
@@ -111,8 +68,48 @@ body {
 
   .a4-sheet {
     width: 210mm !important;
+    max-width: 210mm !important;
     min-height: 297mm !important;
     margin: 0 !important;
     box-shadow: none !important;
+    transform: none !important;
+  }
+}
+
+/* ─── IndieBill Animation Utilities ─────────────────────────────────────── */
+
+@keyframes ib-page-in {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes ib-modal-in {
+  from { opacity: 0; transform: scale(0.97); }
+  to   { opacity: 1; transform: scale(1); }
+}
+
+@keyframes ib-dropdown-in {
+  from { opacity: 0; transform: translateY(-4px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes ib-bar-grow {
+  from { transform: scaleY(0); }
+  to   { transform: scaleY(1); }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .animate-page-in {
+    animation: ib-page-in 180ms ease-out both;
+  }
+  .animate-modal-in {
+    animation: ib-modal-in 160ms ease-out both;
+  }
+  .animate-dropdown-in {
+    animation: ib-dropdown-in 140ms ease-out both;
+  }
+  .animate-bar-grow {
+    animation: ib-bar-grow 600ms ease-out both;
+    transform-origin: bottom;
   }
 }

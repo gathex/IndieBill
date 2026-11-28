@@ -18,11 +18,11 @@ export const metadata: Metadata = {
     template: "%s · IndieBill",
   },
   description:
-    "Create professional invoices and quotations, share them anywhere, accept UPI or Stripe payments, and track every balance in one workspace built for freelancers.",
+    "Create professional invoices and quotations, share them anywhere, accept UPI or Razorpay payments, and track every balance in one workspace built for freelancers.",
   openGraph: {
     title: "IndieBill",
     description:
-      "Create professional invoices and quotations, share them anywhere, accept UPI or Stripe payments, and track every balance in one workspace built for freelancers.",
+      "Create professional invoices and quotations, share them anywhere, accept UPI or Razorpay payments, and track every balance in one workspace built for freelancers.",
     siteName: "IndieBill",
   },
 };
@@ -39,7 +39,7 @@ export default function RootLayout({
       lang="en"
       data-theme="light"
       suppressHydrationWarning
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased scroll-smooth`}
     >
       <head>
         <script dangerouslySetInnerHTML={{ __html: themeScript }} />

@@ -84,7 +84,7 @@ export default async function DashboardPage() {
       {/* Primary Financial & Operational Metrics */}
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {/* Net Profit */}
-        <Card className="border-l-4 border-l-emerald-500 dark:border-l-emerald-400">
+        <Card className="border-l-4 border-l-emerald-500 dark:border-l-emerald-400 animate-page-in [animation-delay:0ms]">
           <CardHeader className="pb-2">
             <div className="flex items-center justify-between">
               <CardTitle className="text-sm font-medium text-zinc-500 dark:text-zinc-400">
@@ -120,7 +120,7 @@ export default async function DashboardPage() {
         </Card>
 
         {/* Total Received Income */}
-        <Card>
+        <Card className="animate-page-in [animation-delay:40ms]">
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium text-zinc-500 dark:text-zinc-400">
               Total Received Income
@@ -137,7 +137,7 @@ export default async function DashboardPage() {
         </Card>
 
         {/* Total Expenses */}
-        <Card>
+        <Card className="animate-page-in [animation-delay:80ms]">
           <CardHeader className="pb-2">
             <div className="flex items-center justify-between">
               <CardTitle className="text-sm font-medium text-zinc-500 dark:text-zinc-400">
@@ -162,7 +162,7 @@ export default async function DashboardPage() {
         </Card>
 
         {/* Outstanding Invoices */}
-        <Card>
+        <Card className="animate-page-in [animation-delay:120ms]">
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium text-zinc-500 dark:text-zinc-400">
               Outstanding Invoices
@@ -179,7 +179,7 @@ export default async function DashboardPage() {
         </Card>
 
         {/* Overdue */}
-        <Card>
+        <Card className="animate-page-in [animation-delay:160ms]">
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium text-zinc-500 dark:text-zinc-400">
               Overdue
@@ -196,7 +196,7 @@ export default async function DashboardPage() {
         </Card>
 
         {/* Drafts */}
-        <Card>
+        <Card className="animate-page-in [animation-delay:200ms]">
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium text-zinc-500 dark:text-zinc-400">
               Drafts
@@ -242,7 +242,7 @@ export default async function DashboardPage() {
         <CardContent className="pt-6">
           {/* Visual Bar Breakdown */}
           <div className="grid grid-cols-6 gap-2 sm:gap-4 items-end h-52 pb-4 border-b border-zinc-100 dark:border-zinc-800">
-            {financials.monthlyBreakdown.map((m) => {
+            {financials.monthlyBreakdown.map((m, idx) => {
               const incomeHeightPercent = Math.max(
                 4,
                 Math.round((m.income / maxFinancialValue) * 100)
@@ -262,16 +262,22 @@ export default async function DashboardPage() {
                     {/* Income Bar */}
                     <div className="flex flex-col items-center flex-1 max-w-[28px] h-full justify-end">
                       <div
-                        className="w-full rounded-t-sm bg-emerald-500 dark:bg-emerald-400/90 transition-all group-hover:brightness-110"
-                        style={{ height: `${incomeHeightPercent}%` }}
+                        className="w-full rounded-t-sm bg-emerald-500 dark:bg-emerald-400/90 transition-all group-hover:brightness-110 animate-bar-grow origin-bottom"
+                        style={{
+                          height: `${incomeHeightPercent}%`,
+                          animationDelay: `${idx * 40}ms`,
+                        }}
                         title={`Income: ${money(m.income)}`}
                       />
                     </div>
                     {/* Expense Bar */}
                     <div className="flex flex-col items-center flex-1 max-w-[28px] h-full justify-end">
                       <div
-                        className="w-full rounded-t-sm bg-rose-500 dark:bg-rose-400/90 transition-all group-hover:brightness-110"
-                        style={{ height: `${expenseHeightPercent}%` }}
+                        className="w-full rounded-t-sm bg-rose-500 dark:bg-rose-400/90 transition-all group-hover:brightness-110 animate-bar-grow origin-bottom"
+                        style={{
+                          height: `${expenseHeightPercent}%`,
+                          animationDelay: `${idx * 40 + 20}ms`,
+                        }}
                         title={`Expenses: ${money(m.expenses)}`}
                       />
                     </div>

@@ -11,6 +11,7 @@ interface InvoiceSheetProps {
   logoDataUrl?: string | null;
   qrDataUrl?: string | null;
   qrLabel?: string;
+  paymentUrl?: string | null;
 }
 
 export function InvoiceSheet({
@@ -23,13 +24,15 @@ export function InvoiceSheet({
   logoDataUrl,
   qrDataUrl,
   qrLabel = "Scan to pay online",
+  paymentUrl,
 }: InvoiceSheetProps) {
   const money = (amount: number) => formatCurrency(amount, currency, locale);
   const showHsn = Boolean(invoice.gstEnabled || invoice.items.some((i) => i.hsnSac));
   const effectiveBusinessGstin = invoice.businessGstin || businessGstin;
+  const effectivePaymentUrl = paymentUrl || invoice.razorpayPaymentLinkUrl;
 
   return (
-    <article className="a4-sheet relative overflow-hidden bg-white px-[15mm] py-[14mm] text-[11px] leading-relaxed text-zinc-900">
+    <article className="a4-sheet relative w-[210mm] max-w-[794px] mx-auto shrink-0 origin-top overflow-hidden bg-white px-[15mm] py-[14mm] text-[11px] leading-relaxed text-zinc-900 shadow-xl dark:shadow-2xl print:shadow-none print:m-0 print:border-none">
       {logoDataUrl ? (
         // eslint-disable-next-line @next/next/no-img-element
         <img
@@ -212,6 +215,18 @@ export function InvoiceSheet({
                 Point a phone camera at the code to open the payment link or payment
                 details for {invoice.number}.
               </p>
+              {effectivePaymentUrl ? (
+                <div className="mt-2.5 print:hidden">
+                  <a
+                    href={effectivePaymentUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-1.5 rounded bg-blue-600 hover:bg-blue-700 px-3 py-1.5 text-[11px] font-semibold text-white shadow-sm transition-colors"
+                  >
+                    Pay Online Now →
+                  </a>
+                </div>
+              ) : null}
             </div>
           </section>
         ) : null}

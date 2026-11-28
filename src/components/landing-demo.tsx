@@ -89,7 +89,7 @@ const copy: Record<DemoView, {
     points: [
       "Partial payments with a running outstanding balance",
       "Duplicate references are caught before they are saved",
-      "Stripe webhooks mark matching invoices as paid",
+      "Razorpay webhooks mark matching invoices as paid",
     ],
   },
 };
@@ -236,7 +236,7 @@ function PaymentsPreview() {
   ];
   const rows = [
     { name: "Globex Inc", ref: "INV-0005 · UPI", amount: "+$1,000.00", state: "Partial" },
-    { name: "Acme Corp", ref: "INV-0002 · STRIPE", amount: "+$2,500.00", state: "Paid" },
+    { name: "Acme Corp", ref: "INV-0002 · RAZORPAY", amount: "+$2,500.00", state: "Paid" },
     { name: "Initech", ref: "INV-0003 · BANK", amount: "+$750.00", state: "Partial" },
   ];
 

@@ -16,7 +16,11 @@ export const proxy = auth((req) => {
   }
 
   const isLoggedIn = Boolean(req.auth?.user);
-  const isPublicPage = pathname === "/";
+  const isPublicPage =
+    pathname === "/" ||
+    pathname.startsWith("/share") ||
+    pathname.startsWith("/i/") ||
+    pathname.startsWith("/q/");
   const isAuthPage =
     pathname.startsWith("/login") || pathname.startsWith("/register");
 

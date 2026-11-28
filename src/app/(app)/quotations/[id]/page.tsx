@@ -22,16 +22,19 @@ import type { QuotationPdfData } from "@/components/quotation-document";
 import { ConvertQuotationButton } from "@/components/convert-quotation-button";
 import { ConfirmSubmitButton } from "@/components/confirm-submit-button";
 import { Notice } from "@/components/notice";
+import { getQuotationShareUrl } from "@/lib/share";
+import { buildMailtoUrl } from "@/lib/mailto";
+import { ShareInvoiceButton } from "@/components/share-invoice-button";
 
 export default async function QuotationDetailPage({
   params,
   searchParams,
 }: {
   params: Promise<{ id: string }>;
-  searchParams: Promise<{ notice?: string }>;
+  searchParams: Promise<{ notice?: string; error?: string }>;
 }) {
   const { id } = await params;
-  const { notice } = await searchParams;
+  const { notice, error } = await searchParams;
   const session = await auth();
   const userId = session?.user?.id;
   if (!userId) redirect("/login");
@@ -40,9 +43,20 @@ export default async function QuotationDetailPage({
   if (!quotation) notFound();
 
   const settings = await getUserSettings(userId);
+  const shareUrl = await getQuotationShareUrl(quotation.id);
   const money = (amount: number) =>
     formatCurrency(amount, settings.currency, settings.locale);
   const status = effectiveQuotationStatus(quotation.status, quotation.validUntil);
+  const mailtoUrl = buildMailtoUrl({
+    to: quotation.client.email,
+    clientName: quotation.client.name,
+    businessName: settings.businessName,
+    documentType: "quotation",
+    documentNumber: quotation.number,
+    amountDue: money(quotation.total),
+    dueDate: formatDate(quotation.validUntil, undefined, settings.locale),
+    shareUrl,
+  });
   const discount = computeQuotationTotals({
     subtotal: quotation.subtotal,
     discountPercent: quotation.discountPercent,
@@ -87,7 +101,7 @@ export default async function QuotationDetailPage({
 
   return (
     <div className="space-y-6">
-      <Notice notice={notice} />
+      <Notice notice={notice} errorMessage={error} mailtoUrl={mailtoUrl} />
       <div className="flex items-start justify-between gap-4">
         <div>
           <Link href="/quotations" className="text-sm text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-50">
@@ -295,6 +309,24 @@ export default async function QuotationDetailPage({
                   Send quotation email
                 </Button>
               </form>
+              <div className="flex justify-center -mt-1">
+                <a
+                  href={mailtoUrl}
+                  className="inline-flex items-center gap-1.5 text-xs text-zinc-500 hover:text-zinc-800 dark:text-zinc-400 dark:hover:text-zinc-200 underline underline-offset-2 transition-colors py-0.5"
+                >
+                  <svg
+                    className="w-3.5 h-3.5"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                  >
+                    <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
+                    <polyline points="22,6 12,13 2,6" />
+                  </svg>
+                  <span>Open in Mail App (backup)</span>
+                </a>
+              </div>
               <QuotationPdfDownload
                 quotation={pdfData}
                 businessName={settings.businessName}
@@ -304,6 +336,31 @@ export default async function QuotationDetailPage({
                 locale={settings.locale}
                 logoDataUrl={settings.logoDataUrl}
               />
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle>Share proposal</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="space-y-2">
+                <p className="text-sm font-medium text-zinc-900 dark:text-zinc-100">Share with client</p>
+                <ShareInvoiceButton
+                  url={shareUrl}
+                  title={`Quotation ${quotation.number}`}
+                  documentType="quotation"
+                  documentNumber={quotation.number}
+                  businessName={settings.businessName}
+                  clientName={quotation.client.name}
+                  clientEmail={quotation.client.email}
+                  recipientPhone={quotation.client.phone}
+                  amountDue={money(quotation.total)}
+                  dueDate={formatDate(quotation.validUntil, undefined, settings.locale)}
+                  mailtoUrl={mailtoUrl}
+                  compact
+                />
+              </div>
             </CardContent>
           </Card>
 

@@ -30,6 +30,8 @@ export interface InvoicePdfData {
   placeOfSupply?: string | null;
   total: number;
   notes: string | null;
+  paymentLink?: string | null;
+  razorpayPaymentLinkUrl?: string | null;
   clientName: string;
   clientEmail: string | null;
   clientCompany?: string | null;

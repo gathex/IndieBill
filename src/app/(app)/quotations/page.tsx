@@ -38,9 +38,9 @@ function filterHref(status: string | undefined, q: string, value: string) {
 export default async function QuotationsPage({
   searchParams,
 }: {
-  searchParams: Promise<{ status?: string; q?: string; notice?: string }>;
+  searchParams: Promise<{ status?: string; q?: string; notice?: string; error?: string }>;
 }) {
-  const { status, q = "", notice } = await searchParams;
+  const { status, q = "", notice, error } = await searchParams;
   const session = await auth();
   const userId = session?.user?.id;
   if (!userId) redirect("/login");
@@ -69,7 +69,7 @@ export default async function QuotationsPage({
 
   return (
     <div className="space-y-6">
-      <Notice notice={notice} />
+      <Notice notice={notice} errorMessage={error} />
       <div className="flex flex-wrap items-center justify-between gap-4">
         <h1 className="text-3xl font-semibold tracking-tight text-zinc-900 dark:text-zinc-100">Quotations</h1>
         <Link href="/quotations/new">

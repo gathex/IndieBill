@@ -1,6 +1,7 @@
 "use client";
 
-import { useState, useMemo, useTransition, useRef } from "react";
+import { useState, useMemo, useTransition } from "react";
+import { useAutoAnimate } from "@formkit/auto-animate/react";
 import { formatCurrency, cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -8,7 +9,6 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { useAutoAnimate } from "@formkit/auto-animate/react";
 import {
   createCatalogItem,
   updateCatalogItem,
@@ -66,6 +66,7 @@ export function CatalogManager({
   const [deleteTarget, setDeleteTarget] = useState<SerializedCatalogItem | null>(null);
 
   const [isPending, startTransition] = useTransition();
+  const [listParentRef] = useAutoAnimate<HTMLTableSectionElement>();
 
   function openCreateModal() {
     setEditingItem(null);
@@ -153,15 +154,15 @@ export function CatalogManager({
             prev.map((it) =>
               it.id === editingItem.id
                 ? {
-                    ...it,
-                    name: updated.name,
-                    description: updated.description,
-                    rate: updated.rate,
-                    unit: updated.unit,
-                    hsnSac: updated.hsnSac,
-                    defaultTaxRate: updated.defaultTaxRate,
-                    isActive: updated.isActive,
-                  }
+                  ...it,
+                  name: updated.name,
+                  description: updated.description,
+                  rate: updated.rate,
+                  unit: updated.unit,
+                  hsnSac: updated.hsnSac,
+                  defaultTaxRate: updated.defaultTaxRate,
+                  isActive: updated.isActive,
+                }
                 : it
             )
           );
@@ -270,33 +271,30 @@ export function CatalogManager({
               <button
                 type="button"
                 onClick={() => setActiveFilter("all")}
-                className={`rounded-md px-3 py-1 font-medium transition-colors ${
-                  activeFilter === "all"
-                    ? "bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 shadow-sm"
-                    : "text-zinc-500 hover:text-zinc-800 dark:hover:text-zinc-200"
-                }`}
+                className={`rounded-md px-3 py-1 font-medium transition-colors ${activeFilter === "all"
+                  ? "bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 shadow-sm"
+                  : "text-zinc-500 hover:text-zinc-800 dark:hover:text-zinc-200"
+                  }`}
               >
                 All ({items.length})
               </button>
               <button
                 type="button"
                 onClick={() => setActiveFilter("active")}
-                className={`rounded-md px-3 py-1 font-medium transition-colors ${
-                  activeFilter === "active"
-                    ? "bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 shadow-sm"
-                    : "text-zinc-500 hover:text-zinc-800 dark:hover:text-zinc-200"
-                }`}
+                className={`rounded-md px-3 py-1 font-medium transition-colors ${activeFilter === "active"
+                  ? "bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 shadow-sm"
+                  : "text-zinc-500 hover:text-zinc-800 dark:hover:text-zinc-200"
+                  }`}
               >
                 Active ({activeCount})
               </button>
               <button
                 type="button"
                 onClick={() => setActiveFilter("inactive")}
-                className={`rounded-md px-3 py-1 font-medium transition-colors ${
-                  activeFilter === "inactive"
-                    ? "bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 shadow-sm"
-                    : "text-zinc-500 hover:text-zinc-800 dark:hover:text-zinc-200"
-                }`}
+                className={`rounded-md px-3 py-1 font-medium transition-colors ${activeFilter === "inactive"
+                  ? "bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 shadow-sm"
+                  : "text-zinc-500 hover:text-zinc-800 dark:hover:text-zinc-200"
+                  }`}
               >
                 Inactive ({inactiveCount})
               </button>
@@ -335,7 +333,7 @@ export function CatalogManager({
                     <th className="py-2.5 text-right font-medium">Actions</th>
                   </tr>
                 </thead>
-                <tbody>
+                <tbody ref={listParentRef}>
                   {filteredItems.map((item) => (
                     <tr
                       key={item.id}
@@ -420,7 +418,7 @@ export function CatalogManager({
       {isModalOpen ? (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-xs animate-in fade-in duration-200">
           <div
-            className="w-full max-w-lg rounded-2xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 shadow-2xl p-6 space-y-5"
+            className="w-full max-w-lg rounded-2xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 shadow-2xl p-6 space-y-5 animate-modal-in"
             role="dialog"
             aria-modal="true"
           >

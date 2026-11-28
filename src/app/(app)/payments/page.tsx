@@ -18,9 +18,9 @@ import { Card, CardContent } from "@/components/ui/card";
 export default async function PaymentsPage({
   searchParams,
 }: {
-  searchParams: Promise<{ notice?: string }>;
+  searchParams: Promise<{ notice?: string; error?: string }>;
 }) {
-  const { notice } = await searchParams;
+  const { notice, error } = await searchParams;
   const session = await auth();
   const userId = session?.user?.id;
   if (!userId) redirect("/login");
@@ -35,7 +35,7 @@ export default async function PaymentsPage({
 
   return (
     <div className="space-y-6">
-      <Notice notice={notice} />
+      <Notice notice={notice} errorMessage={error} />
       <div className="flex flex-wrap items-center justify-between gap-4">
         <div>
           <h1 className="text-3xl font-semibold tracking-tight text-zinc-900 dark:text-zinc-100">Payments</h1>

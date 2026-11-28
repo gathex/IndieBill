@@ -1,13 +1,13 @@
 "use client";
 
 import { useState, useMemo, useTransition } from "react";
+import { useAutoAnimate } from "@formkit/auto-animate/react";
 import { formatCurrency, formatDate } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent } from "@/components/ui/card";
-import { useAutoAnimate } from "@formkit/auto-animate/react";
 import {
   EXPENSE_CATEGORIES,
   EXPENSE_PAYMENT_METHODS,
@@ -78,6 +78,7 @@ export function ExpensesManager({
   const [deleteTarget, setDeleteTarget] = useState<SerializedExpense | null>(null);
 
   const [isPending, startTransition] = useTransition();
+  const [listParentRef] = useAutoAnimate<HTMLTableSectionElement>();
 
   const money = (val: number) => formatCurrency(val, currency, locale);
 
@@ -224,16 +225,16 @@ export function ExpensesManager({
             prev.map((item) =>
               item.id === editingExpense.id
                 ? {
-                    ...item,
-                    title: updated.title,
-                    amount: updated.amount,
-                    category: updated.category,
-                    date: updated.date.toISOString(),
-                    vendor: updated.vendor,
-                    paymentMethod: updated.paymentMethod,
-                    taxAmount: updated.taxAmount,
-                    notes: updated.notes,
-                  }
+                  ...item,
+                  title: updated.title,
+                  amount: updated.amount,
+                  category: updated.category,
+                  date: updated.date.toISOString(),
+                  vendor: updated.vendor,
+                  paymentMethod: updated.paymentMethod,
+                  taxAmount: updated.taxAmount,
+                  notes: updated.notes,
+                }
                 : item
             )
           );
@@ -453,7 +454,7 @@ export function ExpensesManager({
                     <th className="py-3 text-right font-medium">Actions</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-zinc-200 dark:divide-zinc-800">
+                <tbody ref={listParentRef} className="divide-y divide-zinc-200 dark:divide-zinc-800">
                   {filteredExpenses.map((exp) => (
                     <tr key={exp.id} className="transition-colors hover:bg-zinc-50 dark:hover:bg-zinc-900/50">
                       <td className="py-3.5 pr-4 whitespace-nowrap text-zinc-600 dark:text-zinc-400">
@@ -476,9 +477,8 @@ export function ExpensesManager({
                       </td>
                       <td className="py-3.5 pr-4 whitespace-nowrap">
                         <span
-                          className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium border ${
-                            CATEGORY_COLORS[exp.category] || CATEGORY_COLORS.Other
-                          }`}
+                          className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium border ${CATEGORY_COLORS[exp.category] || CATEGORY_COLORS.Other
+                            }`}
                         >
                           {exp.category}
                         </span>
@@ -534,7 +534,7 @@ export function ExpensesManager({
       {/* Create / Edit Modal */}
       {isModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-xs animate-in fade-in">
-          <div className="w-full max-w-lg rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 shadow-xl overflow-hidden">
+          <div className="w-full max-w-lg rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 shadow-xl overflow-hidden animate-modal-in">
             <div className="flex items-center justify-between border-b border-zinc-200 dark:border-zinc-800 px-6 py-4">
               <h2 className="text-lg font-semibold text-zinc-900 dark:text-zinc-100">
                 {editingExpense ? "Edit Expense" : "Add Expense"}

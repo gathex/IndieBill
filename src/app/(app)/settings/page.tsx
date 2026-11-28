@@ -8,6 +8,7 @@ import {
   getLanguageOptions,
 } from "@/lib/locale-data";
 import { SettingsForm } from "@/components/settings-form";
+import { ReminderSettingsCard } from "@/components/reminder-settings-card";
 
 export default async function SettingsPage() {
   const session = await auth();
@@ -30,6 +31,10 @@ export default async function SettingsPage() {
       qrAccountNumber: true,
       gstin: true,
       state: true,
+      remindersEnabled: true,
+      remindBeforeDays: true,
+      remindOnDueDate: true,
+      remindAfterDays: true,
     },
   });
 
@@ -62,6 +67,13 @@ export default async function SettingsPage() {
         countries={getCountryOptions(locale)}
         currencies={getCurrencyOptions(locale)}
         languages={getLanguageOptions(locale)}
+      />
+
+      <ReminderSettingsCard
+        remindersEnabled={user?.remindersEnabled ?? true}
+        remindBeforeDays={user?.remindBeforeDays ?? 3}
+        remindOnDueDate={user?.remindOnDueDate ?? true}
+        remindAfterDays={user?.remindAfterDays ?? "3,7,14"}
       />
     </div>
   );

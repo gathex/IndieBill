@@ -10,10 +10,10 @@ import { computeInvoiceTotals, createInvoiceNumber, round2 } from "@/lib/invoice
 import { computeGstTotals, getStateDisplayName } from "@/lib/gst";
 import { derivePaymentStatus, getInvoiceBalance } from "@/lib/payments";
 import { sendInvoiceEmail } from "@/lib/email";
-import { createPaymentLink } from "@/lib/stripe";
 import { renderInvoicePdf } from "@/lib/pdf";
 import { generatePaymentQr } from "@/lib/qr";
 import { getUserSettings } from "@/lib/users";
+import { getInvoiceShareUrl } from "@/lib/share";
 import type { InvoicePdfData } from "@/components/invoice-document";
 
 const invoiceSchema = z.object({
@@ -302,8 +302,13 @@ export async function sendInvoiceEmailAction(formData: FormData) {
   });
   if (!invoice) throw new Error("Invoice not found.");
 
+  if (!invoice.client.email?.trim()) {
+    redirect(`/invoices/${id}?notice=client-missing-email`);
+  }
+
   const settings = await getUserSettings(userId);
   const balance = getInvoiceBalance(invoice.total, invoice.payments);
+  const shareUrl = await getInvoiceShareUrl(invoice.id);
   const qr = await generatePaymentQr({
     invoiceNumber: invoice.number,
     amount: balance > 0 ? balance : invoice.total,
@@ -311,7 +316,7 @@ export async function sendInvoiceEmailAction(formData: FormData) {
     locale: settings.locale,
     businessName: settings.businessName,
     dueDate: invoice.dueDate,
-    paymentLink: invoice.paymentLink,
+    paymentLink: invoice.razorpayPaymentLinkUrl || invoice.paymentLink,
     qrName: settings.qrName,
     qrVpa: settings.qrVpa,
     qrUpiId: settings.qrUpiId,
@@ -338,16 +343,29 @@ export async function sendInvoiceEmailAction(formData: FormData) {
       businessName: settings.businessName,
       invoiceNumber: invoice.number,
       clientName: invoice.client.name,
-      amount: invoice.total,
+      amount: balance > 0 ? balance : invoice.total,
       currency: settings.currency,
       locale: settings.locale,
       dueDate: invoice.dueDate,
-      paymentLink: invoice.paymentLink,
+      paymentLink: invoice.razorpayPaymentLinkUrl || invoice.paymentLink,
+      shareUrl,
       pdf: { filename: `invoice-${invoice.number}.pdf`, content: pdf },
     });
     skipped = "skipped" in result;
-  } catch {
-    redirect(`/invoices/${id}?notice=email-failed`);
+  } catch (err) {
+    if (
+      err &&
+      typeof err === "object" &&
+      "digest" in err &&
+      typeof err.digest === "string" &&
+      err.digest.startsWith("NEXT_REDIRECT")
+    ) {
+      throw err;
+    }
+    console.error("[Email] Failed to send invoice email:", err);
+    const errorMessage = err instanceof Error ? err.message : "Failed to send invoice email.";
+    revalidatePath(`/invoices/${id}`);
+    redirect(`/invoices/${id}?notice=email-failed&error=${encodeURIComponent(errorMessage)}`);
   }
 
   if (!skipped && invoice.status === "DRAFT") {
@@ -359,32 +377,4 @@ export async function sendInvoiceEmailAction(formData: FormData) {
   redirect(`/invoices/${id}?notice=${skipped ? "email-skipped" : "email-sent"}`);
 }
 
-export async function createPaymentLinkForInvoice(invoiceId: string) {
-  const userId = await requireUserId();
-  const invoice = await prisma.invoice.findFirst({
-    where: { id: invoiceId, userId },
-    include: { payments: true },
-  });
-  if (!invoice) throw new Error("Invoice not found.");
-  if (invoice.paymentLink) return invoice.paymentLink;
 
-  const balance = getInvoiceBalance(invoice.total, invoice.payments);
-  if (balance <= 0) throw new Error("Invoice is already paid.");
-
-  const settings = await getUserSettings(userId);
-  const paymentLink = await createPaymentLink({
-    invoiceId: invoice.id,
-    invoiceNumber: invoice.number,
-    amount: balance,
-    currency: settings.currency,
-  });
-  if (paymentLink) {
-    await prisma.invoice.update({
-      where: { id: invoice.id },
-      data: { paymentLink },
-    });
-  }
-
-  revalidatePath(`/invoices/${invoice.id}`);
-  return paymentLink;
-}

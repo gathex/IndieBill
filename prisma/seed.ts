@@ -182,11 +182,148 @@ export async function seed() {
     }
   }
 
-  const [catalogItemCount, expenseCount] = await Promise.all([
+  // Ensure Acme and Globex clients exist for recurring invoice links
+  const acmeClient = await prisma.client.upsert({
+    where: { id: "seed-client-acme" },
+    update: {
+      userId: user.id,
+      name: "Acme Corp",
+      email: "billing@acme.example",
+      company: "Acme Corp",
+    },
+    create: {
+      id: "seed-client-acme",
+      userId: user.id,
+      name: "Acme Corp",
+      email: "billing@acme.example",
+      company: "Acme Corp",
+    },
+  });
+
+  const globexClient = await prisma.client.upsert({
+    where: { id: "seed-client-globex" },
+    update: {
+      userId: user.id,
+      name: "Globex Inc",
+      email: "accounts@globex.example",
+      company: "Globex Inc",
+    },
+    create: {
+      id: "seed-client-globex",
+      userId: user.id,
+      name: "Globex Inc",
+      email: "accounts@globex.example",
+      company: "Globex Inc",
+    },
+  });
+
+  const now = new Date();
+  const dateFromNow = (days: number) => {
+    const d = new Date(now);
+    d.setDate(d.getDate() + days);
+    d.setHours(12, 0, 0, 0);
+    return d;
+  };
+
+  const recurringSpecs = [
+    {
+      title: "Monthly Website Maintenance & Retainer",
+      clientId: acmeClient.id,
+      frequency: "MONTHLY",
+      dueInDays: 14,
+      autoSendEmail: true,
+      status: "ACTIVE",
+      currency: "USD",
+      notes: "Monthly retainer covers routine maintenance, security patches, backups, and up to 4h of on-call support.",
+      discount: 5,
+      taxRate: 8.5,
+      gstEnabled: false,
+      startDate: dateFromNow(-30),
+      nextRunDate: dateFromNow(0),
+      items: [
+        {
+          description: "Monthly Retainer: Security Updates, Backups & Content Maintenance",
+          quantity: 1,
+          rate: 1200,
+          unit: "month",
+        },
+        {
+          description: "On-call Support (4 hours allocated)",
+          quantity: 4,
+          rate: 125,
+          unit: "hr",
+        },
+      ],
+    },
+    {
+      title: "Quarterly Cloud Infrastructure Audit",
+      clientId: globexClient.id,
+      frequency: "QUARTERLY",
+      dueInDays: 30,
+      autoSendEmail: false,
+      status: "ACTIVE",
+      currency: "USD",
+      notes: "Quarterly compliance, architecture review, and cost optimization report.",
+      discount: 0,
+      taxRate: 18,
+      gstEnabled: true,
+      startDate: dateFromNow(-90),
+      nextRunDate: dateFromNow(1),
+      items: [
+        {
+          description: "Quarterly Cloud Security & Architecture Audit",
+          quantity: 1,
+          rate: 3500,
+          unit: "audit",
+          hsnSac: "998313",
+        },
+        {
+          description: "Performance & Cost Optimization Report",
+          quantity: 1,
+          rate: 1500,
+          unit: "report",
+          hsnSac: "998314",
+        },
+      ],
+    },
+  ];
+
+  for (const spec of recurringSpecs) {
+    const { items, ...recurringData } = spec;
+    const existing = await prisma.recurringInvoice.findFirst({
+      where: { userId: user.id, title: spec.title },
+    });
+
+    if (existing) {
+      await prisma.recurringInvoice.update({
+        where: { id: existing.id },
+        data: {
+          ...recurringData,
+          items: {
+            deleteMany: {},
+            create: items,
+          },
+        },
+      });
+    } else {
+      await prisma.recurringInvoice.create({
+        data: {
+          ...recurringData,
+          userId: user.id,
+          items: {
+            create: items,
+          },
+        },
+      });
+    }
+  }
+
+  const [catalogItemCount, expenseCount, recurringCount] = await Promise.all([
     prisma.catalogItem.count({ where: { userId: user.id } }),
     prisma.expense.count({ where: { userId: user.id } }),
+    prisma.recurringInvoice.count({ where: { userId: user.id } }),
   ]);
-  console.log(`Seeded ${catalogItemCount} catalog items and ${expenseCount} expenses for ${user.email}.`);
+  console.log(`Seeded ${catalogItemCount} catalog items, ${expenseCount} expenses, and ${recurringCount} recurring invoices for ${user.email}.`);
 }
 
 if (process.argv[1] && process.argv[1].endsWith("seed.ts")) {

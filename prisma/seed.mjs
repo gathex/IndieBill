@@ -503,17 +503,114 @@ async function main() {
     }
   }
 
-  const [clientCount, invoiceCount, quotationCount, paymentCount, catalogItemCount, expenseCount] = await Promise.all([
+  const recurringSpecs = [
+    {
+      title: "Monthly Website Maintenance & Retainer",
+      clientKey: "acme",
+      frequency: "MONTHLY",
+      dueInDays: 14,
+      autoSendEmail: true,
+      status: "ACTIVE",
+      currency: "USD",
+      notes: "Monthly retainer covers routine maintenance, security patches, backups, and up to 4h of on-call support.",
+      discount: 5,
+      taxRate: 8.5,
+      gstEnabled: false,
+      startDate: dateFromNow(-30),
+      nextRunDate: dateFromNow(0),
+      items: [
+        {
+          description: "Monthly Retainer: Security Updates, Backups & Content Maintenance",
+          quantity: 1,
+          rate: 1200,
+          unit: "month",
+        },
+        {
+          description: "On-call Support (4 hours allocated)",
+          quantity: 4,
+          rate: 125,
+          unit: "hr",
+        },
+      ],
+    },
+    {
+      title: "Quarterly Cloud Infrastructure Audit",
+      clientKey: "globex",
+      frequency: "QUARTERLY",
+      dueInDays: 30,
+      autoSendEmail: false,
+      status: "ACTIVE",
+      currency: "USD",
+      notes: "Quarterly compliance, architecture review, and cost optimization report.",
+      discount: 0,
+      taxRate: 18,
+      gstEnabled: true,
+      startDate: dateFromNow(-90),
+      nextRunDate: dateFromNow(1),
+      items: [
+        {
+          description: "Quarterly Cloud Security & Architecture Audit",
+          quantity: 1,
+          rate: 3500,
+          unit: "audit",
+          hsnSac: "998313",
+        },
+        {
+          description: "Performance & Cost Optimization Report",
+          quantity: 1,
+          rate: 1500,
+          unit: "report",
+          hsnSac: "998314",
+        },
+      ],
+    },
+  ];
+
+  for (const spec of recurringSpecs) {
+    const { items, clientKey, ...recurringData } = spec;
+    const clientId = clients[clientKey].id;
+    const existing = await prisma.recurringInvoice.findFirst({
+      where: { userId: user.id, title: spec.title },
+    });
+
+    if (existing) {
+      await prisma.recurringInvoice.update({
+        where: { id: existing.id },
+        data: {
+          ...recurringData,
+          clientId,
+          items: {
+            deleteMany: {},
+            create: items,
+          },
+        },
+      });
+    } else {
+      await prisma.recurringInvoice.create({
+        data: {
+          ...recurringData,
+          userId: user.id,
+          clientId,
+          items: {
+            create: items,
+          },
+        },
+      });
+    }
+  }
+
+  const [clientCount, invoiceCount, quotationCount, paymentCount, catalogItemCount, expenseCount, recurringCount] = await Promise.all([
     prisma.client.count({ where: { userId: user.id } }),
     prisma.invoice.count({ where: { userId: user.id } }),
     prisma.quotation.count({ where: { userId: user.id } }),
     prisma.payment.count({ where: { userId: user.id } }),
     prisma.catalogItem.count({ where: { userId: user.id } }),
     prisma.expense.count({ where: { userId: user.id } }),
+    prisma.recurringInvoice.count({ where: { userId: user.id } }),
   ]);
 
   console.log(
-    `Seeded ${clientCount} clients, ${invoiceCount} invoices, ${quotationCount} quotations, ${paymentCount} payments, ${catalogItemCount} catalog items, and ${expenseCount} expenses for ${user.email}.`,
+    `Seeded ${clientCount} clients, ${invoiceCount} invoices, ${quotationCount} quotations, ${paymentCount} payments, ${catalogItemCount} catalog items, ${expenseCount} expenses, and ${recurringCount} recurring invoices for ${user.email}.`,
   );
 }
 

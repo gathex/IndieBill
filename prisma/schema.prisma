@@ -26,6 +26,10 @@ model User {
   qrAccountNumber String?
   gstin           String?
   state           String?
+  remindersEnabled Boolean  @default(true)
+  remindBeforeDays Int      @default(3)
+  remindOnDueDate  Boolean  @default(true)
+  remindAfterDays  String   @default("3,7,14")
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
 
@@ -37,6 +41,8 @@ model User {
   payments   Payment[]
   catalogItems CatalogItem[]
   expenses   Expense[]
+  recurringInvoices RecurringInvoice[]
+  paymentReminderLogs PaymentReminderLog[]
 }
 
 model Account {
@@ -86,6 +92,7 @@ model Client {
   updatedAt  DateTime    @updatedAt
   invoices   Invoice[]
   quotations Quotation[]
+  recurringInvoices RecurringInvoice[]
   user       User        @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
@@ -108,7 +115,10 @@ model Invoice {
   igstAmount  Float    @default(0)
   total       Float    @default(0)
   notes       String?
-  paymentLink String?
+  paymentLink            String?
+  razorpayPaymentLinkId  String?
+  razorpayPaymentLinkUrl String?
+  remindersPaused        Boolean  @default(false)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
   user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
@@ -116,9 +126,13 @@ model Invoice {
   items       InvoiceItem[]
   quotations  Quotation[]
   payments    Payment[]
+  recurringInvoiceId String?
+  recurringInvoice   RecurringInvoice? @relation(fields: [recurringInvoiceId], references: [id], onDelete: SetNull)
+  paymentReminderLogs PaymentReminderLog[]
 
   @@unique([userId, number])
   @@index([userId, clientId])
+  @@index([recurringInvoiceId])
 }
 
 model InvoiceItem {
@@ -229,4 +243,67 @@ model Expense {
 
   @@index([userId, date])
   @@index([userId, category])
+}
+
+model RecurringInvoice {
+  id              String                 @id @default(cuid())
+  userId          String
+  clientId        String
+  title           String
+  frequency       String                 // "WEEKLY" | "MONTHLY" | "QUARTERLY" | "YEARLY"
+  startDate       DateTime
+  nextRunDate     DateTime
+  endDate         DateTime?
+  dueInDays       Int                    @default(15)
+  autoSendEmail   Boolean                @default(false)
+  status          String                 @default("ACTIVE") // "ACTIVE" | "PAUSED" | "COMPLETED"
+  currency        String?
+  notes           String?
+  discount        Float                  @default(0)
+  taxRate         Float                  @default(0)
+  gstEnabled      Boolean                @default(false)
+  lastGeneratedAt DateTime?
+  createdAt       DateTime               @default(now())
+  updatedAt       DateTime               @updatedAt
+
+  user              User                   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  client            Client                 @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  items             RecurringInvoiceItem[]
+  generatedInvoices Invoice[]
+
+  @@index([userId, status])
+  @@index([userId, nextRunDate])
+  @@index([status, nextRunDate])
+}
+
+model RecurringInvoiceItem {
+  id                 String           @id @default(cuid())
+  recurringInvoiceId String
+  description        String
+  quantity           Float            @default(1)
+  rate               Float            @default(0)
+  unit               String?
+  hsnSac             String?
+
+  recurringInvoice RecurringInvoice @relation(fields: [recurringInvoiceId], references: [id], onDelete: Cascade)
+
+  @@index([recurringInvoiceId])
+}
+
+model PaymentReminderLog {
+  id             String   @id @default(cuid())
+  userId         String
+  invoiceId      String
+  type           String   // "BEFORE_DUE" | "ON_DUE" | "OVERDUE" | "MANUAL"
+  channel        String   @default("EMAIL") // "EMAIL"
+  recipientEmail String
+  status         String   // "SENT" | "FAILED"
+  errorMessage   String?
+  sentAt         DateTime @default(now())
+
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  invoice Invoice @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
+
+  @@index([userId, sentAt])
+  @@index([invoiceId, type])
 }

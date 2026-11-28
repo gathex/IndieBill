@@ -7,10 +7,13 @@ import {
   getQuotationById,
 } from "@/lib/quotations";
 import { getUserSettings } from "@/lib/users";
+import { formatCurrency, formatDate } from "@/lib/utils";
 import { getStateDisplayName } from "@/lib/gst";
 import { QuotationSheet } from "@/components/quotation-sheet";
 import { QuotationPdfDownload } from "@/components/quotation-pdf-download";
 import { PrintButton } from "@/components/print-button";
+import { ShareInvoiceButton } from "@/components/share-invoice-button";
+import { getQuotationShareUrl } from "@/lib/share";
 import { Button } from "@/components/ui/button";
 import type { QuotationPdfData } from "@/components/quotation-document";
 
@@ -28,6 +31,7 @@ export default async function QuotationPreviewPage({
   if (!quotation) notFound();
 
   const settings = await getUserSettings(userId);
+  const shareUrl = await getQuotationShareUrl(quotation.id);
   const discount = computeQuotationTotals({
     subtotal: quotation.subtotal,
     discountPercent: quotation.discountPercent,
@@ -89,6 +93,24 @@ export default async function QuotationPreviewPage({
           <Link href={`/quotations/${quotation.id}`}>
             <Button variant="ghost">Details</Button>
           </Link>
+          <ShareInvoiceButton
+            compact
+            layout="row"
+            url={shareUrl}
+            title={`Quotation ${quotation.number}`}
+            documentType="quotation"
+            documentNumber={quotation.number}
+            businessName={settings.businessName}
+            clientName={quotation.client.name}
+            clientEmail={quotation.client.email}
+            recipientPhone={quotation.client.phone}
+            amountDue={formatCurrency(
+              quotation.total,
+              settings.currency,
+              settings.locale,
+            )}
+            dueDate={formatDate(quotation.validUntil, undefined, settings.locale)}
+          />
           <PrintButton />
           <QuotationPdfDownload
             quotation={pdfData}
@@ -102,7 +124,7 @@ export default async function QuotationPreviewPage({
         </div>
       </div>
 
-      <div className="overflow-x-auto bg-zinc-200 dark:bg-zinc-700 p-4 print:bg-white print:p-0">
+      <div className="w-full flex justify-center overflow-x-auto py-8 px-4 bg-zinc-200 dark:bg-zinc-800 rounded-xl print:bg-white print:p-0 print:m-0 print:block print:overflow-visible print:rounded-none">
         <QuotationSheet
           quotation={pdfData}
           businessName={settings.businessName}

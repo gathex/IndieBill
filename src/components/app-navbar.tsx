@@ -53,7 +53,9 @@ export function AppNavbar({ user }: AppNavbarProps) {
   }, []);
 
   const isBillingActive =
-    pathname.startsWith("/invoices") || pathname.startsWith("/quotations");
+    pathname.startsWith("/invoices") ||
+    pathname.startsWith("/quotations") ||
+    pathname.startsWith("/recurring");
   const isFinanceActive =
     pathname.startsWith("/payments") || pathname.startsWith("/expenses");
   const isClientsActive = pathname.startsWith("/clients");
@@ -153,6 +155,21 @@ export function AppNavbar({ user }: AppNavbarProps) {
                   <span className="font-medium">Quotations</span>
                   <span className="text-xs text-zinc-500 dark:text-zinc-400">
                     Estimates & client proposals
+                  </span>
+                </Link>
+                <Link
+                  href="/recurring"
+                  onClick={() => setOpenDropdown(null)}
+                  className={cn(
+                    "flex flex-col rounded-lg px-3 py-2 text-sm transition-colors",
+                    pathname.startsWith("/recurring")
+                      ? "bg-zinc-100 dark:bg-zinc-800 text-zinc-900 dark:text-zinc-50 font-medium"
+                      : "text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800/80 hover:text-zinc-900 dark:hover:text-zinc-100"
+                  )}
+                >
+                  <span className="font-medium">Recurring</span>
+                  <span className="text-xs text-zinc-500 dark:text-zinc-400">
+                    Subscriptions & retainers
                   </span>
                 </Link>
               </div>
@@ -343,6 +360,18 @@ export function AppNavbar({ user }: AppNavbarProps) {
                   )}
                 >
                   Quotations
+                </Link>
+                <Link
+                  href="/recurring"
+                  onClick={() => setMobileOpen(false)}
+                  className={cn(
+                    "block rounded-lg px-3 py-1.5 text-sm font-medium transition-colors",
+                    pathname.startsWith("/recurring")
+                      ? "bg-zinc-100 dark:bg-zinc-800 text-zinc-900 dark:text-zinc-50 font-semibold"
+                      : "text-zinc-600 dark:text-zinc-400 hover:bg-zinc-100/60 dark:hover:bg-zinc-800/60"
+                  )}
+                >
+                  Recurring
                 </Link>
               </div>
             </div>

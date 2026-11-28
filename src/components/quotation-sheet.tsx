@@ -25,7 +25,7 @@ export function QuotationSheet({
   const effectiveBusinessGstin = quotation.businessGstin || businessGstin;
 
   return (
-    <article className="a4-sheet relative overflow-hidden bg-white px-[15mm] py-[14mm] text-[11px] leading-relaxed text-zinc-900">
+    <article className="a4-sheet relative w-[210mm] max-w-[794px] mx-auto shrink-0 origin-top overflow-hidden bg-white px-[15mm] py-[14mm] text-[11px] leading-relaxed text-zinc-900 shadow-xl dark:shadow-2xl print:shadow-none print:m-0 print:border-none">
       {logoDataUrl ? (
         // eslint-disable-next-line @next/next/no-img-element
         <img

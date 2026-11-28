@@ -9,6 +9,7 @@ import {
 import { generatePaymentQr } from "@/lib/qr";
 import { getInvoiceShareUrl } from "@/lib/share";
 import { getInvoiceBalance } from "@/lib/payments";
+import { formatCurrency, formatDate } from "@/lib/utils";
 import { getUserSettings } from "@/lib/users";
 import { getStateDisplayName } from "@/lib/gst";
 import { InvoiceSheet } from "@/components/invoice-sheet";
@@ -42,7 +43,7 @@ export default async function InvoicePreviewPage({
       locale: settings.locale,
       businessName: settings.businessName,
       dueDate: invoice.dueDate,
-      paymentLink: invoice.paymentLink,
+      paymentLink: invoice.razorpayPaymentLinkUrl || invoice.paymentLink,
       qrName: settings.qrName,
       qrVpa: settings.qrVpa,
       qrUpiId: settings.qrUpiId,
@@ -77,6 +78,8 @@ export default async function InvoicePreviewPage({
     placeOfSupply: getStateDisplayName(invoice.client.state) || invoice.client.state || null,
     total: invoice.total,
     notes: invoice.notes,
+    paymentLink: invoice.paymentLink,
+    razorpayPaymentLinkUrl: invoice.razorpayPaymentLinkUrl,
     clientName: invoice.client.name,
     clientEmail: invoice.client.email,
     clientCompany: invoice.client.company,
@@ -106,15 +109,41 @@ export default async function InvoicePreviewPage({
             Full A4 sheet · use Print / Save as PDF for the best result.
           </p>
         </div>
-        <div className="flex flex-wrap gap-2">
+        <div className="flex flex-wrap items-center gap-2">
+          {invoice.razorpayPaymentLinkUrl && balance > 0 ? (
+            <a
+              href={invoice.razorpayPaymentLinkUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-1.5 rounded-md bg-blue-600 hover:bg-blue-700 text-white font-medium px-4 py-2 text-sm shadow-sm transition-colors"
+            >
+              <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24">
+                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14H9v-2h2v2zm0-4H9V7h2v5z" />
+              </svg>
+              Pay Now
+            </a>
+          ) : null}
           <Link href={`/invoices/${invoice.id}`}>
             <Button variant="ghost">Details</Button>
           </Link>
           <ShareInvoiceButton
             compact
+            layout="row"
             url={shareUrl}
             title={`Invoice ${invoice.number}`}
-            text={`Invoice ${invoice.number} from ${settings.businessName}`}
+            documentType="invoice"
+            documentNumber={invoice.number}
+            businessName={settings.businessName}
+            clientName={invoice.client.name}
+            clientEmail={invoice.client.email}
+            recipientPhone={invoice.client.phone}
+            amountDue={formatCurrency(
+              balance > 0 ? balance : invoice.total,
+              settings.currency,
+              settings.locale,
+            )}
+            dueDate={formatDate(invoice.dueDate, undefined, settings.locale)}
+            paymentUrl={invoice.razorpayPaymentLinkUrl}
           />
           <PrintButton />
           <InvoicePdfDownload
@@ -131,7 +160,7 @@ export default async function InvoicePreviewPage({
         </div>
       </div>
 
-      <div className="overflow-x-auto bg-zinc-200 dark:bg-zinc-700 p-4 print:bg-white print:p-0">
+      <div className="w-full flex justify-center overflow-x-auto py-8 px-4 bg-zinc-200 dark:bg-zinc-800 rounded-xl print:bg-white print:p-0 print:m-0 print:block print:overflow-visible print:rounded-none">
         <InvoiceSheet
           invoice={pdfData}
           businessName={settings.businessName}

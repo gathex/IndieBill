@@ -274,7 +274,7 @@ export function SettingsForm({
           <div>
             <h2 className="text-lg font-semibold text-zinc-900 dark:text-zinc-100">QR payment details</h2>
             <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400">
-              Used in invoice QR codes when there is no Stripe payment link.
+              Used in invoice QR codes for direct UPI scan-to-pay.
             </p>
           </div>
           <div className="grid gap-4 sm:grid-cols-2">

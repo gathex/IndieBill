@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useAutoAnimate } from "@formkit/auto-animate/react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -77,6 +78,7 @@ export function InvoiceFormClient({
 }: InvoiceFormClientProps) {
   const router = useRouter();
   const isEdit = Boolean(invoice);
+  const [itemsParentRef] = useAutoAnimate<HTMLDivElement>();
 
   const [clientId, setClientId] = useState(invoice?.clientId ?? clients[0]?.id ?? "");
   const [status, setStatus] = useState<InvoiceStatus>(() => {
@@ -347,7 +349,7 @@ export function InvoiceFormClient({
             size="sm"
           />
         </div>
-        <div className="space-y-3">
+        <div ref={itemsParentRef} className="space-y-3">
           {items.map((item, index) => (
             <div
               key={index}

@@ -16,6 +16,7 @@ import { computeGstTotals, getStateDisplayName } from "@/lib/gst";
 import { sendQuotationEmail } from "@/lib/email";
 import { renderQuotationPdf } from "@/lib/pdf";
 import { getUserSettings } from "@/lib/users";
+import { getQuotationShareUrl } from "@/lib/share";
 import type { QuotationPdfData } from "@/components/quotation-document";
 
 const quotationSchema = z.object({
@@ -269,7 +270,12 @@ export async function sendQuotationEmailAction(formData: FormData) {
   });
   if (!quotation) throw new Error("Quotation not found.");
 
+  if (!quotation.client.email?.trim()) {
+    redirect(`/quotations/${id}?notice=client-missing-email`);
+  }
+
   const settings = await getUserSettings(userId);
+  const shareUrl = await getQuotationShareUrl(quotation.id);
   let skipped = false;
   try {
     const pdfData = await buildPdfData(id, userId);
@@ -291,11 +297,24 @@ export async function sendQuotationEmailAction(formData: FormData) {
       currency: settings.currency,
       locale: settings.locale,
       validUntil: quotation.validUntil,
+      shareUrl,
       pdf: { filename: `quotation-${quotation.number}.pdf`, content: pdf },
     });
     skipped = "skipped" in result;
-  } catch {
-    redirect(`/quotations/${id}?notice=quotation-email-failed`);
+  } catch (err) {
+    if (
+      err &&
+      typeof err === "object" &&
+      "digest" in err &&
+      typeof err.digest === "string" &&
+      err.digest.startsWith("NEXT_REDIRECT")
+    ) {
+      throw err;
+    }
+    console.error("[Email] Failed to send quotation email:", err);
+    const errorMessage = err instanceof Error ? err.message : "Failed to send quotation email.";
+    revalidatePath(`/quotations/${id}`);
+    redirect(`/quotations/${id}?notice=quotation-email-failed&error=${encodeURIComponent(errorMessage)}`);
   }
 
   if (!skipped && quotation.status === "DRAFT") {

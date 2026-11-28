@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useAutoAnimate } from "@formkit/auto-animate/react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -87,6 +88,7 @@ export function QuotationFormClient({
 }: QuotationFormClientProps) {
   const router = useRouter();
   const isEdit = Boolean(quotation);
+  const [itemsParentRef] = useAutoAnimate<HTMLDivElement>();
 
   const [clientId, setClientId] = useState(
     quotation?.clientId ??
@@ -357,7 +359,7 @@ export function QuotationFormClient({
             size="sm"
           />
         </div>
-        <div className="space-y-3">
+        <div ref={itemsParentRef} className="space-y-3">
           {items.map((item, index) => (
             <div
               key={index}
