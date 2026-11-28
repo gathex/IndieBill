@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent } from "@/components/ui/card";
+import { ModalPortal } from "@/components/ui/modal-portal";
 import {
   EXPENSE_CATEGORIES,
   EXPENSE_PAYMENT_METHODS,
@@ -533,8 +534,9 @@ export function ExpensesManager({
 
       {/* Create / Edit Modal */}
       {isModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-xs animate-in fade-in">
-          <div className="w-full max-w-lg rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 shadow-xl overflow-hidden animate-modal-in">
+        <ModalPortal>
+          <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 overflow-y-auto bg-black/50 backdrop-blur-xs animate-in fade-in">
+            <div className="w-full max-w-lg max-h-[90vh] overflow-y-auto my-auto rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 shadow-xl animate-modal-in">
             <div className="flex items-center justify-between border-b border-zinc-200 dark:border-zinc-800 px-6 py-4">
               <h2 className="text-lg font-semibold text-zinc-900 dark:text-zinc-100">
                 {editingExpense ? "Edit Expense" : "Add Expense"}
@@ -682,12 +684,14 @@ export function ExpensesManager({
             </form>
           </div>
         </div>
+        </ModalPortal>
       )}
 
       {/* Delete Confirmation Modal */}
       {deleteTarget && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-xs animate-in fade-in">
-          <div className="w-full max-w-sm rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 p-6 shadow-xl">
+        <ModalPortal>
+          <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 overflow-y-auto bg-black/50 backdrop-blur-xs animate-in fade-in">
+            <div className="w-full max-w-sm max-h-[90vh] overflow-y-auto my-auto rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 p-6 shadow-xl">
             <h3 className="text-lg font-semibold text-zinc-900 dark:text-zinc-100">
               Delete Expense?
             </h3>
@@ -715,6 +719,7 @@ export function ExpensesManager({
             </div>
           </div>
         </div>
+        </ModalPortal>
       )}
     </div>
   );

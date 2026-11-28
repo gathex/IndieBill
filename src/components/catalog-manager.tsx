@@ -9,6 +9,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { ModalPortal } from "@/components/ui/modal-portal";
 import {
   createCatalogItem,
   updateCatalogItem,
@@ -416,12 +417,13 @@ export function CatalogManager({
 
       {/* Create / Edit Modal */}
       {isModalOpen ? (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-xs animate-in fade-in duration-200">
-          <div
-            className="w-full max-w-lg rounded-2xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 shadow-2xl p-6 space-y-5 animate-modal-in"
-            role="dialog"
-            aria-modal="true"
-          >
+        <ModalPortal>
+          <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 overflow-y-auto bg-black/50 backdrop-blur-xs animate-in fade-in duration-200">
+            <div
+              className="w-full max-w-lg max-h-[90vh] overflow-y-auto my-auto rounded-2xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 shadow-2xl p-6 space-y-5 animate-modal-in"
+              role="dialog"
+              aria-modal="true"
+            >
             <div className="flex items-center justify-between border-b border-zinc-100 dark:border-zinc-800 pb-3.5">
               <div>
                 <h2 className="text-lg font-semibold text-zinc-900 dark:text-zinc-100">
@@ -634,16 +636,18 @@ export function CatalogManager({
             </form>
           </div>
         </div>
+        </ModalPortal>
       ) : null}
 
       {/* Delete Confirmation Modal */}
       {deleteTarget ? (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-xs animate-in fade-in duration-200">
-          <div
-            className="w-full max-w-md rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 shadow-2xl p-6 space-y-4"
-            role="dialog"
-            aria-modal="true"
-          >
+        <ModalPortal>
+          <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 overflow-y-auto bg-black/50 backdrop-blur-xs animate-in fade-in duration-200">
+            <div
+              className="w-full max-w-md max-h-[90vh] overflow-y-auto my-auto rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 shadow-2xl p-6 space-y-4"
+              role="dialog"
+              aria-modal="true"
+            >
             <h2 className="text-lg font-semibold text-zinc-900 dark:text-zinc-100">
               Delete Catalog Item
             </h2>
@@ -674,6 +678,7 @@ export function CatalogManager({
             </div>
           </div>
         </div>
+        </ModalPortal>
       ) : null}
     </div>
   );
