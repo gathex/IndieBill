@@ -28,10 +28,13 @@ function LoginForm() {
   const [error, setError] = useState<string | null>(null);
   const [pending, setPending] = useState(false);
 
+  const appOrigin =
+    process.env.NEXT_PUBLIC_APP_URL?.replace(/\/$/, "") || "your app domain";
+
   const errorMessage =
     error ||
     (urlError === "Configuration"
-      ? "Authentication configuration issue. If signing in with Google, verify that 'http://localhost:3000/api/auth/callback/google' is added to Authorized redirect URIs in Google Cloud Console."
+      ? `Authentication configuration issue. If signing in with Google, verify that '${appOrigin}/api/auth/callback/google' is added to Authorized redirect URIs in Google Cloud Console.`
       : urlError === "AccessDenied"
         ? "Access denied. You do not have permission to sign in."
         : urlError
