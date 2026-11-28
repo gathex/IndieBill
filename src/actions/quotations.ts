@@ -5,7 +5,7 @@ import { redirect } from "next/navigation";
 import { z } from "zod";
 import { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/db";
-import { auth } from "@/auth";
+import { requireUserId } from "@/lib/auth";
 import { createInvoiceNumber } from "@/lib/invoices";
 import {
   computeQuotationTotals,
@@ -42,13 +42,6 @@ const quotationSchema = z.object({
 
 export type QuotationItemInput = z.infer<typeof quotationSchema>["items"][number];
 export type QuotationInput = z.infer<typeof quotationSchema>;
-
-async function requireUserId(): Promise<string> {
-  const session = await auth();
-  const userId = session?.user?.id;
-  if (!userId) throw new Error("You must be signed in.");
-  return userId;
-}
 
 function revalidateQuotations() {
   revalidatePath("/dashboard");

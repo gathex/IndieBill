@@ -150,6 +150,7 @@ export function QuickActionFab() {
   );
   const fabRef = useRef<HTMLDivElement>(null);
   const pathname = usePathname();
+  const isFormRoute = pathname.endsWith("/new") || pathname.endsWith("/edit");
 
   // Close when pathname changes
   const prevPathRef = useRef(pathname);
@@ -163,8 +164,10 @@ export function QuickActionFab() {
   const closeMenu = useCallback(() => setIsOpen(false), []);
   const toggleMenu = useCallback(() => setIsOpen((prev) => !prev), []);
 
-  // Keyboard shortcut: Cmd+K / Ctrl+K and Escape
+  // Keyboard shortcut: Cmd+K / Ctrl+K and Escape (active only when FAB is mounted)
   useEffect(() => {
+    if (isFormRoute) return;
+
     function handleKeyDown(event: KeyboardEvent) {
       if (event.key === "Escape" && isOpen) {
         event.preventDefault();
@@ -190,21 +193,25 @@ export function QuickActionFab() {
 
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [isOpen, closeMenu, toggleMenu]);
+  }, [isFormRoute, isOpen, closeMenu, toggleMenu]);
 
   // Click outside to close
   useEffect(() => {
+    if (isFormRoute || !isOpen) return;
+
     function handleClickOutside(event: MouseEvent) {
       if (fabRef.current && !fabRef.current.contains(event.target as Node)) {
         closeMenu();
       }
     }
 
-    if (isOpen) {
-      document.addEventListener("mousedown", handleClickOutside);
-    }
+    document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, [isOpen, closeMenu]);
+  }, [isFormRoute, isOpen, closeMenu]);
+
+  if (isFormRoute) {
+    return null;
+  }
 
   return (
     <>
@@ -220,28 +227,10 @@ export function QuickActionFab() {
       {/* Floating Action Container */}
       <div
         ref={fabRef}
-        className="fixed bottom-6 right-6 z-40 flex items-center gap-3 print:hidden"
+        className="fixed bottom-6 right-6 z-40 flex items-center print:hidden"
         role="region"
         aria-label="Quick Actions"
       >
-        {/* Subtle Tooltip / Micro-badge */}
-        <button
-          type="button"
-          onClick={toggleMenu}
-          className={cn(
-            "hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/95 dark:bg-zinc-900/95 text-zinc-700 dark:text-zinc-200 text-xs font-medium shadow-md shadow-zinc-950/5 dark:shadow-black/30 border border-zinc-200/80 dark:border-zinc-800/80 backdrop-blur-sm transition-all duration-200 cursor-pointer hover:bg-zinc-50 dark:hover:bg-zinc-850 active:scale-95",
-            isOpen ? "opacity-0 scale-90 pointer-events-none" : "opacity-100 scale-100",
-          )}
-          aria-hidden={isOpen}
-          tabIndex={isOpen ? -1 : 0}
-        >
-          <span className="inline-block h-1.5 w-1.5 rounded-full bg-orange-500 animate-pulse" />
-          <span>Quick Create</span>
-          <kbd className="font-mono text-[10px] px-1.5 py-0.5 rounded bg-zinc-100 dark:bg-zinc-800 text-zinc-500 dark:text-zinc-400 border border-zinc-200 dark:border-zinc-700">
-            {shortcutKey}
-          </kbd>
-        </button>
-
         {/* Speed-Dial Menu (Opens Upward) */}
         <div
           className={cn(
@@ -328,36 +317,54 @@ export function QuickActionFab() {
           </div>
         </div>
 
-        {/* Main Trigger Button */}
-        <button
-          type="button"
-          onClick={toggleMenu}
-          aria-expanded={isOpen}
-          aria-haspopup="menu"
-          aria-label={isOpen ? "Close quick actions menu" : "Open quick actions menu"}
-          className={cn(
-            "relative group flex h-13 w-13 sm:h-14 sm:w-14 items-center justify-center rounded-full bg-zinc-900 text-white dark:bg-zinc-100 dark:text-zinc-900 shadow-xl shadow-zinc-950/25 dark:shadow-black/60 border border-zinc-800/40 dark:border-zinc-200/40 hover:bg-zinc-800 dark:hover:bg-white active:scale-95 transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-orange-500 dark:focus-visible:ring-orange-400 dark:focus-visible:ring-offset-zinc-950 cursor-pointer",
-            isOpen && "ring-4 ring-orange-500/20 dark:ring-orange-400/25",
-          )}
-        >
-          {/* Smooth + to × icon rotation */}
-          <svg
+        {/* Trigger Wrapper with Hover-Only Shortcut Pill */}
+        <div className="relative group flex items-center">
+          <div
             className={cn(
-              "h-6 w-6 transition-transform duration-200 ease-out transform",
-              isOpen ? "rotate-45" : "rotate-0",
+              "hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/95 dark:bg-zinc-900/95 text-zinc-700 dark:text-zinc-200 text-xs font-medium shadow-md shadow-zinc-950/5 dark:shadow-black/30 border border-zinc-200/80 dark:border-zinc-800/80 backdrop-blur-sm transition-all duration-200 whitespace-nowrap absolute right-full mr-3 pointer-events-none opacity-0 translate-x-1",
+              !isOpen &&
+                "group-hover:opacity-100 group-hover:translate-x-0 group-focus-within:opacity-100 group-focus-within:translate-x-0",
             )}
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2.4"
-            strokeLinecap="round"
-            strokeLinejoin="round"
             aria-hidden="true"
           >
-            <line x1="12" y1="5" x2="12" y2="19" />
-            <line x1="5" y1="12" x2="19" y2="12" />
-          </svg>
-        </button>
+            <span className="inline-block h-1.5 w-1.5 rounded-full bg-orange-500" />
+            <span>Quick Create</span>
+            <kbd className="font-mono text-[10px] px-1.5 py-0.5 rounded bg-zinc-100 dark:bg-zinc-800 text-zinc-500 dark:text-zinc-400 border border-zinc-200 dark:border-zinc-700">
+              {shortcutKey}
+            </kbd>
+          </div>
+
+          {/* Main Trigger Button */}
+          <button
+            type="button"
+            onClick={toggleMenu}
+            aria-expanded={isOpen}
+            aria-haspopup="menu"
+            aria-label={isOpen ? "Close quick actions menu" : "Open quick actions menu"}
+            className={cn(
+              "relative flex h-13 w-13 sm:h-14 sm:w-14 items-center justify-center rounded-full bg-zinc-900 text-white dark:bg-zinc-100 dark:text-zinc-900 shadow-xl shadow-zinc-950/25 dark:shadow-black/60 border border-zinc-800/40 dark:border-zinc-200/40 hover:bg-zinc-800 dark:hover:bg-white active:scale-95 transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-orange-500 dark:focus-visible:ring-orange-400 dark:focus-visible:ring-offset-zinc-950 cursor-pointer",
+              isOpen && "ring-4 ring-orange-500/20 dark:ring-orange-400/25",
+            )}
+          >
+            {/* Smooth + to × icon rotation */}
+            <svg
+              className={cn(
+                "h-6 w-6 transition-transform duration-200 ease-out transform",
+                isOpen ? "rotate-45" : "rotate-0",
+              )}
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2.4"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              aria-hidden="true"
+            >
+              <line x1="12" y1="5" x2="12" y2="19" />
+              <line x1="5" y1="12" x2="19" y2="12" />
+            </svg>
+          </button>
+        </div>
       </div>
     </>
   );

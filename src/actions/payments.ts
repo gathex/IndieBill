@@ -5,7 +5,7 @@ import { redirect } from "next/navigation";
 import { z } from "zod";
 import { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/db";
-import { auth } from "@/auth";
+import { requireUserId } from "@/lib/auth";
 import { round2 } from "@/lib/invoices";
 import {
   PAYMENT_METHODS,
@@ -21,13 +21,6 @@ const paymentSchema = z.object({
   reference: z.string().nullable(),
   notes: z.string().nullable(),
 });
-
-async function requireUserId(): Promise<string> {
-  const session = await auth();
-  const userId = session?.user?.id;
-  if (!userId) throw new Error("You must be signed in.");
-  return userId;
-}
 
 function revalidatePaymentViews(invoiceId: string) {
   revalidatePath("/dashboard");

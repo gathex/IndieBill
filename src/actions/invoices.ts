@@ -5,7 +5,7 @@ import { redirect } from "next/navigation";
 import { z } from "zod";
 import { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/db";
-import { auth } from "@/auth";
+import { requireUserId } from "@/lib/auth";
 import { computeInvoiceTotals, createInvoiceNumber, round2 } from "@/lib/invoices";
 import { computeGstTotals, getStateDisplayName } from "@/lib/gst";
 import { derivePaymentStatus, getInvoiceBalance } from "@/lib/payments";
@@ -39,13 +39,6 @@ const invoiceSchema = z.object({
 
 export type InvoiceItemInput = z.infer<typeof invoiceSchema>["items"][number];
 export type InvoiceInput = z.infer<typeof invoiceSchema>;
-
-async function requireUserId(): Promise<string> {
-  const session = await auth();
-  const userId = session?.user?.id;
-  if (!userId) throw new Error("You must be signed in.");
-  return userId;
-}
 
 function revalidateInvoices() {
   revalidatePath("/dashboard");

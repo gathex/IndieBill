@@ -3,7 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { prisma } from "@/lib/db";
-import { auth } from "@/auth";
+import { requireUserId } from "@/lib/auth";
 import {
   generateInvoiceFromRecurring,
   RECURRING_FREQUENCIES,
@@ -34,15 +34,6 @@ const recurringSchema = z.object({
 });
 
 export type RecurringInvoiceInput = z.infer<typeof recurringSchema>;
-
-async function requireUserId(): Promise<string> {
-  const session = await auth();
-  const userId = session?.user?.id;
-  if (!userId) {
-    throw new Error("You must be signed in.");
-  }
-  return userId;
-}
 
 function revalidateRecurring() {
   revalidatePath("/dashboard");

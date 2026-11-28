@@ -2,16 +2,9 @@
 
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
-import { auth } from "@/auth";
+import { requireUserId } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { sendManualReminder } from "@/lib/reminders";
-
-async function requireUserId(): Promise<string> {
-  const session = await auth();
-  const userId = session?.user?.id;
-  if (!userId) throw new Error("You must be signed in.");
-  return userId;
-}
 
 /**
  * Updates the business payment reminder configuration.

@@ -2,20 +2,13 @@
 
 import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/db";
-import { auth } from "@/auth";
+import { requireUserId } from "@/lib/auth";
 import {
   catalogItemSchema,
   type CatalogItemInput,
 } from "@/lib/catalog";
 
 export type { CatalogItemInput };
-
-async function requireUserId(): Promise<string> {
-  const session = await auth();
-  const userId = session?.user?.id;
-  if (!userId) throw new Error("You must be signed in.");
-  return userId;
-}
 
 function normalizeInput(input: CatalogItemInput) {
   return {

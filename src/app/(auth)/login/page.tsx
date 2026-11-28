@@ -21,6 +21,7 @@ function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const urlError = searchParams.get("error");
+  const isSessionExpired = searchParams.get("session") === "expired";
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -116,6 +117,12 @@ function LoginForm() {
               onChange={(e) => setPassword(e.target.value)}
             />
           </div>
+
+          {isSessionExpired && !errorMessage && (
+            <p className="rounded-lg bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800/60 p-2.5 text-xs text-amber-800 dark:text-amber-300 leading-relaxed">
+              Your session expired or is no longer valid. Please sign in again.
+            </p>
+          )}
 
           {errorMessage && (
             <p className="rounded-lg bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-900/50 p-2.5 text-xs text-red-600 dark:text-red-400 leading-relaxed">

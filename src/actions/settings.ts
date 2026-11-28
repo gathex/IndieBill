@@ -2,7 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
-import { auth } from "@/auth";
+import { requireUserId } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import {
   isValidCountryCode,
@@ -45,9 +45,7 @@ const settingsSchema = z.object({
 export type SettingsInput = z.infer<typeof settingsSchema>;
 
 export async function updateSettings(input: SettingsInput) {
-  const session = await auth();
-  const userId = session?.user?.id;
-  if (!userId) throw new Error("You must be signed in.");
+  const userId = await requireUserId();
 
   const data = settingsSchema.parse(input);
   await prisma.user.update({

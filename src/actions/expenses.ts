@@ -1,20 +1,12 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { auth } from "@/auth";
+import { requireUserId } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { expenseSchema, ExpenseInput } from "@/lib/expenses";
 
-function getUserId(session: { user?: { id?: string } } | null) {
-  if (!session?.user?.id) {
-    throw new Error("Unauthorized");
-  }
-  return session.user.id;
-}
-
 export async function createExpenseAction(data: ExpenseInput) {
-  const session = await auth();
-  const userId = getUserId(session);
+  const userId = await requireUserId();
 
   const parsed = expenseSchema.safeParse(data);
   if (!parsed.success) {
@@ -46,8 +38,7 @@ export async function updateExpenseAction(
   id: string,
   data: Partial<ExpenseInput>
 ) {
-  const session = await auth();
-  const userId = getUserId(session);
+  const userId = await requireUserId();
 
   const existing = await prisma.expense.findFirst({
     where: { id, userId },
@@ -91,8 +82,7 @@ export async function updateExpenseAction(
 }
 
 export async function deleteExpenseAction(id: string) {
-  const session = await auth();
-  const userId = getUserId(session);
+  const userId = await requireUserId();
 
   const existing = await prisma.expense.findFirst({
     where: { id, userId },

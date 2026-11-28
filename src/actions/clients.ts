@@ -3,7 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { prisma } from "@/lib/db";
-import { auth } from "@/auth";
+import { requireUserId } from "@/lib/auth";
 import { isValidGstin } from "@/lib/gst";
 
 const clientSchema = z.object({
@@ -23,13 +23,6 @@ const clientSchema = z.object({
 });
 
 export type ClientInput = z.infer<typeof clientSchema>;
-
-async function requireUserId(): Promise<string> {
-  const session = await auth();
-  const userId = session?.user?.id;
-  if (!userId) throw new Error("You must be signed in.");
-  return userId;
-}
 
 function normalize(input: ClientInput) {
   return {

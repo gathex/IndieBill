@@ -24,6 +24,20 @@ export const proxy = auth((req) => {
     pathname.startsWith("/q/");
   const isAuthPage =
     pathname.startsWith("/login") || pathname.startsWith("/register");
+  const isExpiredSession = nextUrl.searchParams.get("session") === "expired";
+
+  if (isAuthPage && isExpiredSession) {
+    const res = NextResponse.next();
+    for (const cookieName of [
+      "authjs.session-token",
+      "__Secure-authjs.session-token",
+      "next-auth.session-token",
+      "__Secure-next-auth.session-token",
+    ]) {
+      res.cookies.delete(cookieName);
+    }
+    return res;
+  }
 
   if (isAuthPage && isLoggedIn) {
     return NextResponse.redirect(new URL("/dashboard", nextUrl));

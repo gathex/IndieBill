@@ -2,18 +2,9 @@
 
 import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/db";
-import { auth } from "@/auth";
+import { requireUserId } from "@/lib/auth";
 import { getRazorpayClient } from "@/lib/razorpay";
 import { getInvoiceBalance } from "@/lib/payments";
-
-async function requireUserId(): Promise<string> {
-  const session = await auth();
-  const userId = session?.user?.id;
-  if (!userId) {
-    throw new Error("You must be signed in.");
-  }
-  return userId;
-}
 
 export async function createRazorpayPaymentLink(invoiceId: string): Promise<string> {
   const userId = await requireUserId();
